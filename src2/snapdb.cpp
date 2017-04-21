@@ -267,7 +267,10 @@ void process_result(json_history_entry data, unsigned long file_position) {
   
   it->second->row_mutex.lock();
   if (it->second->history.find(ts) != it->second->history.end()) {
-    std::cerr << "collision:" << vid << " : " << ts << "\n";
+    ts ++;
+    if (it->second->history.find(ts) != it->second->history.end()) {
+      std::cerr << "collision:" << vid << " : " << ts << "\n";
+    }
   }
   it->second->history[ts] = data;
   it->second->row_mutex.unlock(); 
