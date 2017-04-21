@@ -122,14 +122,14 @@ parsed_result parse_data(char * line) {
   } catch (...) {
   }
 
-  /*
+  
   int active_event = 0;
   for (int i = 0; i < d["events"].Size(); i++) {
     if (d["events"][i]["subids"].HasMember("ensighten")) {
       active_event = i;
     }
   }
-  */
+  
   return result;
   
 }
