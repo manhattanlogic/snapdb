@@ -233,7 +233,7 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
   }
 
   result_processor_mutex.unlock();
-  return;
+  
   json_history_entry * je = new json_history_entry;
   je->document = data;
   je->file_position = file_position;
