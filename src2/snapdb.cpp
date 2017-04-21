@@ -66,68 +66,13 @@ std::string replace_all(
   return result;
 }
 
-
-// const std::string _top_categories[] = 
-std::vector<std::string> top_categories = {"BABY","BEDDING & BATH","BOOKS & MEDIA","CLOTHING & SHOES",
-					   "CRAFTS & SEWING", "ELECTRONICS", "EMERGENCY PREPAREDNESS",
-					   "FARMERS MARKET", "FOOD & GIFTS", "HEALTH & BEAUTY",
-					   "FOR THE HOME", "FURNITURE", "JEWELRY & WATCHES",
-					   "LUGGAGE & BAGS", "MAIN STREET REVOLUTION", "OFFICE SUPPLIES",
-					   "PET SUPPLIES", "SPORTS & TOYS", "WORLDSTOCK FAIR TRADE"};
-
-std::unordered_map<std::string, std::string> top_categories_index;
-
-void index_top_categories() {
-  for (int i = 0; i < top_categories.size(); i++) {
-    std::string replaced = replace_all(top_categories[i], "&", "&AMP;");
-    top_categories_index[top_categories[i]] = top_categories[i];
-    if (top_categories[i] != replaced) {
-      top_categories_index[replaced] = top_categories[i];
-    }
-  }
-}
-
-std::string get_true_top_category(std::string crumb) {
-  if (top_categories_index.size() == 0) {
-    index_top_categories();
-    std::cerr << "created index: " << top_categories_index.size() << "\n";
-  }
-  auto upped = crumb;
-  std::transform(upped.begin(), upped.end(), upped.begin(), ::toupper);
-  auto it = top_categories_index.find(upped);
-  if (it == top_categories_index.end()) {
-    return "";
-  } else {
-    return it->second;
-  }
-}
-
 #define THREADS 16
 
 static const char* kTypeNames[] = 
   { "Null", "False", "True", "Object", "Array", "String", "Number" };
 
-// using json = nlohmann::json;
 
-std::string gat_domain(std::string url) {
-  char domain[1024] = {};
-  sscanf(url.c_str(), "https://%[^/^:]", domain);
-  if (domain[0] == 0) {
-    sscanf(url.c_str(), "http://%[^/^:]", domain);
-  }
-  if (domain[0] == 0) {
-    sscanf(url.c_str(), "android-app://%[^/^:]", domain);
-  }
-  
-  return domain;
-}
-
-
-
-std::unordered_map<unsigned long, single_user_history *> history;
-std::unordered_map<unsigned long, single_user_history *> histories[THREADS];
-
-std::unordered_map<unsigned long, single_json_history * > json_history;
+std::unordered_map<unsigned long, single_json_history *> json_history;
 
 
 
@@ -160,11 +105,13 @@ parsed_result parse_data(char * line) {
       d["events"][i]["subids"]["ensighten"].CopyFrom(d2, allocator);
     }
   }
-
-  // data ready at this point - do the actual work
   
   try {
     result.vid = d["vid"].GetUint64();
+  } catch (...) {
+  }
+  try {
+    result.id = d["id"].GetUint64();
   } catch (...) {
   }
   try {
@@ -174,6 +121,14 @@ parsed_result parse_data(char * line) {
     result.ts = mktime(&tm);
   } catch (...) {
   }
+
+  int active_event = 0;
+  for (int i = 0; i < d["events"].Size(); i++) {
+    if (d["events"][i]["subids"].HasMember("ensighten")) {
+      active_event = i;
+    }
+  }
+  
   return result;
   
 }
@@ -184,10 +139,7 @@ std::mutex line_read_mutex;
 std::mutex result_processor_mutex;
 bool has_more_lines = true;
 
-// 20821717 users loaded for 7 days
-// 275256   275256  5501534 conv_users.csv
-// 1436394  1436394 28696915 long_users.csv
-//FILE * file = fopen("../data/7days.tsv", "r");
+
 FILE * file;
 
 long get_next_line(char * line) {
@@ -206,17 +158,11 @@ long get_next_line(char * line) {
 
 int counter;
 
-int current_action = 0; // compute_converters
-
-
-
 
 void process_result(parsed_result data, unsigned long file_position) {
-  //std::lock_guard<std::mutex> guard(result_processor_mutex);
-  
+  if (data.vid == 0 || data.ts == 0) return;
   result_processor_mutex.lock();
-  
-  
+
   unsigned long vid = data.vid;
   unsigned long ts = data.ts;
   
@@ -232,15 +178,12 @@ void process_result(parsed_result data, unsigned long file_position) {
     it = json_history.find(vid);
   }
   result_processor_mutex.unlock();
-
+  
   it->second->row_mutex.lock();
-  json_history_entry * je = new json_history_entry;
-  je->file_position = file_position;
+  json_history_entry je;
+  je.file_position = file_position;
   it->second->history[ts] = je;
-  it->second->row_mutex.unlock();
-  
-  
-  
+  it->second->row_mutex.unlock(); 
 }
 
 
@@ -253,10 +196,6 @@ void thread_runner(int id) {
   }
 }
 
-/*
-1. load JSON into unordered_map
-2. start server...
- */
 
 void start_web_server(int port) {
   using namespace httplib;
@@ -331,5 +270,5 @@ int main (int argc, char**argv) {
     threads[i].join();
     std::cerr << "\n";
   }
-  // start_web_server(8080);
+  start_web_server(8080);
 }

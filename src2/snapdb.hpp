@@ -38,19 +38,22 @@ struct single_user_history {
   std::mutex row_mutex;
 };
 
-
-
-
 struct json_history_entry {
-  rapidjson::Document * document;
+  unsigned long ts = 0;
+  unsigned long vid = 0;
+  unsigned long id = 0;
+  std::string referrer = "";
+  std::string location = "";
+  ensighten_type ensighten;
   unsigned long file_position = 0;
+  unsigned int active_event = 0;
 };
 
 struct single_json_history {
-  std::unordered_map<unsigned long, json_history_entry *> history;
+  std::unordered_map<unsigned long, json_history_entry> history;
   std::mutex row_mutex;
 };
 
 
 extern std::unordered_map<unsigned long, single_user_history *> history;
-extern std::unordered_map<unsigned long, single_json_history * > json_history;
+extern std::unordered_map<unsigned long, single_json_history *> json_history;
