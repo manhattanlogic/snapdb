@@ -38,6 +38,7 @@ struct parsed_result {
 struct single_user_history {
   std::map<unsigned long, parsed_result *> history;
   std::mutex row_mutex;
+  std::unordered_map<std::string, int> generic_index;
 };
 
 
