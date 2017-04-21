@@ -16,9 +16,10 @@ struct ensighten_item {
 
 struct ensighten_type {
   bool exists = false;
-  std::string browser;
+  std::string browser; //
   std::vector<std::string> crumbs;
   std::string pageType;
+  std::string pageName;
   std::vector<ensighten_item *> items;
   std::string camGroup;
   std::string camSource;

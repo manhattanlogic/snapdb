@@ -145,6 +145,31 @@ json_history_entry parse_data(char * line) {
 	  event.ensighten.browser = d["events"][i]["subids"]["ensighten"]["browser"].GetString();
 	}
       } catch (...) {}
+
+      try {
+	if (d["events"][i]["subids"]["ensighten"].HasMember("pageType")) {
+	  event.ensighten.pageType = d["events"][i]["subids"]["ensighten"]["pageType"].GetString();
+	}
+      } catch (...) {}
+
+      try {
+	if (d["events"][i]["subids"]["ensighten"].HasMember("pageName")) {
+	  event.ensighten.pageName = d["events"][i]["subids"]["ensighten"]["pageName"].GetString();
+	}
+      } catch (...) {}
+
+      try {
+	if (d["events"][i]["subids"]["ensighten"].HasMember("camGroup")) {
+	  event.ensighten.camGroup = d["events"][i]["subids"]["ensighten"]["camGroup"].GetString();
+	}
+      } catch (...) {}
+
+      try {
+	if (d["events"][i]["subids"]["ensighten"].HasMember("camSource")) {
+	  event.ensighten.camSource = d["events"][i]["subids"]["ensighten"]["camSource"].GetString();
+	}
+      } catch (...) {}
+      
     }
     result.events.push_back(event);
   }
