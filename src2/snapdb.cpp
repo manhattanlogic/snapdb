@@ -143,10 +143,12 @@ rapidjson::Document * parse_json(char * line) {
   json = replace_all(json, "\\'","'");
   json = replace_all(json, "\\\\","\\");
 
-  return d;
+  
   
   
   d->Parse(json.c_str());
+
+  return d;
   if (d->HasParseError()) {
     std::cerr << "json error\n" << json << "\n";
     return d;
