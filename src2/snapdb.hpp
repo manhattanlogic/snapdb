@@ -45,10 +45,8 @@ struct json_history_entry {
   unsigned long file_position = 0;
 };
 
-
-
 struct single_json_history {
-  std::map<unsigned long, json_history_entry> history;
+  std::map<unsigned long, json_history_entry *> history;
 };
 
 
