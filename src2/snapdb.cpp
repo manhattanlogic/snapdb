@@ -192,11 +192,10 @@ int current_action = 0; // compute_converters
 
 
 
-void process_result(rapidjson::Document * data, unsigned long file_position) {
+void process_result(void * _data, unsigned long file_position) {
   //std::lock_guard<std::mutex> guard(result_processor_mutex);
 
-  
-  
+  rapidjson::Document * data = (rapidjson::Document *)_data;
   
   result_processor_mutex.lock();
   
@@ -246,7 +245,7 @@ void thread_runner(int id) {
   long file_position;
   while ((file_position = get_next_line(line)) >= 0) {
     auto result = parse_json(line);
-    process_result(result, file_position);
+    process_result((void *)result, file_position);
   }
 }
 
