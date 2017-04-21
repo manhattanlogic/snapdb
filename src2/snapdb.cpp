@@ -131,13 +131,14 @@ std::unordered_map<unsigned long, single_json_history * > json_history;
 
 
 
-rapidjson::Document parse_json(char * line) {
+parsed_result parse_data(char * line) {
+  parsed_result result = {};
   rapidjson::Document d;
   
   char * tab = strchr(line, '\t');
-  if (tab == NULL) return d;
+  if (tab == NULL) return result;
   tab = strchr((tab + 1), '\t');
-  if (tab == NULL) return d;
+  if (tab == NULL) return result;
   std::string json = (tab+1);
   json = replace_all(json, "\\'","'");
   json = replace_all(json, "\\\\","\\");
@@ -145,7 +146,7 @@ rapidjson::Document parse_json(char * line) {
   d.Parse(json.c_str());
   if (d.HasParseError()) {
     std::cerr << "json error\n" << json << "\n";
-    return d;
+    return result;
   }
   
   for (int i = 0; i < d["events"].Size(); i++) {
@@ -157,25 +158,22 @@ rapidjson::Document parse_json(char * line) {
       d["events"][i]["subids"]["ensighten"].CopyFrom(d2, d.GetAllocator());
     }
   }
-  return d;
-}
 
-parsed_result parse_data(char * line) {
-  parsed_result result = {};
-  auto json = parse_json(line);
   try {
-    result.vid = json["vid"].GetUint64();
+    result.vid = d["vid"].GetUint64();
   } catch (...) {
   }
   try {
     struct tm tm;
-    auto str_ts = json["events"][0]["ts"].GetString();
+    auto str_ts = d["events"][0]["ts"].GetString();
     strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
     result.ts = mktime(&tm);
   } catch (...) {
   }
   return result;
+  
 }
+
 
 
 std::mutex line_read_mutex;
