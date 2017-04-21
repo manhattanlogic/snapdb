@@ -223,7 +223,7 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     json_history[vid] = suh;
     it = json_history.find(vid);
   }
-  //it->second[ts].document = data;
+  it->second[ts].document = data;
 }
 
 
