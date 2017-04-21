@@ -203,16 +203,14 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     vid = (*data)["vid"].GetUint64();
   } catch (...) {
   }
-
-  return;
   
-  try {
+  //try {
     struct tm tm;
     auto str_ts = (*data)["events"][0]["ts"].GetString();
     strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
     ts = mktime(&tm);
-  } catch (...) {
-  }
+    //} catch (...) {
+    // }
 
   
   
