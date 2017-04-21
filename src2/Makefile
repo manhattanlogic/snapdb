@@ -20,7 +20,7 @@ ifeq ($(UNAME_S),Linux)
 $(PROG): $(OBJS)
 	$(CXX) $(CXXFLAGS) -Wl,--export-dynamic -o $@ $^ $(LIBS)
 
-rproc.dylib: rproc.cpp
+rproc.so: rproc.cpp
 	$(CXX) -Wall -fPIC -c rproc.cpp -o rproc.o
 	$(CXX) -shared -rdynamic -o rproc.so rproc.o
 endif
