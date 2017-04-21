@@ -26,7 +26,8 @@ char * f1() {
   long users = 0;
   long events = 0;
   long tiny_events = 0;
-  
+
+  /*
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
     users++;
     for (auto j = i->second.begin(); j != i->second.end(); j++) {
@@ -39,7 +40,7 @@ char * f1() {
   }
 
   result << "users:" << users << ", events:" << events << ", tiny events:" << tiny_events << "\n";
-  
+  */
 
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());

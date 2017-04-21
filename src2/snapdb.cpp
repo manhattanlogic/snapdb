@@ -127,8 +127,7 @@ std::string gat_domain(std::string url) {
 std::unordered_map<unsigned long, single_user_history *> history;
 std::unordered_map<unsigned long, single_user_history *> histories[THREADS];
 
-std::unordered_map<unsigned long, std::map<unsigned long, json_history_entry> > json_history;
-
+std::unordered_map<unsigned long, single_json_history * > json_history;
 
 rapidjson::Document * parse_json(char * line) {
   rapidjson::Document * d = new rapidjson::Document();
@@ -219,11 +218,13 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
   
   auto it = json_history.find(vid);
   if (it == json_history.end()) {
-    std::map<unsigned long, json_history_entry> suh;
+    single_json_history * suh = new single_json_history;
     json_history[vid] = suh;
     it = json_history.find(vid);
   }
-  it->second[ts].document = NULL;
+  
+  it->second->history[ts].document = data;
+  
 }
 
 

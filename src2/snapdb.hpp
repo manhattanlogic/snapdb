@@ -46,5 +46,11 @@ struct json_history_entry {
 };
 
 
+
+struct single_json_history {
+  std::map<unsigned long, json_history_entry> history;
+};
+
+
 extern std::unordered_map<unsigned long, single_user_history *> history;
-extern std::unordered_map<unsigned long, std::map<unsigned long, json_history_entry> > json_history;
+extern std::unordered_map<unsigned long, single_json_history * > json_history;
