@@ -145,7 +145,6 @@ rapidjson::Document * parse_json(char * line) {
     return d;
   }
 
-  /*
   for (int i = 0; i < (*d)["events"].Size(); i++) {
     if ((*d)["events"][i]["subids"].HasMember("ensighten") &&
 	(*d)["events"][i]["subids"]["ensighten"].IsString()) {
@@ -155,7 +154,6 @@ rapidjson::Document * parse_json(char * line) {
       (*d)["events"][i]["subids"]["ensighten"].CopyFrom(d2, (*d).GetAllocator());
     }
   }
-  */
   return d;
 }
 
@@ -228,7 +226,7 @@ void thread_runner(int id) {
   long file_position;
   while ((file_position = get_next_line(line)) >= 0) {
     auto result = parse_json(line);
-    process_result(result, file_position);
+    // process_result(result, file_position);
   }
 }
 
