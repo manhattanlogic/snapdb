@@ -197,7 +197,7 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     std::cerr << counter <<  "\n";
   }
 
-  return;
+  
   
   unsigned long vid = 0;
   unsigned long ts = 0;
@@ -214,6 +214,8 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     ts = mktime(&tm);
   } catch (...) {
   }
+
+  return;
   
   auto it = json_history.find(vid);
   if (it == json_history.end()) {
