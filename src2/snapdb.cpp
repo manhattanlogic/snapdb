@@ -365,10 +365,16 @@ void start_web_server(int port) {
       rapidjson::Value array(rapidjson::kArrayType);
 
 
+
+      unsigned long vid;
       
-      
-      std::cerr << "looking for a user\n";
-      auto vid = get_random_user();
+      auto vid_it = req.params.find("vid");
+      if (vid_it == req.params.end()) {
+	std::cerr << "looking for a user\n";
+	vid = get_random_user();
+      } else {
+	vid = strtoul(vid_it->second.c_str(), NULL, 0);
+      }
       
 
       
@@ -387,23 +393,14 @@ void start_web_server(int port) {
 
       std::cerr << "loading user:" << vid << " width " << history_it->second->history.size() << " events\n";
       for (auto i = history_it->second->history.begin(); i != history_it->second->history.end(); i++) {
-	/*
-	std::cerr << "seek:" << i->second.file_position << "\n";
-	auto r = fseek(file, i->second.file_position, SEEK_SET);
-	std::cerr << "r:" << ftell(file) << "\n";
-	*/
-	
 	fseek(file, i->second.file_position, SEEK_SET);
 	fgets(line, 1024 * 1024 * 4, file);
-
-	
 	auto parsed_json = parse_json(line);
 	rapidjson::Value event(rapidjson::kObjectType);
 	event.CopyFrom(parsed_json, allocator);
-	array.PushBack(event, allocator);
-	
+	array.PushBack(event, allocator);	
       }
-
+      std::cerr << "user loaded\n";
 
       
       rapidjson::Value vid_value(rapidjson::kStringType);
