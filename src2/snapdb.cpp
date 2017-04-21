@@ -146,7 +146,7 @@ rapidjson::Document * parse_json(char * line) {
     return d;
   }
 
-  return;
+  return d;
   
   for (int i = 0; i < (*d)["events"].Size(); i++) {
     if ((*d)["events"][i]["subids"].HasMember("ensighten") &&
