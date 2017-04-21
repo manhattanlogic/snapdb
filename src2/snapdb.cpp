@@ -72,10 +72,42 @@ std::string replace_all(
 static const char* kTypeNames[] = 
   { "Null", "False", "True", "Object", "Array", "String", "Number" };
 
-
+std::unordered_set<unsigned long> history_filter;
 std::unordered_map<unsigned long, single_json_history *> json_history;
 
 
+
+rapidjson::Document parse_json(char * line) {
+  rapidjson::Document d;
+  char * tab = strchr(line, '\t');
+  if (tab == NULL) return d;
+  tab = strchr((tab + 1), '\t');
+  if (tab == NULL) return d;
+  std::string json = (tab+1);
+  json = replace_all(json, "\\'","'");
+  json = replace_all(json, "\\\\","\\");
+
+  d.Parse(json.c_str());
+  if (d.HasParseError()) {
+    std::cerr << "json error\n" << json << "\n";
+    return d;
+  }
+
+  rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
+  
+  for (int i = 0; i < d["events"].Size(); i++) {
+    if (d["events"][i]["subids"].HasMember("ensighten") &&
+	d["events"][i]["subids"]["ensighten"].IsString()) {
+      rapidjson::Document d2;
+      std::string ensighten_json = d["events"][i]["subids"]["ensighten"].GetString();
+      d2.Parse(ensighten_json.c_str());
+      d["events"][i]["subids"]["ensighten"].CopyFrom(d2, allocator);
+    }
+  }
+
+  return d;
+  
+}
 
 json_history_entry parse_data(char * line) {
   json_history_entry result = {};
@@ -271,7 +303,10 @@ void process_result(json_history_entry data, unsigned long file_position) {
     if (it->second->history.find(ts) != it->second->history.end()) {
       ts++;
       if (it->second->history.find(ts) != it->second->history.end()) {
-	std::cerr << "collision:" << vid << " : " << ts << "\n";
+	ts++;
+	if (it->second->history.find(ts) != it->second->history.end()) {
+	  std::cerr << "collision:" << vid << " : " << ts << "\n";
+	}
       }
     }
   }
@@ -285,8 +320,33 @@ void thread_runner(int id) {
   long file_position;
   while ((file_position = get_next_line(line)) >= 0) {
     auto result = parse_data(line);
+    result.file_position = file_position;
     process_result(result, file_position);
   }
+}
+
+
+
+unsigned long rand_between(unsigned long min, unsigned long max) {
+  return (unsigned long)(min + rand() % (max - min));
+}
+
+#define MAX_ITERATIONS 10000
+
+unsigned long get_random_user() {
+  if (history_filter.size() == 0) {
+    int counter = 0;
+    for (int c = 0; c < MAX_ITERATIONS; c++) {
+      auto random_it = std::next(std::begin(json_history), rand_between(0, json_history.size()));
+      if (random_it->second->history.size() > 1) return random_it->first;
+    }
+  } else {
+    for (int c = 0; c < MAX_ITERATIONS; c++) {
+      auto filtered = std::next(std::begin(history_filter), rand_between(0, history_filter.size()));
+      if (json_history[*filtered]->history.size() > 1) return (*filtered);
+    }
+  }
+  return 0;
 }
 
 
@@ -294,13 +354,78 @@ void start_web_server(int port) {
   using namespace httplib;
   Server svr;
 
+  svr.get("/get_raw_user", [](const auto& req, auto& res) {
+      std::cerr << "get_raw_user celled\n";
+      
+      char line[1024 * 1024 * 4];
+
+      rapidjson::Document document;
+      document.SetObject();
+      rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
+      rapidjson::Value array(rapidjson::kArrayType);
+
+
+      
+      
+      std::cerr << "looking for a user\n";
+      auto vid = get_random_user();
+      
+
+      
+
+      if (vid == 0) {
+	res.set_content("{user find failed}", "text/plain");
+	return;
+      }
+
+
+      auto history_it = json_history.find(vid);
+      if (history_it == json_history.end()) {
+	res.set_content("{found bad user}", "text/plain");
+	return;
+      }
+
+      std::cerr << "loading user:" << vid << " width " << history_it->second->history.size() << " events\n";
+      for (auto i = history_it->second->history.begin(); i != history_it->second->history.end(); i++) {
+	/*
+	std::cerr << "seek:" << i->second.file_position << "\n";
+	auto r = fseek(file, i->second.file_position, SEEK_SET);
+	std::cerr << "r:" << ftell(file) << "\n";
+	*/
+	
+	fseek(file, i->second.file_position, SEEK_SET);
+	fgets(line, 1024 * 1024 * 4, file);
+
+	
+	auto parsed_json = parse_json(line);
+	rapidjson::Value event(rapidjson::kObjectType);
+	event.CopyFrom(parsed_json, allocator);
+	array.PushBack(event, allocator);
+	
+      }
+
+
+      
+      rapidjson::Value vid_value(rapidjson::kStringType);
+      vid_value.SetString(std::to_string(vid).c_str(), std::to_string(vid).size(), allocator);
+
+      document.AddMember("data", array, allocator);
+      document.AddMember("id", vid_value, allocator);
+      
+      rapidjson::StringBuffer buffer;
+      rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+      document.Accept(writer);
+      
+      res.set_content(buffer.GetString(), "text/plain");
+      
+    });
 
   svr.get("/exec", [](const auto& req, auto& res) {
       auto mod_it = req.params.find("mod");
       auto func_it = req.params.find("func");
 
       if (mod_it == req.params.end()) {
-        std::cerr << "exec no mod param" << std::endl;
+	  std::cerr << "exec no mod param" << std::endl;
         return;
       }
       

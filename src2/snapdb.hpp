@@ -2,6 +2,7 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#include <unordered_set>
 #include "rapidjson/include/rapidjson/document.h"
 #include "rapidjson/include/rapidjson/prettywriter.h"
 #include "rapidjson/include/rapidjson/writer.h"
@@ -48,3 +49,4 @@ struct single_json_history {
 
 
 extern std::unordered_map<unsigned long, single_json_history *> json_history;
+extern std::unordered_set<unsigned long> history_filter;
