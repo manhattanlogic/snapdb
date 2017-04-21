@@ -102,7 +102,7 @@ std::string get_true_top_category(std::string crumb) {
   }
 }
 
-#define THREADS 1
+#define THREADS 16
 
 static const char* kTypeNames[] = 
   { "Null", "False", "True", "Object", "Array", "String", "Number" };
@@ -132,8 +132,6 @@ std::unordered_map<unsigned long, std::map<unsigned long, json_history_entry> > 
 
 rapidjson::Document * parse_json(char * line) {
   rapidjson::Document * d = new rapidjson::Document();
-
-  
   
   char * tab = strchr(line, '\t');
   if (tab == NULL) return d;
@@ -143,12 +141,7 @@ rapidjson::Document * parse_json(char * line) {
   json = replace_all(json, "\\'","'");
   json = replace_all(json, "\\\\","\\");
 
-  
-  
-  
   d->Parse(json.c_str());
-
-  return d;
   if (d->HasParseError()) {
     std::cerr << "json error\n" << json << "\n";
     return d;
@@ -207,11 +200,13 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
   
   unsigned long vid = 0;
   unsigned long ts = 0;
-  return;
+  
   try {
     vid = (*data)["vid"].GetUint64();
   } catch (...) {
   }
+
+  return;
   
   try {
     struct tm tm;
