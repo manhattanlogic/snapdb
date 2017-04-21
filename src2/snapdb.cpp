@@ -194,6 +194,8 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     std::cerr << counter <<  "\n";
   }
 
+  return;
+  
   unsigned long vid = 0;
   unsigned long ts = 0;
   try {
@@ -226,7 +228,7 @@ void thread_runner(int id) {
   long file_position;
   while ((file_position = get_next_line(line)) >= 0) {
     auto result = parse_json(line);
-    // process_result(result, file_position);
+    process_result(result, file_position);
   }
 }
 
