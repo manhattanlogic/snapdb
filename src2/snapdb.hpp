@@ -6,6 +6,7 @@
 #include "rapidjson/include/rapidjson/prettywriter.h"
 #include "rapidjson/include/rapidjson/writer.h"
 #include "rapidjson/include/rapidjson/stringbuffer.h"
+#include <mutex>
 
 struct ensighten_item {
   std::string sku;
