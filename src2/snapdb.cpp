@@ -320,5 +320,7 @@ int main (int argc, char**argv) {
     threads[i].join();
     std::cerr << "\n";
   }
+
+  std::cerr << json_history.size() << " users loaded\n";
   // start_web_server(8080);
 }
