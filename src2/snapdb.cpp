@@ -208,8 +208,6 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
   } catch (...) {
   }
 
-  
-  
   try {
     struct tm tm;
     auto str_ts = (*data)["events"][0]["ts"].GetString();
@@ -217,8 +215,6 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     ts = mktime(&tm);
   } catch (...) {
   }
-
-  
   
   auto it = json_history.find(vid);
   if (it == json_history.end()) {
@@ -299,6 +295,7 @@ void start_web_server(int port) {
 
 
 int main (int argc, char**argv) {
+  json_history.reserve(1000000);
   if(cmdOptionExists(argv, argv+argc, "-data")) {
     char * filename = getCmdOption(argv, argv + argc, "-data");
     std::cerr << "loading file:" << filename << "\n";
