@@ -18,6 +18,7 @@ char * f1() {
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
     if (i->second->history.size() < 2) continue;
     bool is_valid = false;
+    bool is_converter = false;
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       if (j->second.events.size() <= 0) continue;
       for (int e = 0; e < j->second.events.size(); e++) {
@@ -31,11 +32,13 @@ char * f1() {
 	}
 	
 	for (int k = 0; k < event.ensighten.items.size(); k++) {
-	 
+	  if (event.ensighten.items[k].tag == "order") {
+	    is_converter = true;
+	  }
 	}
       }
     }
-    if (is_valid) {
+    if (is_valid && is_converter)  {
       history_filter.insert(i->first);
     }
   }
