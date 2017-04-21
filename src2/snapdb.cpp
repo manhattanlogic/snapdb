@@ -160,6 +160,24 @@ rapidjson::Document * parse_json(char * line) {
   return d;
 }
 
+parsed_result parse_data(char * line) {
+  parsed_result result = {};
+  auto json = parse_json(line);
+  try {
+    result.vid = (*json)["vid"].GetUint64();
+  } catch (...) {
+  }
+  try {
+    struct tm tm;
+    auto str_ts = (*json)["events"][0]["ts"].GetString();
+    strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
+    result.ts = mktime(&tm);
+  } catch (...) {
+  }
+  delete json;
+  return result;
+}
+
 
 std::mutex line_read_mutex;
 std::mutex result_processor_mutex;
@@ -192,29 +210,15 @@ int current_action = 0; // compute_converters
 
 
 
-void process_result(void * _data, unsigned long file_position) {
+void process_result(parsed_result data, unsigned long file_position) {
   //std::lock_guard<std::mutex> guard(result_processor_mutex);
-
-  rapidjson::Document * data = (rapidjson::Document *)_data;
   
   result_processor_mutex.lock();
   
   
-  unsigned long vid = 0;
-  unsigned long ts = 0;
+  unsigned long vid = data.vid;
+  unsigned long ts = data.ts;
   
-  try {
-    vid = (*data)["vid"].GetUint64();
-  } catch (...) {
-  }
-
-  try {
-    struct tm tm;
-    auto str_ts = (*data)["events"][0]["ts"].GetString();
-    strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
-    ts = mktime(&tm);
-  } catch (...) {
-  }
 
 
   counter += 1;
@@ -229,13 +233,11 @@ void process_result(void * _data, unsigned long file_position) {
     it = json_history.find(vid);
   }
 
-  
-  
   json_history_entry * je = new json_history_entry;
   je->file_position = file_position;
   it->second->history[ts] = je;
 
-  delete data;
+  
   result_processor_mutex.unlock();
 }
 
@@ -244,8 +246,8 @@ void thread_runner(int id) {
   char * line = (char *) malloc(1024 * 1024 * 64); // 64 MB to be safe
   long file_position;
   while ((file_position = get_next_line(line)) >= 0) {
-    auto result = parse_json(line);
-    process_result((void *)result, file_position);
+    auto result = parse_data(line);
+    process_result(result, file_position);
   }
 }
 
