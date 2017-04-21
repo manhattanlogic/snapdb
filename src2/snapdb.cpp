@@ -141,6 +141,7 @@ json_history_entry parse_data(char * line) {
 	}
     } catch (...) {
     }
+    result.events.push_back(event);
   }
   
   return result;
