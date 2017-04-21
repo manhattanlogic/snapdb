@@ -30,17 +30,13 @@ char * f1() {
 	  is_conveter = true;
 	}
       }
-
       auto test_it = ids.find(j->second->id);
       if (test_it != ids.end()) {
 	std::cerr << "collision:" << j->second->id << "\n";
       } else {
 	ids.insert(j->second->id);
       }
-      
-      
     }
-    
     users ++;
     if (is_conveter) {
       converters++;

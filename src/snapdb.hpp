@@ -15,6 +15,8 @@ struct ensighten_type {
   std::vector<std::string> crumbs;
   std::string pageType;
   std::vector<ensighten_item *> items;
+  std::string camGroup;
+  std::string camSource;
 };
 
 struct parsed_result {

@@ -287,54 +287,67 @@ parsed_result * parse_event(rapidjson::Document &_d, char * line) {
     if (d["events"][valid_event]["subids"].HasMember("ensighten") &&
 	d["events"][valid_event]["subids"]["ensighten"].IsString()) {
       std::string ensighten_json = d["events"][valid_event]["subids"]["ensighten"].GetString();
-      d.Parse(ensighten_json.c_str());
-      if (d.HasParseError()) {
+      rapidjson::Document d2;
+      d2.Parse(ensighten_json.c_str());
+      if (d2.HasParseError()) {
 	return result;
       } else {
 	result->ensighten.exists = true;
 	
       
-	if (d.HasMember("browser")) {
-	  if (d["browser"].IsString()) {
-	    result->ensighten.browser = d["browser"].GetString();
+	if (d2.HasMember("browser")) {
+	  if (d2["browser"].IsString()) {
+	    result->ensighten.browser = d2["browser"].GetString();
 	  }
 	}
-	if (d.HasMember("pageType")) {
-	  if (d["pageType"].IsString()) {
-	    result->ensighten.pageType = d["pageType"].GetString();
+	if (d2.HasMember("pageType")) {
+	  if (d2["pageType"].IsString()) {
+	    result->ensighten.pageType = d2["pageType"].GetString();
+	  }
+	}
+
+	if (d2.HasMember("camGroup")) {
+	  if (d2["camGroup"].IsString()) {
+	    result->ensighten.camGroup = d2["camGroup"].GetString();
+	  }
+	}
+
+	if (d2.HasMember("camSource")) {
+	  if (d2["camSource"].IsString()) {
+	    result->ensighten.camSource = d2["camSource"].GetString();
 	  }
 	}
 	
-	if (d.HasMember("crumbs")) {
-	  for ( int i = 0; i < d["crumbs"].Size(); i++) {
-	    if (d["crumbs"][i].IsString()) {
-	      result->ensighten.crumbs.push_back(d["crumbs"][i].GetString());
+	if (d2.HasMember("crumbs")) {
+	  for ( int i = 0; i < d2["crumbs"].Size(); i++) {
+	    if (d2["crumbs"][i].IsString()) {
+	      result->ensighten.crumbs.push_back(d2["crumbs"][i].GetString());
 	    }
 	  }
 	}
       
-	if (d.HasMember("items") &&
-	    d.IsObject()) {
+	if (d2.HasMember("items") &&
+	    d2.IsObject()) {
 	
-	  for (int i = 0; i < d["items"].Size(); i++) {
+	  for (int i = 0; i < d2["items"].Size(); i++) {
 	    
 	    ensighten_item * item = new ensighten_item;
-	    if (d["items"][i].HasMember("sku")) {
-	      if (d["items"][i]["sku"].IsString()) {
-		item->sku = d["items"][i]["sku"].GetString();
+	    if (d2["items"][i].HasMember("sku")) {
+	      if (d2["items"][i]["sku"].IsString()) {
+		item->sku = d2["items"][i]["sku"].GetString();
 	      }
 	    }
 	  
-	    if (d["items"][i].HasMember("tags") &&
-		d["items"][i]["tags"].IsArray()) {
-	      if (d["items"][i]["tags"][0].IsString()) {
-		item->tag = d["items"][i]["tags"][0].GetString();
+	    if (d2["items"][i].HasMember("tags") &&
+		d2["items"][i]["tags"].IsArray()) {
+	      if (d2["items"][i]["tags"][0].IsString()) {
+		item->tag = d2["items"][i]["tags"][0].GetString();
 	      }
 	    }
 
-	    if (d["items"][i].HasMember("productName")) {
-	      if (d["items"][i]["productName"].IsString()) {
-		item->productName = d["items"][i]["productName"].GetString();
+	    if (d2["items"][i].HasMember("productName")) {
+	      if (d2["items"][i]["productName"].IsString()) {
+		item->productName = d2["items"][i]["productName"].GetString();
 	      }
 	    }
 	    result->ensighten.items.push_back(item);
