@@ -132,6 +132,7 @@ std::unordered_map<unsigned long, std::map<unsigned long, json_history_entry> > 
 
 rapidjson::Document * parse_json(char * line) {
   rapidjson::Document * d = new rapidjson::Document();
+  return d;
   char * tab = strchr(line, '\t');
   if (tab == NULL) return d;
   tab = strchr((tab + 1), '\t');
