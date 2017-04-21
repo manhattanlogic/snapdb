@@ -72,6 +72,7 @@ std::string replace_all(
 static const char* kTypeNames[] = 
   { "Null", "False", "True", "Object", "Array", "String", "Number" };
 
+std::unordered_set<unsigned long> ids;
 std::unordered_set<unsigned long> history_filter;
 std::unordered_map<unsigned long, single_json_history *> json_history;
 
@@ -281,8 +282,16 @@ void process_result(json_history_entry data, unsigned long file_position) {
   if (data.vid == 0 || data.ts == 0) return;
   result_processor_mutex.lock();
 
+  unsigned long id = data.id;
   unsigned long vid = data.vid;
   unsigned long ts = data.ts;
+
+
+  auto id_it = ids.find(id);
+  if (id_it != ids.end()) {
+    std::cerr << "id collision\n";
+  }
+  ids.insert(id);
   
   counter += 1;
   if (counter % 10000 == 0) {

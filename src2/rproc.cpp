@@ -38,7 +38,7 @@ char * f1() {
 	}
       }
     }
-    if (is_valid && is_converter)  {
+    if (is_valid)  {
       history_filter.insert(i->first);
     }
   }
@@ -50,3 +50,8 @@ char * f1() {
   buffer[result.str().size()] = 0;
   return buffer;
 }
+
+/*
+this user lives on 2 devices:
+1612018255760278685
+*/
