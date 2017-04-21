@@ -144,6 +144,7 @@ json_history_entry parse_data(char * line) {
     } catch (...) {}
     
     if (is_active_event) {
+      event.ensighten.exists = true;
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("browser")) {
 	  event.ensighten.browser = d["events"][i]["subids"]["ensighten"]["browser"].GetString();
@@ -346,5 +347,5 @@ int main (int argc, char**argv) {
   }
 
   std::cerr << json_history.size() << " users loaded\n";
-  // start_web_server(8080);
+  start_web_server(8080);
 }

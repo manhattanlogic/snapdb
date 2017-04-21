@@ -10,12 +10,6 @@
 extern std::string test_string;
 
 
-void show_single_history(single_user_history *sh) {
-  for (auto it = sh->history.begin(); it != sh->history.end(); it++) {
-    std::cout << "\t" << it->first << " " << it->second->vid << std::endl;
-  }
-}
-
 extern "C"
 char * f1() {
   std::unordered_set <unsigned long> ids;

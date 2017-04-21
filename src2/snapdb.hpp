@@ -25,23 +25,6 @@ struct ensighten_type {
   std::string camSource;
 };
 
-struct parsed_result {
-  unsigned long ts;
-  unsigned long vid;
-  unsigned long id;
-  std::string referrer = "";
-  std::string location = "";
-  ensighten_type ensighten;
-  unsigned long file_position = 0;
-};
-
-struct single_user_history {
-  std::map<unsigned long, parsed_result *> history;
-  std::mutex row_mutex;
-  std::unordered_map<std::string, int> generic_index;
-};
-
-
 struct json_simgle_event_type {
   std::string location;
   std::string referrer;
@@ -63,5 +46,4 @@ struct single_json_history {
 };
 
 
-extern std::unordered_map<unsigned long, single_user_history *> history;
 extern std::unordered_map<unsigned long, single_json_history *> json_history;
