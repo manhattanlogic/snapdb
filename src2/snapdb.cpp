@@ -196,7 +196,7 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
   
   
   
-  // result_processor_mutex.lock();
+  result_processor_mutex.lock();
   
   
   unsigned long vid = 0;
@@ -232,10 +232,10 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     it = json_history.find(vid);
   }
 
-  // result_processor_mutex.unlock();
+  result_processor_mutex.unlock();
   
   json_history_entry * je = new json_history_entry;
-  je->document = data;
+  //je->document = data;
   je->file_position = file_position;
   it->second->history[ts] = je;
   
