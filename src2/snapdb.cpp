@@ -199,7 +199,7 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
   if (counter % 10000 == 0) {
     std::cerr << counter <<  "\n";
   }
-  return;
+  
   unsigned long vid = 0;
   unsigned long ts = 0;
   
@@ -207,6 +207,8 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     vid = (*data)["vid"].GetUint64();
   } catch (...) {
   }
+
+  return;
   
   try {
     struct tm tm;
