@@ -223,7 +223,7 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     it = json_history.find(vid);
   }
 
-  return;
+  guard.unlock();
   
   json_history_entry * je = new json_history_entry;
   je->document = data;
