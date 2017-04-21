@@ -21,12 +21,15 @@ char * f1() {
   std::unordered_set <unsigned long> ids;
   int users = 0;
   int converters = 0;
+
+  std::stringstream result;
+  
   for (auto i = history.begin(); i != history.end(); i++) {
     bool is_conveter = false;
 
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       for (int item = 0; item < j->second->ensighten.items.size(); item++) {
-	if (j->second->ensighten.items[item]->tag == "order") {
+	if (j->second->ensighten.camSource == "Digital Brand") {
 	  is_conveter = true;
 	}
       }
@@ -39,13 +42,11 @@ char * f1() {
     }
     users ++;
     if (is_conveter) {
-      converters++;
+      result << i->first << "\n";
     }
   }
 
-  std::stringstream result;
   
-  result << (float)converters / users * 100 << "%\n";
 
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());
