@@ -116,9 +116,11 @@ json_history_entry parse_data(char * line) {
   }
   try {
     struct tm tm;
-    auto str_ts = d["events"][0]["ts"].GetString();
-    strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
-    result.ts = mktime(&tm);
+    if (d["events"][0]["ts"].IsString()) {
+      auto str_ts = d["events"][0]["ts"].GetString();
+      strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
+      result.ts = mktime(&tm);
+    }
   } catch (...) {
   }
 
@@ -132,13 +134,13 @@ json_history_entry parse_data(char * line) {
     }
     json_simgle_event_type event;
     try {
-      if (d["events"][i]["subids"].HasMember("location")) {
+      if (d["events"][i]["subids"].HasMember("location") && d["events"][i]["subids"]["location"].IsString()) {
 	  event.location = d["events"][i]["subids"]["location"].GetString();
 	}
     } catch (...) {}
     
     try {
-      if (d["events"][i]["subids"].HasMember("referrer")) {
+      if (d["events"][i]["subids"].HasMember("referrer") && d["events"][i]["subids"]["referrer"].IsString()) {
 	  event.referrer = d["events"][i]["subids"]["referrer"].GetString();
 	}
     } catch (...) {}
@@ -146,31 +148,31 @@ json_history_entry parse_data(char * line) {
     if (is_active_event) {
       event.ensighten.exists = true;
       try {
-	if (d["events"][i]["subids"]["ensighten"].HasMember("browser")) {
+	if (d["events"][i]["subids"]["ensighten"].HasMember("browser") && d["events"][i]["subids"]["ensighten"]["browser"].IsString()) {
 	  event.ensighten.browser = d["events"][i]["subids"]["ensighten"]["browser"].GetString();
 	}
       } catch (...) {}
 
       try {
-	if (d["events"][i]["subids"]["ensighten"].HasMember("pageType")) {
+	if (d["events"][i]["subids"]["ensighten"].HasMember("pageType") && d["events"][i]["subids"]["ensighten"]["pageType"].IsString()) {
 	  event.ensighten.pageType = d["events"][i]["subids"]["ensighten"]["pageType"].GetString();
 	}
       } catch (...) {}
       
       try {
-	if (d["events"][i]["subids"]["ensighten"].HasMember("pageName")) {
+	if (d["events"][i]["subids"]["ensighten"].HasMember("pageName") && d["events"][i]["subids"]["ensighten"]["pageName"].IsString()) {
 	  event.ensighten.pageName = d["events"][i]["subids"]["ensighten"]["pageName"].GetString();
 	}
       } catch (...) {}
       
       try {
-	if (d["events"][i]["subids"]["ensighten"].HasMember("camGroup")) {
+	if (d["events"][i]["subids"]["ensighten"].HasMember("camGroup") && d["events"][i]["subids"]["ensighten"]["camGroup"].IsString()) {
 	  event.ensighten.camGroup = d["events"][i]["subids"]["ensighten"]["camGroup"].GetString();
 	}
       } catch (...) {}
 
       try {
-	if (d["events"][i]["subids"]["ensighten"].HasMember("camSource")) {
+	if (d["events"][i]["subids"]["ensighten"].HasMember("camSource") && d["events"][i]["subids"]["ensighten"]["camSource"].IsString()) {
 	  event.ensighten.camSource = d["events"][i]["subids"]["ensighten"]["camSource"].GetString();
 	}
       } catch (...) {}
@@ -180,13 +182,14 @@ json_history_entry parse_data(char * line) {
 	for (int j = 0; j < d["events"][i]["subids"]["ensighten"]["items"].Size(); j++) {
 	  ensighten_item item;
 	  try {
-	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("sku")) {
+	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("sku") && d["events"][i]["subids"]["ensighten"]["items"][j]["sku"].IsString()) {
 	      item.sku = d["events"][i]["subids"]["ensighten"]["items"][j]["sku"].GetString();
 	    }
 	  } catch (...) {}
 	  
 	  try {
-	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("productName")) {
+	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("productName") &&
+		d["events"][i]["subids"]["ensighten"]["items"][j]["productName"].IsString()) {
 	      item.productName = d["events"][i]["subids"]["ensighten"]["items"][j]["productName"].GetString();
 	    }
 	  } catch (...) {}
@@ -194,7 +197,8 @@ json_history_entry parse_data(char * line) {
 	  try {
 	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("tags") &&
 		d["events"][i]["subids"]["ensighten"]["items"][j]["tags"].IsArray() &&
-		d["events"][i]["subids"]["ensighten"]["items"][j]["tags"].Size() > 0) {
+		d["events"][i]["subids"]["ensighten"]["items"][j]["tags"].Size() > 0 &&
+		d["events"][i]["subids"]["ensighten"]["items"][j]["tags"][0].IsString()) {
 	      item.tag = d["events"][i]["subids"]["ensighten"]["items"][j]["tags"][0].GetString();
 	    }
 	  } catch (...) {}
