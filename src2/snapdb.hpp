@@ -56,7 +56,7 @@ struct json_history_entry {
 };
 
 struct single_json_history {
-  std::unordered_map<unsigned long, json_history_entry> history;
+  std::map<unsigned long, json_history_entry> history;
   std::mutex row_mutex;
 };
 
