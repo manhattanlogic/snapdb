@@ -20,7 +20,7 @@ struct ensighten_type {
   std::vector<std::string> crumbs;
   std::string pageType;
   std::string pageName;
-  std::vector<ensighten_item *> items;
+  std::vector<ensighten_item> items;
   std::string camGroup;
   std::string camSource;
 };

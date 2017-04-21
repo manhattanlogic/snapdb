@@ -144,20 +144,17 @@ json_history_entry parse_data(char * line) {
     } catch (...) {}
     
     if (is_active_event) {
-      
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("browser")) {
 	  event.ensighten.browser = d["events"][i]["subids"]["ensighten"]["browser"].GetString();
 	}
       } catch (...) {}
 
-      
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("pageType")) {
 	  event.ensighten.pageType = d["events"][i]["subids"]["ensighten"]["pageType"].GetString();
 	}
       } catch (...) {}
-
       
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("pageName")) {
@@ -176,6 +173,33 @@ json_history_entry parse_data(char * line) {
 	  event.ensighten.camSource = d["events"][i]["subids"]["ensighten"]["camSource"].GetString();
 	}
       } catch (...) {}
+
+
+      if (d["events"][i]["subids"]["ensighten"].HasMember("items") && d["events"][i]["subids"]["ensighten"]["items"].IsArray()) {
+	for (int j = 0; j < d["events"][i]["subids"]["ensighten"]["items"].Size(); j++) {
+	  ensighten_item item;
+	  try {
+	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("sku")) {
+	      item.sku = d["events"][i]["subids"]["ensighten"]["items"][j]["sku"].GetString();
+	    }
+	  } catch (...) {}
+	  
+	  try {
+	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("productName")) {
+	      item.productName = d["events"][i]["subids"]["ensighten"]["items"][j]["productName"].GetString();
+	    }
+	  } catch (...) {}
+
+	  try {
+	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("tags") &&
+		d["events"][i]["subids"]["ensighten"]["items"][j]["tags"].IsArray() &&
+		d["events"][i]["subids"]["ensighten"]["items"][j]["tags"].Size() > 0) {
+	      item.tag = d["events"][i]["subids"]["ensighten"]["items"][j]["tags"][0].GetString();
+	    }
+	  } catch (...) {}
+	  event.ensighten.items.push_back(item);
+	}
+      }
       
     }
     result.events.push_back(event);
