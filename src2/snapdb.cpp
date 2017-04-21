@@ -122,8 +122,6 @@ json_history_entry parse_data(char * line) {
   } catch (...) {
   }
 
-  
-  
   for (int i = 0; i < d["events"].Size(); i++) {
     if (d["events"][i]["subids"].HasMember("ensighten")) {
       result.active_event = i;
@@ -133,13 +131,20 @@ json_history_entry parse_data(char * line) {
       if (d["events"][i]["subids"].HasMember("location")) {
 	  event.location = d["events"][i]["subids"]["location"].GetString();
 	}
-    } catch (...) {
-    }
+    } catch (...) {}
+    
     try {
       if (d["events"][i]["subids"].HasMember("referrer")) {
 	  event.referrer = d["events"][i]["subids"]["referrer"].GetString();
 	}
-    } catch (...) {
+    } catch (...) {}
+    
+    if (result.active_event == i) {
+      try {
+	if (d["events"][i]["subids"]["ensighten"].HasMember("browser")) {
+	  event.ensighten.browser = d["events"][i]["subids"]["ensighten"]["browser"].GetString();
+	}
+      } catch (...) {}
     }
     result.events.push_back(event);
   }
