@@ -270,5 +270,5 @@ int main (int argc, char**argv) {
     threads[i].join();
     std::cerr << "\n";
   }
-  start_web_server(8080);
+  // start_web_server(8080);
 }
