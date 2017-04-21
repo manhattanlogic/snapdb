@@ -146,7 +146,6 @@ rapidjson::Document * parse_json(char * line) {
     return d;
   }
 
-  return d;
   
   for (int i = 0; i < (*d)["events"].Size(); i++) {
     if ((*d)["events"][i]["subids"].HasMember("ensighten") &&
@@ -199,18 +198,19 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
   
   unsigned long vid = 0;
   unsigned long ts = 0;
+  return;
   try {
     vid = (*data)["vid"].GetUint64();
   } catch (...) {
   }
   
-  //try {
+  try {
     struct tm tm;
     auto str_ts = (*data)["events"][0]["ts"].GetString();
     strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
     ts = mktime(&tm);
-    //} catch (...) {
-    // }
+  } catch (...) {
+  }
 
   
   
