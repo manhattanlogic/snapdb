@@ -129,6 +129,9 @@ std::unordered_map<unsigned long, single_user_history *> histories[THREADS];
 
 std::unordered_map<unsigned long, single_json_history * > json_history;
 
+
+
+
 rapidjson::Document * parse_json(char * line) {
   rapidjson::Document * d = new rapidjson::Document();
   
@@ -145,6 +148,8 @@ rapidjson::Document * parse_json(char * line) {
     std::cerr << "json error\n" << json << "\n";
     return d;
   }
+
+  return d;
   
   for (int i = 0; i < (*d)["events"].Size(); i++) {
     if ((*d)["events"][i]["subids"].HasMember("ensighten") &&
