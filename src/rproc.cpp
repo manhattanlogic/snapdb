@@ -5,6 +5,7 @@
 #include "snapdb.hpp"
 #include <sstream>
 #include <unordered_set>
+#include <memory.h>
 
 extern std::string test_string;
 
