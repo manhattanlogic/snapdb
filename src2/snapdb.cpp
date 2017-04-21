@@ -134,6 +134,7 @@ struct test_data {
   unsigned long ts;
 };
 
+/*
 test_data test_json(char * line) {
   test_data result = {};
   rapidjson::Document d;
@@ -160,7 +161,7 @@ test_data test_json(char * line) {
   }
   return result;
 }
-
+*/
   
 rapidjson::Document * parse_json(char * line) {
   rapidjson::Document * d = new rapidjson::Document();
@@ -191,6 +192,24 @@ rapidjson::Document * parse_json(char * line) {
     }
   }
   return d;
+}
+
+test_data test_json(char * line) {
+  auto json = parse_json(line);
+  test_data result = {};
+  try {
+    result.vid = (*json)["vid"].GetUint64();
+  } catch (...) {
+  }
+  try {
+    struct tm tm;
+    auto str_ts = (*json)["events"][0]["ts"].GetString();
+    strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
+    result.ts = mktime(&tm);
+  } catch (...) {
+    result.ts = 0;
+  }
+  return result;
 }
 
 
