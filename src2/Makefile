@@ -2,7 +2,7 @@ PROG = snapdb
 
 INCLUDES= -I/usr/local/include
 
-CXX = c++ -std=c++14
+CXX = g++ -std=c++14
 CXXFLAGS = -O3  $(INCLUDES)
 
 CC = cc
