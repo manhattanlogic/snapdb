@@ -102,7 +102,7 @@ std::string get_true_top_category(std::string crumb) {
   }
 }
 
-#define THREADS 32
+#define THREADS 16
 
 static const char* kTypeNames[] = 
   { "Null", "False", "True", "Object", "Array", "String", "Number" };
@@ -140,13 +140,16 @@ rapidjson::Document * parse_json(char * line) {
   std::string json = (tab+1);
   json = replace_all(json, "\\'","'");
   json = replace_all(json, "\\\\","\\");
+
+  return d;
+  
   d->Parse(json.c_str());
   if (d->HasParseError()) {
     std::cerr << "json error\n" << json << "\n";
     return d;
   }
 
-  return d;
+  
   
   for (int i = 0; i < (*d)["events"].Size(); i++) {
     if ((*d)["events"][i]["subids"].HasMember("ensighten") &&
