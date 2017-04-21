@@ -76,8 +76,8 @@ std::unordered_map<unsigned long, single_json_history *> json_history;
 
 
 
-parsed_result parse_data(char * line) {
-  parsed_result result = {};
+json_history_entry parse_data(char * line) {
+  json_history_entry result = {};
   rapidjson::Document d;
   
   char * tab = strchr(line, '\t');
@@ -123,10 +123,10 @@ parsed_result parse_data(char * line) {
   }
 
   
-  int active_event = 0;
+  
   for (int i = 0; i < d["events"].Size(); i++) {
     if (d["events"][i]["subids"].HasMember("ensighten")) {
-      active_event = i;
+      result.active_event = i;
     }
   }
   
@@ -160,7 +160,7 @@ long get_next_line(char * line) {
 int counter;
 
 
-void process_result(parsed_result data, unsigned long file_position) {
+void process_result(json_history_entry data, unsigned long file_position) {
   if (data.vid == 0 || data.ts == 0) return;
   result_processor_mutex.lock();
 
@@ -181,9 +181,7 @@ void process_result(parsed_result data, unsigned long file_position) {
   result_processor_mutex.unlock();
   
   it->second->row_mutex.lock();
-  json_history_entry je;
-  je.file_position = file_position;
-  it->second->history[ts] = je;
+  it->second->history[ts] = data;
   it->second->row_mutex.unlock(); 
 }
 

@@ -39,13 +39,17 @@ struct single_user_history {
   std::mutex row_mutex;
 };
 
+
+struct json_simgle_event_type {
+  std::string location;
+  std::string referrer;
+};
+
 struct json_history_entry {
   unsigned long ts = 0;
   unsigned long vid = 0;
   unsigned long id = 0;
-  std::string referrer = "";
-  std::string location = "";
-  ensighten_type * ensighten = NULL;
+  std::vector<json_simgle_event_type> events;
   unsigned long file_position = 0;
   unsigned int active_event = 0;
 };
