@@ -131,8 +131,8 @@ std::unordered_map<unsigned long, single_json_history * > json_history;
 
 
 
-rapidjson::Document * parse_json(char * line) {
-  rapidjson::Document * d = new rapidjson::Document();
+rapidjson::Document parse_json(char * line) {
+  rapidjson::Document d;
   
   char * tab = strchr(line, '\t');
   if (tab == NULL) return d;
@@ -142,19 +142,19 @@ rapidjson::Document * parse_json(char * line) {
   json = replace_all(json, "\\'","'");
   json = replace_all(json, "\\\\","\\");
 
-  d->Parse(json.c_str());
-  if (d->HasParseError()) {
+  d.Parse(json.c_str());
+  if (d.HasParseError()) {
     std::cerr << "json error\n" << json << "\n";
     return d;
   }
   
-  for (int i = 0; i < (*d)["events"].Size(); i++) {
-    if ((*d)["events"][i]["subids"].HasMember("ensighten") &&
-	(*d)["events"][i]["subids"]["ensighten"].IsString()) {
+  for (int i = 0; i < d["events"].Size(); i++) {
+    if (d["events"][i]["subids"].HasMember("ensighten") &&
+	d["events"][i]["subids"]["ensighten"].IsString()) {
       rapidjson::Document d2;
-      std::string ensighten_json = (*d)["events"][i]["subids"]["ensighten"].GetString();
+      std::string ensighten_json = d["events"][i]["subids"]["ensighten"].GetString();
       d2.Parse(ensighten_json.c_str());
-      (*d)["events"][i]["subids"]["ensighten"].CopyFrom(d2, (*d).GetAllocator());
+      d["events"][i]["subids"]["ensighten"].CopyFrom(d2, d.GetAllocator());
     }
   }
   return d;
@@ -164,17 +164,16 @@ parsed_result parse_data(char * line) {
   parsed_result result = {};
   auto json = parse_json(line);
   try {
-    result.vid = (*json)["vid"].GetUint64();
+    result.vid = json["vid"].GetUint64();
   } catch (...) {
   }
   try {
     struct tm tm;
-    auto str_ts = (*json)["events"][0]["ts"].GetString();
+    auto str_ts = json["events"][0]["ts"].GetString();
     strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
     result.ts = mktime(&tm);
   } catch (...) {
   }
-  delete json;
   return result;
 }
 
@@ -219,8 +218,6 @@ void process_result(parsed_result data, unsigned long file_position) {
   unsigned long vid = data.vid;
   unsigned long ts = data.ts;
   
-
-
   counter += 1;
   if (counter % 10000 == 0) {
     std::cerr << counter <<  "\n";
