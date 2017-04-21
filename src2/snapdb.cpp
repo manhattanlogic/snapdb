@@ -47,7 +47,6 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
 }
 
 
-
 std::string replace_all(
 			const std::string & str ,   // where to work
 			const std::string & find ,  // substitute 'find'
