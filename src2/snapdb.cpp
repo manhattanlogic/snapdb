@@ -128,6 +128,19 @@ json_history_entry parse_data(char * line) {
     if (d["events"][i]["subids"].HasMember("ensighten")) {
       result.active_event = i;
     }
+    json_simgle_event_type event;
+    try {
+      if (d["events"][i]["subids"].HasMember("location")) {
+	  event.location = d["events"][i]["subids"]["location"].GetString();
+	}
+    } catch (...) {
+    }
+    try {
+      if (d["events"][i]["subids"].HasMember("referrer")) {
+	  event.referrer = d["events"][i]["subids"]["referrer"].GetString();
+	}
+    } catch (...) {
+    }
   }
   
   return result;
