@@ -45,7 +45,7 @@ struct json_history_entry {
   unsigned long id = 0;
   std::string referrer = "";
   std::string location = "";
-  ensighten_type ensighten;
+  //ensighten_type ensighten;
   unsigned long file_position = 0;
   unsigned int active_event = 0;
 };
