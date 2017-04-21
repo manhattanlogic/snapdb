@@ -193,13 +193,10 @@ int current_action = 0; // compute_converters
 void process_result(rapidjson::Document * data, unsigned long file_position) {
   //std::lock_guard<std::mutex> guard(result_processor_mutex);
 
-  result_processor_mutex.lock();
   
-  counter += 1;
-  if (counter % 10000 == 0) {
-    std::cerr << counter <<  "\n";
-  }
-
+  
+  
+  result_processor_mutex.lock();
   
   
   unsigned long vid = 0;
@@ -210,6 +207,8 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
   } catch (...) {
   }
 
+  
+  
   try {
     struct tm tm;
     auto str_ts = (*data)["events"][0]["ts"].GetString();
@@ -219,6 +218,12 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
   }
 
   
+  
+
+  counter += 1;
+  if (counter % 10000 == 0) {
+    std::cerr << counter <<  "\n";
+  }
   
   auto it = json_history.find(vid);
   if (it == json_history.end()) {
