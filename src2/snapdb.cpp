@@ -211,7 +211,8 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     ts = mktime(&tm);
   } catch (...) {
   }
-  
+
+  return;
   
   
   auto it = json_history.find(vid);
