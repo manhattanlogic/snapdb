@@ -145,6 +145,7 @@ rapidjson::Document * parse_json(char * line) {
     return d;
   }
 
+  /*
   for (int i = 0; i < (*d)["events"].Size(); i++) {
     if ((*d)["events"][i]["subids"].HasMember("ensighten") &&
 	(*d)["events"][i]["subids"]["ensighten"].IsString()) {
@@ -154,6 +155,7 @@ rapidjson::Document * parse_json(char * line) {
       (*d)["events"][i]["subids"]["ensighten"].CopyFrom(d2, (*d).GetAllocator());
     }
   }
+  */
   return d;
 }
 
