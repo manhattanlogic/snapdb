@@ -122,7 +122,7 @@ json_history_entry parse_data(char * line) {
       strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
       result.ts = mktime(&tm) * 1000;
       int ms;
-      char * dot = strchr(str_ts, '.');
+      char * dot = strchr((char *)str_ts, '.');
       sscanf(dot+1, "%d", &ms);
       result.ts += ms;
     }
