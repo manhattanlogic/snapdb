@@ -146,8 +146,6 @@ rapidjson::Document * parse_json(char * line) {
     std::cerr << "json error\n" << json << "\n";
     return d;
   }
-
-  
   
   for (int i = 0; i < (*d)["events"].Size(); i++) {
     if ((*d)["events"][i]["subids"].HasMember("ensighten") &&
@@ -192,13 +190,14 @@ int current_action = 0; // compute_converters
 
 
 void process_result(rapidjson::Document * data, unsigned long file_position) {
- 
   std::lock_guard<std::mutex> guard(result_processor_mutex);
    
   counter += 1;
   if (counter % 10000 == 0) {
     std::cerr << counter <<  "\n";
   }
+
+  return;
   
   unsigned long vid = 0;
   unsigned long ts = 0;
