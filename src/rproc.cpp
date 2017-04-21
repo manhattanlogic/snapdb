@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <stdlib.h>
+#include <stdio.h>
 #include "snapdb.hpp"
 #include <sstream>
 #include <unordered_set>
