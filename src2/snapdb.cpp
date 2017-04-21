@@ -209,6 +209,7 @@ test_data test_json(char * line) {
   } catch (...) {
     result.ts = 0;
   }
+  delete json;
   return result;
 }
 
