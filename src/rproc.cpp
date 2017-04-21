@@ -51,7 +51,7 @@ char * f1() {
   result << (float)converters / users * 100 << "%\n";
 
   char * buffer = (char *)malloc(result.str().size() + 1);
-  memcpy(buffer, result.str().c_str(), result.str().size());
+  std::memcpy(buffer, result.str().c_str(), result.str().size());
   buffer[result.str().size()] = 0;
   return buffer;
 }
