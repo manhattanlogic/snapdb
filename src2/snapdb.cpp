@@ -188,9 +188,13 @@ int counter;
 int current_action = 0; // compute_converters
 
 
+
+
 void process_result(rapidjson::Document * data, unsigned long file_position) {
-  std::lock_guard<std::mutex> guard(result_processor_mutex);
-   
+  //std::lock_guard<std::mutex> guard(result_processor_mutex);
+
+  result_processor_mutex.lock();
+  
   counter += 1;
   if (counter % 10000 == 0) {
     std::cerr << counter <<  "\n";
@@ -223,7 +227,7 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     it = json_history.find(vid);
   }
 
-  guard.unlock();
+  result_processor_mutex.unlock();
   
   json_history_entry * je = new json_history_entry;
   je->document = data;
