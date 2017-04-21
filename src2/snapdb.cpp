@@ -129,9 +129,39 @@ std::unordered_map<unsigned long, single_user_history *> histories[THREADS];
 
 std::unordered_map<unsigned long, single_json_history * > json_history;
 
+struct test_data {
+  unsigned long vid;
+  unsigned long ts;
+};
 
+test_data test_json(char * line) {
+  test_data result = {};
+  rapidjson::Document d;
+  char * tab = strchr(line, '\t');
+  if (tab == NULL) return result;
+  tab = strchr((tab + 1), '\t');
+  if (tab == NULL) return result;
+  std::string json = (tab+1);
+  json = replace_all(json, "\\'","'");
+  json = replace_all(json, "\\\\","\\");
+  d.Parse(json.c_str());
+  try {
+    result.vid = d["vid"].GetUint64();
+  } catch (...) {
+    result.vid = 0;
+  }
+  try {
+    struct tm tm;
+    auto str_ts = d["events"][0]["ts"].GetString();
+    strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
+    result.ts = mktime(&tm);
+  } catch (...) {
+    result.ts = 0;
+  }
+  return result;
+}
 
-
+  
 rapidjson::Document * parse_json(char * line) {
   rapidjson::Document * d = new rapidjson::Document();
   
@@ -195,7 +225,7 @@ int current_action = 0; // compute_converters
 
 
 
-void process_result(rapidjson::Document * data, unsigned long file_position) {
+void process_result(test_data data, unsigned long file_position) {
   //std::lock_guard<std::mutex> guard(result_processor_mutex);
 
   
@@ -203,7 +233,7 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
   
   result_processor_mutex.lock();
   
-  
+  /*
   unsigned long vid = 0;
   unsigned long ts = 0;
   
@@ -221,8 +251,10 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     ts = mktime(&tm);
   } catch (...) {
   }
-
+  */
   
+  unsigned long vid = data.vid;
+  unsigned long ts = ts;
   
 
   counter += 1;
@@ -252,7 +284,9 @@ void thread_runner(int id) {
   char * line = (char *) malloc(1024 * 1024 * 64); // 64 MB to be safe
   long file_position;
   while ((file_position = get_next_line(line)) >= 0) {
-    auto result = parse_json(line);
+    //auto result = parse_json(line);
+    auto result = test_json(line);
+    
     process_result(result, file_position);
   }
 }
