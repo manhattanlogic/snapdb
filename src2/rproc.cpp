@@ -33,13 +33,16 @@ char * f1() {
     bool is_converter = false;
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       if (j->second.events.size() <= 0) continue;
-      auto event = j->second.events[j->second.active_event];
-      if (!(event.ensighten.exists)) continue;
-      camGroups.insert(event.ensighten.camGroup);
-      camSources.insert(event.ensighten.camSource);
-      for (int k = 0; k < event.ensighten.items.size(); k++) {
-	if (event.ensighten.items[k].tag == "order") {
-	  is_converter = true;
+
+      for (int e = 0; e < j->second.events.size(); e++) {
+	auto event = j->second.events[e];
+	if (!(event.ensighten.exists)) continue;
+	camGroups.insert(event.ensighten.camGroup);
+	camSources.insert(event.ensighten.camSource);
+	for (int k = 0; k < event.ensighten.items.size(); k++) {
+	  if (event.ensighten.items[k].tag == "order") {
+	    is_converter = true;
+	  }
 	}
       }
     }
