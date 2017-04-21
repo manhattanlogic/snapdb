@@ -218,7 +218,7 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
   } catch (...) {
   }
 
-  return;
+  
   
   auto it = json_history.find(vid);
   if (it == json_history.end()) {
