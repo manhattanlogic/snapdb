@@ -148,6 +148,8 @@ parsed_result parse_data(char * line) {
     std::cerr << "json error\n" << json << "\n";
     return result;
   }
+
+  rapidjson::Document::AllocatorType& allocator = d.GetAllocator();
   
   for (int i = 0; i < d["events"].Size(); i++) {
     if (d["events"][i]["subids"].HasMember("ensighten") &&
@@ -155,10 +157,12 @@ parsed_result parse_data(char * line) {
       rapidjson::Document d2;
       std::string ensighten_json = d["events"][i]["subids"]["ensighten"].GetString();
       d2.Parse(ensighten_json.c_str());
-      d["events"][i]["subids"]["ensighten"].CopyFrom(d2, d.GetAllocator());
+      d["events"][i]["subids"]["ensighten"].CopyFrom(d2, allocator);
     }
   }
 
+  // data ready at this point - do the actual work
+  
   try {
     result.vid = d["vid"].GetUint64();
   } catch (...) {
@@ -227,13 +231,16 @@ void process_result(parsed_result data, unsigned long file_position) {
     json_history[vid] = suh;
     it = json_history.find(vid);
   }
+  result_processor_mutex.unlock();
 
+  it->second->row_mutex.lock();
   json_history_entry * je = new json_history_entry;
   je->file_position = file_position;
   it->second->history[ts] = je;
-
+  it->second->row_mutex.unlock();
   
-  result_processor_mutex.unlock();
+  
+  
 }
 
 
