@@ -31,6 +31,29 @@
 
 #include "snapdb.hpp"
 
+#include "date/tz.h"
+
+
+date::sys_time<std::chrono::milliseconds>
+parse8601(std::istream&& is)
+{
+    std::string save;
+    is >> save;
+    std::istringstream in{save};
+    date::sys_time<std::chrono::milliseconds> tp;
+    in >> date::parse("%FT%TZ", tp);
+    if (in.fail())
+    {
+        in.clear();
+        in.exceptions(std::ios::failbit);
+        in.str(save);
+        in >> date::parse("%FT%T%Ez", tp);
+    }
+    return tp;
+}
+
+
+
 char* getCmdOption(char ** begin, char ** end, const std::string & option)
 {
     char ** itr = std::find(begin, end, option);
@@ -115,10 +138,14 @@ json_history_entry parse_data(char * line) {
   }
   try {
     struct tm tm;
-    if (d["events"][0]["ts"].IsString()) {
-      auto str_ts = d["events"][0]["ts"].GetString();
+    if (d["events"][d["events"].Size()-1]["ts"].IsString()) {
+      auto str_ts = d["events"][d["events"].Size()-1]["ts"].GetString();
       strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
-      result.ts = mktime(&tm);
+      result.ts = mktime(&tm) * 1000;
+      int ms;
+      char * dot = strchr(str_ts, '.');
+      sscanf(dot+1, "%d", &ms);
+      result.ts += ms;
     }
   } catch (...) {
   }
@@ -260,6 +287,9 @@ void process_result(json_history_entry data, unsigned long file_position) {
   result_processor_mutex.unlock();
   
   it->second->row_mutex.lock();
+  if (it->second->history.find(ts) != it->second->history.end()) {
+    std::cerr << "collision:" << vid << " : " << ts << "\n";
+  }
   it->second->history[ts] = data;
   it->second->row_mutex.unlock(); 
 }
