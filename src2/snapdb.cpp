@@ -146,6 +146,7 @@ rapidjson::Document * parse_json(char * line) {
     return d;
   }
 
+  return;
   
   for (int i = 0; i < (*d)["events"].Size(); i++) {
     if ((*d)["events"][i]["subids"].HasMember("ensighten") &&
@@ -312,5 +313,5 @@ int main (int argc, char**argv) {
     threads[i].join();
     std::cerr << "\n";
   }
-  start_web_server(8080);
+  // start_web_server(8080);
 }
