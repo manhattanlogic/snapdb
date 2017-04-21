@@ -205,8 +205,6 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     vid = (*data)["vid"].GetUint64();
   } catch (...) {
   }
-
-  return;
   
   try {
     struct tm tm;
@@ -215,9 +213,6 @@ void process_result(rapidjson::Document * data, unsigned long file_position) {
     ts = mktime(&tm);
   } catch (...) {
   }
-
-  
-  
   
   auto it = json_history.find(vid);
   if (it == json_history.end()) {
