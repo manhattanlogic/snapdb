@@ -102,7 +102,7 @@ std::string get_true_top_category(std::string crumb) {
   }
 }
 
-#define THREADS 16
+#define THREADS 32
 
 static const char* kTypeNames[] = 
   { "Null", "False", "True", "Object", "Array", "String", "Number" };
