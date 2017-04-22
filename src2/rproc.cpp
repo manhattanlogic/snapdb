@@ -14,13 +14,39 @@ extern "C"
 char * f1() {
   std::stringstream result;
   history_filter.clear();
+
+  std::vector<int> stats[4] = {{0,0},{0,0},{0,0},{0,0}};
   
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
     if (i->second->history.size() < 2) continue;
+
+    auto first = i->second->history.begin();
+    auto last = i->second->history.rbegin();
+
+    if (last->second.ts - first->second.ts < 1000) continue;
+    
     bool is_valid = false;
     bool is_converter = false;
+    // all single(1), all plural(2), some single-some plural(3)
+    int plural  = 0;
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       if (j->second.events.size() <= 0) continue;
+      bool comma = j->second.pixels.find_first_of(",") != std::string::npos;
+      switch (plural) {
+      case 0:
+	if (comma) {
+	  plural = 2;
+	} else {
+	  plural = 1; 
+	}
+	break;
+      case 1:
+	if (comma) plural = 3;
+	break;
+      case 2:
+	if (!(comma)) plural = 3;
+	break;
+      }
       for (int e = 0; e < j->second.events.size(); e++) {
 	auto event = j->second.events[e];
 	if (!(event.ensighten.exists)) continue;
