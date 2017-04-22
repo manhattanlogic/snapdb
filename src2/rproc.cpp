@@ -38,7 +38,7 @@ char * f1() {
 	}
       }
     }
-    if (is_valid)  {
+    if (is_valid && is_converter)  {
       history_filter.insert(i->first);
     }
   }
