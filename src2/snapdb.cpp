@@ -129,6 +129,8 @@ json_history_entry parse_data(char * line) {
   char * tab = strchr((tab_p + 1), '\t');
   if (tab == NULL) return result;
 
+  *tab = 0;
+  
   result.pixels = tab_p;
   
   std::string json = (tab+1);
