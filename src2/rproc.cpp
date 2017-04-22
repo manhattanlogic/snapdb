@@ -63,11 +63,12 @@ char * f1() {
 	  }
 	}
       }
-      stats[plural][0]++;
-      if (is_converter) {
-	stats[plural][1]++;
+      if (is_valid) {
+	stats[plural][0]++;
+	if (is_converter) {
+	  stats[plural][1]++;
+	}
       }
-	
     }
     if (is_valid)  {
       history_filter.insert(i->first);
