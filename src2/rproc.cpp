@@ -68,7 +68,7 @@ char * f1() {
       history_filter.insert(i->first);
     }
 
-    if (is_valid) {
+    if (true) {
       stats[plural][0]++;
       if (is_converter) {
 	stats[plural][1]++;
