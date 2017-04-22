@@ -79,15 +79,18 @@ std::unordered_map<unsigned long, single_json_history *> json_history;
 
 
 rapidjson::Document parse_json(char * line) {
+  
   rapidjson::Document d;
-  char * tab = strchr(line, '\t');
-  if (tab == NULL) return d;
-  tab = strchr((tab + 1), '\t');
+  char * tab_p = strchr(line, '\t');
+  if (tab_p == NULL) return d;
+  char * tab = strchr((tab_p + 1), '\t');
   if (tab == NULL) return d;
   std::string json = (tab+1);
   json = replace_all(json, "\\'","'");
   json = replace_all(json, "\\\\","\\");
 
+  *tab = 0;
+  
   d.Parse(json.c_str());
   if (d.HasParseError()) {
     std::cerr << "json error\n" << json << "\n";
@@ -106,18 +109,28 @@ rapidjson::Document parse_json(char * line) {
     }
   }
 
+  rapidjson::Value pixel_value(rapidjson::kStringType);
+  pixel_value.SetString(tab_p, strlen(tab_p), allocator);
+  
+  d.AddMember("__pixels__", pixel_value, allocator);
+  
   return d;
   
 }
 
 json_history_entry parse_data(char * line) {
   json_history_entry result = {};
+
   rapidjson::Document d;
   
-  char * tab = strchr(line, '\t');
+  char * tab_p = strchr(line, '\t');
+  if (tab_p == NULL) return result;
+  
+  char * tab = strchr((tab_p + 1), '\t');
   if (tab == NULL) return result;
-  tab = strchr((tab + 1), '\t');
-  if (tab == NULL) return result;
+
+  
+  
   std::string json = (tab+1);
   json = replace_all(json, "\\'","'");
   json = replace_all(json, "\\\\","\\");

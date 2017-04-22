@@ -52,6 +52,15 @@ char * f1() {
 }
 
 /*
+
 this user lives on 2 devices:
 1612018255760278685
+find the rest of these people
+
+us is recorded by RevJet hence is more reliable
+
+check pixel id for collisions
+
 */
+
+
