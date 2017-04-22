@@ -64,7 +64,7 @@ char * f1() {
 	}
       }
     }
-    if (is_valid && is_converter)  {
+    if (is_valid)  {
       history_filter.insert(i->first);
     }
   }
