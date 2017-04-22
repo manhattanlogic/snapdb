@@ -39,6 +39,7 @@ struct json_history_entry {
   std::vector<json_simgle_event_type> events;
   unsigned long file_position = 0;
   unsigned int active_event = 0;
+  std::string pixels;
 };
 
 struct single_json_history {

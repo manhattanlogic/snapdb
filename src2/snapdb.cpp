@@ -129,7 +129,7 @@ json_history_entry parse_data(char * line) {
   char * tab = strchr((tab_p + 1), '\t');
   if (tab == NULL) return result;
 
-  
+  result.pixels = tab_p;
   
   std::string json = (tab+1);
   json = replace_all(json, "\\'","'");
