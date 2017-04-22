@@ -63,16 +63,18 @@ char * f1() {
 	  }
 	}
       }
-      if (is_valid) {
-	stats[plural][0]++;
-	if (is_converter) {
-	  stats[plural][1]++;
-	}
-      }
     }
     if (is_valid)  {
       history_filter.insert(i->first);
     }
+
+    if (is_valid) {
+      stats[plural][0]++;
+      if (is_converter) {
+	stats[plural][1]++;
+      }
+    }
+    
   }
 
   result << history_filter.size() << " users found\n";
