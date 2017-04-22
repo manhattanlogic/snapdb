@@ -63,6 +63,11 @@ char * f1() {
 	  }
 	}
       }
+      stats[plural][0]++;
+      if (is_converter) {
+	stats[plural][1]++;
+      }
+	
     }
     if (is_valid)  {
       history_filter.insert(i->first);
@@ -70,6 +75,12 @@ char * f1() {
   }
 
   result << history_filter.size() << " users found\n";
+
+  result << stats[0][0] << "," << stats[0][1] << "\n";
+  result << stats[1][0] << "," << stats[1][1] << "\n";
+  result << stats[2][0] << "," << stats[2][1] << "\n";
+  result << stats[3][0] << "," << stats[3][1] << "\n";
+  
   
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());
