@@ -23,7 +23,7 @@ char * f1() {
     auto first = i->second->history.begin();
     auto last = i->second->history.rbegin();
 
-    if (last->second.ts - first->second.ts < 1000) continue;
+    if ((last->second.ts - first->second.ts) < 1000) continue;
     
     bool is_valid = false;
     bool is_converter = false;
