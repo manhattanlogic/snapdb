@@ -1,3 +1,4 @@
+# this is a test
 PROG = snapdb
 
 INCLUDES= -I/usr/local/include
