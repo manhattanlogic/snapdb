@@ -45,10 +45,10 @@ char * query() {
 	for (int e = 0; e < j->second.events.size(); e++) {
 	  auto event = j->second.events[e];
 	  if (event.ensighten.exists) {
-	    browsers.insert(event.ensighten.camSource);
+	    camSources.insert(event.ensighten.camSource);
 	    camGroups.insert(event.ensighten.camGroup);
 	    auto browser = event.ensighten.browser;
-	    if (browser != "") camSources.insert(browser);
+	    if (browser != "") browsers.insert(browser);
 	    for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	      if (event.ensighten.items[it].tag == "order") is_converter = true;
 	    }
