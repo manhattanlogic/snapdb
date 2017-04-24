@@ -54,7 +54,7 @@ char * query() {
 	    }
 	  }
 	}
-	// if (is_converter) break;
+	if (is_converter) break;
       }
       if (browsers.size() > 1) {
 	dual_users++;
@@ -81,7 +81,15 @@ char * query() {
   return buffer;
 }
 
-// DUAL BROWSER USERS: 406510, 51620 (including safari)
-// DUAL BROWSER USERS  406295, 51616 (1-second safari exclusion)
-// DUAL BROWSER USERS  406295, 51616
-
+/*
+[d][t][m]
+[t][m][d]
+[t][m][d]
+[d][t][m]
+[m][d][t]
+[t][m][d]
+[t][m][d]
+[t][m][d]
+[d][m][t]
+2432,145 [2 browser types users/converters] - 5.96% conversion rate (!)
+*/
