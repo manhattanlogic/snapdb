@@ -45,7 +45,8 @@ char * query() {
 	  if (event.ensighten.exists) {
 	    browsers.insert(event.ensighten.camSource);
 	    camGroups.insert(event.ensighten.camGroup);
-	    camSources.insert(event.ensighten.browser);
+	    auto browser = event.ensighten.browser;
+	    if (browser != "") camSources.insert(browser);
 	    for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	      if (event.ensighten.items[it].tag == "order") is_converter = true;
 	    }
@@ -71,6 +72,6 @@ char * query() {
 }
 
 // DUAL BROWSER USERS: 406510, 51620 (including safari)
-
+// DUAL BROWSER USERS  406295, 51616 (1-second safari exclusion)
 
 
