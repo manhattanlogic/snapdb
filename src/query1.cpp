@@ -48,7 +48,8 @@ char * query() {
 	    camSources.insert(event.ensighten.camSource);
 	    camGroups.insert(event.ensighten.camGroup);
 	    auto browser = event.ensighten.browser;
-	    if (browser != "") browsers.insert(browser);
+	    browsers.insert(browser);
+	    //if (browser != "") browsers.insert(browser);
 	    for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	      if (event.ensighten.items[it].tag == "order") is_converter = true;
 	    }
@@ -56,6 +57,7 @@ char * query() {
 	}
 	if (is_converter) break;
       }
+      
       if (browsers.size() > 1) {
 	dual_users++;
 	if (is_converter) {
@@ -69,6 +71,12 @@ char * query() {
 	result << "\n";
 	dump--;
 	if (dump <= 0) break;
+      }
+      
+      if (browsers.size() == 1) {
+	for (auto c = camSources.begin(); c != camSources.end(); c++ ) {
+	  std::string key = (*c) + ":" + (*(browsers.begin()));
+	}
       }
    }
 
@@ -92,4 +100,13 @@ char * query() {
 [t][m][d]
 [d][m][t]
 2432,145 [2 browser types users/converters] - 5.96% conversion rate (!)
+[d][t][m]
+[t][m][d]
+[d][t][m]
+[m][d][t]
+[t][m][d]
+[t][m][d]
+[t][m][d]
+[d][m][t]
+2377,90   [2 browser types users/converters, stop at conversion] - 3.7% conversion rate
 */
