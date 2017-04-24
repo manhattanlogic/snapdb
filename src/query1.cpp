@@ -39,9 +39,9 @@ char * query() {
 	for (int e = 0; e < j->second.events.size(); e++) {
 	  auto event = j->second.events[e];
 	  if (event.ensighten.exists) {
-	    std::string camSource = event.ensighten.camSource;
-	    std::string camGroup = event.ensighten.camGroup;
-	    std::string browser = event.ensighten.browser;
+	    browsers.insert(event.ensighten.camSource);
+	    camGroups.insert(event.ensighten.camGroup);
+	    camSources.insert(event.ensighten.browser);
 	    for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	      if (event.ensighten.items[it].tag == "order") is_converter = true;
 	    }
