@@ -57,7 +57,7 @@ char * query() {
 	}
 	if (is_converter) break;
       }
-      
+      /*
       if (browsers.size() > 1) {
 	dual_users++;
 	if (is_converter) {
@@ -72,15 +72,45 @@ char * query() {
 	dump--;
 	if (dump <= 0) break;
       }
-      
+      */
       if (browsers.size() == 1) {
 	for (auto c = camSources.begin(); c != camSources.end(); c++ ) {
-	  std::string key = (*c) + ":" + (*(browsers.begin()));
+	  std::string key = (*c) + "\t" + (*(browsers.begin()));
+	  auto it = camSourceStats.find(key);
+	  if (it == camSourceStats.end()) {
+	    camSourceStats[key] = {0,0};
+	    it = camSourceStats.find(key);
+	  }
+	  it->second[0]++;
+	  if (is_converter) it->second[1] ++;
 	}
+
+	for (auto c = camGroups.begin(); c != camGroups.end(); c++ ) {
+	  std::string key = (*c) + "\t" + (*(browsers.begin()));
+	  auto it = camGroupStats.find(key);
+	  if (it == camGroupStats.end()) {
+	    camGroupStats[key] = {0,0};
+	    it = camGroupStats.find(key);
+	  }
+	  it->second[0]++;
+	  if (is_converter) it->second[1] ++;
+	}
+
+	
       }
    }
 
-   result << dual_users << "," << dual_converters << "\n";
+   result << "-----  camGroups -----\n";
+   for (auto c = camGroupStats.begin(); c != camGroupStats.end(); c++) {
+     result << c->first << "\t" << c->second[0] << "\t" << c->second[1] << "\n"; 
+   }
+
+   result << "-----  camSources -----\n";
+   for (auto c = camSourceStats.begin(); c != camSourceStats.end(); c++) {
+     result << c->first << "\t" << c->second[0] << "\t" << c->second[1] << "\n"; 
+   }
+   
+   //result << dual_users << "," << dual_converters << "\n";
   
   // end of custom code
   char * buffer = (char *)malloc(result.str().size() + 1);
