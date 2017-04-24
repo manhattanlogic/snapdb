@@ -28,6 +28,8 @@ char * query() {
   
   int dual_users = 0;
   int dual_converters = 0;
+
+  int dump = 100;
   
    for (auto i = json_history.begin(); i != json_history.end(); i++) {
      bool  is_converter = false;
@@ -60,6 +62,14 @@ char * query() {
 	  dual_converters ++;
 	}
       }
+      if (browsers.size() > 2) {
+	for (auto b = browsers.begin(); b != browsers.end(); b++) {
+	  result << "[" << (*b) << "]";
+	}
+	result << "\n";
+	dump--;
+	if (dump <= 0) break;
+      }
    }
 
    result << dual_users << "," << dual_converters << "\n";
@@ -73,5 +83,5 @@ char * query() {
 
 // DUAL BROWSER USERS: 406510, 51620 (including safari)
 // DUAL BROWSER USERS  406295, 51616 (1-second safari exclusion)
-
+// DUAL BROWSER USERS  406295, 51616
 
