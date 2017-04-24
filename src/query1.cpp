@@ -34,6 +34,10 @@ char * query() {
      std::unordered_set<std::string> camSources;
      std::unordered_set<std::string> camGroups;
      std::unordered_set<std::string> browsers;
+
+     auto start =  i->second->history.begin()->second.ts;
+     auto end =  i->second->history.rbegin()->second.ts;
+     if (end - start < 1000) continue;
      
       for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
 	for (int e = 0; e < j->second.events.size(); e++) {
@@ -66,6 +70,7 @@ char * query() {
   return buffer;
 }
 
+// DUAL BROWSER USERS: 406510, 51620 (including safari)
 
 
 
