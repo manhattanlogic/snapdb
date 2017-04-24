@@ -14,7 +14,7 @@ LIBS = -L/usr/local/lib -lpthread -ldl
 
 OBJS = $(PROG).o
 
-all: $(PROG) rproc.so query1.so
+all: $(PROG) rproc.so query1.so dump_skus.so
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -28,7 +28,9 @@ rproc.so: rproc.cpp
 query1.so: query1.cpp
 	$(CXX) -Wall -fPIC -c query1.cpp -o query1.o
 	$(CXX) -shared -rdynamic -o query1.so query1.o
-
+dump_skus.so: dump_skus.cpp
+	$(CXX) -Wall -fPIC -c dump_skus.cpp -o dump_skus.o
+	$(CXX) -shared -rdynamic -o dump_skus.so dump_skus.o
 endif
 ifeq ($(UNAME_S),Darwin)
 $(PROG): $(OBJS)
@@ -37,7 +39,9 @@ $(PROG): $(OBJS)
 rproc.so: rproc.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup rproc.cpp -o $@ 
 query1.so: query1.cpp
-	$(CXX) -dynamiclib -undefined dynamic_lookup query1.cpp -o $@ 
+	$(CXX) -dynamiclib -undefined dynamic_lookup query1.cpp -o $@
+dump_skus.so: dump_skus.cpp
+	$(CXX) -dynamiclib -undefined dynamic_lookup dump_skus.cpp -o $@
 endif
 
 clean:
