@@ -67,7 +67,6 @@ char * query_x() {
       auto end =  i->second->history.rbegin()->second.ts;
       if (end - start < 1000) continue;
       bool is_converter = false;
-      result << i->first;
       for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
 	result << j->second.events.size()  << "\n";
 	if (j->second.events.size() != 1) continue;
