@@ -478,7 +478,7 @@ void start_web_server(int port) {
 
       auto q = procfunc();
       //std::cerr << "q:" << q << "\n";
-      std:::cerr << "dlclose returned: " << dlclose(handle) << "\n";
+      std::cerr << "dlclose returned: " << dlclose(handle) << "\n";
       
       res.set_content(q, "text/plain");
       free(q);
