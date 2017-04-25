@@ -457,7 +457,8 @@ void start_web_server(int port) {
 
       std::cerr << "exec " << mod_it->second << " " << func_it->second << std::endl;
 
-      void * handle = dlopen(mod_it->second.c_str(), RTLD_LAZY | RTLD_GLOBAL);
+      // RTLD_GLOBAL
+      void * handle = dlopen(mod_it->second.c_str(), RTLD_LAZY);
       if (!handle) {
         std::cerr << "dlopen filed: " << dlerror() << std::endl;
         return;
