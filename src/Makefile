@@ -30,7 +30,7 @@ dump_skus.so: dump_skus.cpp
 	$(CXX) -Wall -fPIC -c dump_skus.cpp -o dump_skus.o
 	$(CXX) -shared -rdynamic -o dump_skus.so dump_skus.o
 compute_user_vectors.so: compute_user_vectors.cpp
-	$(CXX) -Wall -fPIC -c compute_user_vectors.cpp -o dump_skus.o
+	$(CXX) -Wall -fPIC -c compute_user_vectors.cpp -o compute_user_vectors.o
 	$(CXX) -shared -rdynamic -o compute_user_vectors.so compute_user_vectors.o
 endif
 ifeq ($(UNAME_S),Darwin)
