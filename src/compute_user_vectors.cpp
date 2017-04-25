@@ -47,7 +47,7 @@ char * query() {
   user_value.resize(w2v_size);
 
   result << w2v.size() << "vectors loaded\n";
-  
+  std::cerr << w2v.size() << "vectors loaded\n";
   int limit = 1000;
   
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
