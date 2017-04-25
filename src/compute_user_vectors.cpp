@@ -13,7 +13,7 @@
 
 
 
-static int load_word2vec(std::string filename, std::unordered_map<std::string, std::vector<float> > &w2v) {
+int __attribute__ ((visibility ("hidden"))) load_word2vec(std::string filename, std::unordered_map<std::string, std::vector<float> > &w2v) {
   int w2v_size = 0;
   std::ifstream file(filename);
   std::string line;
