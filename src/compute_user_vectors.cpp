@@ -43,8 +43,12 @@ char * query() {
   std::stringstream result;
   std::vector<float> user_value;
   user_value.resize(w2v_size);
+
+  int limit = 1000;
   
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
+    if (limit == 0) break;
+    limit --;
     std::fill(user_value.begin(), user_value.end(), 0.0);
     std::vector <std::string> skus;
     int n = 0;
@@ -63,6 +67,7 @@ char * query() {
 	    if ((is_product) || (event.ensighten.items[it].tag == "productpage")) {
 	      skus.push_back(event.ensighten.items[it].sku);
 	      auto sku_vector = w2v.find(event.ensighten.items[it].sku);
+	      result << event.ensighten.items[it].sku << "\n";
 	      if (sku_vector != w2v.end()) {
 		for (int z = 0; z < w2v_size; z++) {
 		  user_value[z] += sku_vector->second[z];
