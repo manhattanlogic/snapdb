@@ -39,7 +39,7 @@ void load_word2vec(std::string filename) {
 
 
 extern "C"
-char * query() {
+char * query_x() {
   std::stringstream result;
   std::cerr << "query started\n";
   std::cout << "query started\n";
