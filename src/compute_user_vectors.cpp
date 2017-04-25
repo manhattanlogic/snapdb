@@ -40,7 +40,7 @@ void load_word2vec(std::string filename) {
 
 extern "C"
 char * query() {
-  load_word2vec();
+  load_word2vec("sku_vectors.csv");
   std::stringstream result;
   std::vector<float> user_value;
   user_value.resize(w2v_size);
