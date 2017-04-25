@@ -50,7 +50,7 @@ char * query_x() {
   std::cout << "query started\n";
 
   
-  if (false) {
+  if (true) {
   
     int w2v_size = load_word2vec("sku_vectors.csv", w2v);
   
