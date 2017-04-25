@@ -457,8 +457,7 @@ void start_web_server(int port) {
 
       std::cerr << "exec " << mod_it->second << " " << func_it->second << std::endl;
 
-      // RTLD_GLOBAL
-      void * handle = dlopen(mod_it->second.c_str(), RTLD_LAZY);
+      void * handle = dlopen(mod_it->second.c_str(), RTLD_LAZY | RTLD_GLOBAL);
       if (!handle) {
         std::cerr << "dlopen filed: " << dlerror() << std::endl;
         return;
@@ -479,7 +478,7 @@ void start_web_server(int port) {
 
       auto q = procfunc();
       //std::cerr << "q:" << q << "\n";
-      dlclose(handle);
+      std:::cerr << "dlclose returned: " << dlclose(handle) << "\n";
       
       res.set_content(q, "text/plain");
       free(q);
