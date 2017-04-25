@@ -51,7 +51,7 @@ char * query_x() {
 
   std::string filename = "sku_vectors.csv";
   
-  if (true) {
+  if (false) {
 
     int w2v_size = 0;
     std::ifstream file(filename);
@@ -75,23 +75,7 @@ char * query_x() {
       }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
     //int w2v_size = load_word2vec("sku_vectors.csv", w2v);
-  
   
     std::vector<float> user_value;
     user_value.resize(w2v_size);
