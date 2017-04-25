@@ -12,7 +12,7 @@
 
 
 
-
+/*
 int __attribute__ ((visibility ("hidden"))) load_word2vec(std::string filename, std::unordered_map<std::string, std::vector<float> > &w2v) {
   int w2v_size = 0;
   std::ifstream file(filename);
@@ -37,7 +37,7 @@ int __attribute__ ((visibility ("hidden"))) load_word2vec(std::string filename, 
   }
   return w2v_size;
 }
-
+*/
 
 extern "C"
 char * query_x() {
