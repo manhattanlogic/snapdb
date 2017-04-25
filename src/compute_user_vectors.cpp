@@ -51,7 +51,7 @@ char * query_x() {
 
   std::string filename = "sku_vectors.csv";
   
-  if (false) {
+  if (true) {
 
     int w2v_size = 0;
     std::ifstream file(filename);
