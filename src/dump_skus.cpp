@@ -10,7 +10,7 @@
 
 
 extern "C"
-char * query() {
+char * query_x() {
   std::stringstream result;
   
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
