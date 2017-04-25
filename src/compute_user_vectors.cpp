@@ -68,6 +68,7 @@ char * query_x() {
       if (end - start < 1000) continue;
       bool is_converter = false;
       for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
+	result << j->second.events.size()  << "\n";
 	if (j->second.events.size() != 1) continue;
 	for (int e = 0; e < j->second.events.size(); e++) {
 	  auto event = j->second.events[e];
