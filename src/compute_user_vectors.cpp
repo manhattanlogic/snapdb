@@ -10,7 +10,7 @@
 #include <iostream>
 
 
-
+std::unordered_map<std::string, std::vector<float> > w2v;
 
 /*
 int load_word2vec(std::string filename, std::unordered_map<std::string, std::vector<float> > &w2v) {
@@ -41,6 +41,7 @@ int load_word2vec(std::string filename, std::unordered_map<std::string, std::vec
 
 extern "C"
 char * query_x() {
+  
   std::unordered_map<std::string, std::vector<float> > w2v;
   std::stringstream result;
 
