@@ -46,7 +46,7 @@ char * query() {
   std::vector<float> user_value;
   user_value.resize(w2v_size);
 
-  result << w2v.size << "vectors loaded\n";
+  result << w2v.size() << "vectors loaded\n";
   
   int limit = 1000;
   
