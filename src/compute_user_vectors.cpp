@@ -62,8 +62,10 @@ char * query() {
       if (j->second.events.size() != 1) continue;
       for (int e = 0; e < j->second.events.size(); e++) {
 	auto event = j->second.events[e];
+	result << event.ensighten.exists << "\n";
 	if (event.ensighten.exists) {
 	  bool is_product = event.ensighten.pageType == "PRODUCT";
+	  result << event.ensighten.items.size() << "\n";
 	  for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	    if ((is_product) || (event.ensighten.items[it].tag == "productpage")) {
 	      skus.push_back(event.ensighten.items[it].sku);
