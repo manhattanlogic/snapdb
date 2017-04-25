@@ -41,7 +41,7 @@ int __attribute__ ((visibility ("hidden"))) load_word2vec(std::string filename, 
 
 extern "C"
 char * query_x() {
-  std::unordered_map<std::string, std::vector<float> > w2v;
+  std::unordered_map<std::string, std::vector<float> > * w2v = new std::unordered_map<std::string, std::vector<float> >;
   std::stringstream result;
 
   result << "roma durak\n";
@@ -68,7 +68,7 @@ char * query_x() {
       for (int i = 1; i < strs.size() - 1; i++) {
 	vector.push_back(std::stof(strs[i]));
       }
-      w2v[strs[0]] = vector;
+      (*w2v)[strs[0]] = vector;
       if (w2v_size == 0) w2v_size = vector.size();
       if (w2v_size != vector.size()) {
 	std::cerr << "vector file malformed\n";
@@ -102,9 +102,9 @@ char * query_x() {
 	    for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	      if ((is_product) || (event.ensighten.items[it].tag == "productpage")) {
 		skus.push_back(event.ensighten.items[it].sku);
-		auto sku_vector = w2v.find(event.ensighten.items[it].sku);
+		auto sku_vector = w2v->find(event.ensighten.items[it].sku);
 		
-		if (sku_vector != w2v.end()) {
+		if (sku_vector != w2v->end()) {
 		  
 		  for (int z = 0; z < w2v_size; z++) {
 		    user_value[z] += sku_vector->second[z];
@@ -129,6 +129,8 @@ char * query_x() {
 
     } // user
   }
+
+  delete w2v;
   
   // end of custom code
   char * buffer = (char *)malloc(result.str().size() + 1);
