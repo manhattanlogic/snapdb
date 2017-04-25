@@ -49,10 +49,48 @@ char * query_x() {
   std::cerr << "query started\n";
   std::cout << "query started\n";
 
+  std::string filename = "sku_vectors.csv";
   
   if (true) {
-  
-    int w2v_size = load_word2vec("sku_vectors.csv", w2v);
+
+    int w2v_size = 0;
+    std::ifstream file(filename);
+    std::string line;
+    int skip = 2;
+    while (std::getline(file, line)) {
+      if (skip > 0) {
+	skip--;
+	continue;
+      }
+      std::vector<std::string> strs;
+      boost::split(strs, line, boost::is_any_of(" "));
+      std::vector<float> vector;
+      for (int i = 1; i < strs.size() - 1; i++) {
+	vector.push_back(std::stof(strs[i]));
+      }
+      w2v[strs[0]] = vector;
+      if (w2v_size == 0) w2v_size = vector.size();
+      if (w2v_size != vector.size()) {
+	std::cerr << "vector file malformed\n";
+      }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    //int w2v_size = load_word2vec("sku_vectors.csv", w2v);
   
   
     std::vector<float> user_value;
