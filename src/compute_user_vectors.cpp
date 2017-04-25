@@ -6,7 +6,7 @@
 #include <unordered_set>
 #include <memory.h>
 #include <fstream>
-#include <boost/algorithm/string.hpp>
+//#include <boost/algorithm/string.hpp>
 #include <iostream>
 
 
@@ -44,7 +44,7 @@ char * query_x() {
   std::cerr << "query started\n";
   std::cout << "query started\n";
   result << "roma durak\n";
-
+  /*
   if (false) {
   
     load_word2vec("sku_vectors.csv");
@@ -107,6 +107,7 @@ char * query_x() {
 
     } // user
   }
+  */
   // end of custom code
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());
