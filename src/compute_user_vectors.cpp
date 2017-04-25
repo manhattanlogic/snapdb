@@ -56,11 +56,9 @@ char * query_x() {
     result << w2v.size() << "vectors loaded\n";
     std::cerr << w2v.size() << "vectors loaded\n";
     std::cout << w2v.size() << "vectors loaded\n";
-    int limit = 1000;
+
   
     for (auto i = json_history.begin(); i != json_history.end(); i++) {
-      if (limit == 0) break;
-      limit --;
       std::fill(user_value.begin(), user_value.end(), 0.0);
       std::vector <std::string> skus;
       int n = 0;
