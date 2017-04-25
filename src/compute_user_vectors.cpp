@@ -24,7 +24,7 @@ void load_word2vec(std::string filename) {
       continue;
     }
     std::vector<std::string> strs;
-    //boost::split(strs, line, boost::is_any_of(" "));
+    boost::split(strs, line, boost::is_any_of(" "));
     std::vector<float> vector;
     for (int i = 1; i < strs.size() - 1; i++) {
       vector.push_back(std::stof(strs[i]));
