@@ -41,11 +41,14 @@ void load_word2vec(std::string filename) {
 extern "C"
 char * query_x() {
   std::stringstream result;
+
+  result << "roma durak\n";
+  
   std::cerr << "query started\n";
   std::cout << "query started\n";
 
   
-  if (true) {
+  if (false) {
   
     load_word2vec("sku_vectors.csv");
   
