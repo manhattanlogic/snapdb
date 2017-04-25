@@ -11,9 +11,10 @@
 
 
 std::unordered_map<std::string, std::vector<float> > w2v;
+int w2v_size;
 
-/*
-int load_word2vec(std::string filename, std::unordered_map<std::string, std::vector<float> > &w2v) {
+extern "C"
+void load_word2vec(const char *filename) {
   int w2v_size = 0;
   std::ifstream file(filename);
   std::string line;
@@ -35,9 +36,7 @@ int load_word2vec(std::string filename, std::unordered_map<std::string, std::vec
       std::cerr << "vector file malformed\n";
     }
   }
-  return w2v_size;
 }
-*/
 
 extern "C"
 char * query_x() {
@@ -53,7 +52,7 @@ char * query_x() {
   
   if (true) {
   
-    int w2v_size = 0;//load_word2vec("sku_vectors.csv", w2v);
+    load_word2vec("sku_vectors.csv");
   
   
     std::vector<float> user_value;
