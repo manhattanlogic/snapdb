@@ -36,7 +36,6 @@ endif
 ifeq ($(UNAME_S),Darwin)
 $(PROG): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
-
 rproc.so: rproc.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup rproc.cpp -o $@ 
 query1.so: query1.cpp

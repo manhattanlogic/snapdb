@@ -43,7 +43,7 @@ char * query_x() {
   std::stringstream result;
   std::cerr << "query started\n";
   std::cout << "query started\n";
-  result << "roma durak\n";
+
   
   if (true) {
   
@@ -52,10 +52,6 @@ char * query_x() {
   
     std::vector<float> user_value;
     user_value.resize(w2v_size);
-
-    result << w2v.size() << "vectors loaded\n";
-    std::cerr << w2v.size() << "vectors loaded\n";
-    std::cout << w2v.size() << "vectors loaded\n";
 
   
     for (auto i = json_history.begin(); i != json_history.end(); i++) {
@@ -68,21 +64,21 @@ char * query_x() {
       if (end - start < 1000) continue;
       bool is_converter = false;
       for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
-	result << j->second.events.size()  << "\n";
+	
 	if (j->second.events.size() != 1) continue;
 	for (int e = 0; e < j->second.events.size(); e++) {
 	  auto event = j->second.events[e];
-	  result << event.ensighten.exists << "\n";
+	 
 	  if (event.ensighten.exists) {
 	    bool is_product = event.ensighten.pageType == "PRODUCT";
-	    result << event.ensighten.items.size() << "\n";
+	    
 	    for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	      if ((is_product) || (event.ensighten.items[it].tag == "productpage")) {
 		skus.push_back(event.ensighten.items[it].sku);
 		auto sku_vector = w2v.find(event.ensighten.items[it].sku);
-		result << event.ensighten.items[it].sku << "\n";
+		
 		if (sku_vector != w2v.end()) {
-		  result << "ok\n";
+		  
 		  for (int z = 0; z < w2v_size; z++) {
 		    user_value[z] += sku_vector->second[z];
 		  }
