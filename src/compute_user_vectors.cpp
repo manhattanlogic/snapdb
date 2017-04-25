@@ -45,7 +45,7 @@ char * query_x() {
   std::cout << "query started\n";
   result << "roma durak\n";
   
-  if (false) {
+  if (true) {
   
     load_word2vec("sku_vectors.csv");
   
