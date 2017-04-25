@@ -48,4 +48,4 @@ compute_user_vectors.so: compute_user_vectors.cpp
 endif
 
 clean:
-	rm -rf $(PROG) $(PROG).dSYM  $(OBJS) *.o *~ rproc.dylib rproc.so
+	rm -rf $(PROG) $(PROG).dSYM  $(OBJS) *.o *.dylib *.so

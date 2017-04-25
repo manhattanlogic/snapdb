@@ -40,6 +40,8 @@ void load_word2vec(std::string filename) {
 
 extern "C"
 char * query() {
+  std::cerr << "query started\n";
+  std::cout << "query started\n";
   load_word2vec("sku_vectors.csv");
   
   std::stringstream result;
@@ -48,6 +50,7 @@ char * query() {
 
   result << w2v.size() << "vectors loaded\n";
   std::cerr << w2v.size() << "vectors loaded\n";
+  std::cout << w2v.size() << "vectors loaded\n";
   int limit = 1000;
   
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
