@@ -12,7 +12,7 @@
 
 
 
-
+/*
 int load_word2vec(std::string filename, std::unordered_map<std::string, std::vector<float> > &w2v) {
   int w2v_size = 0;
   std::ifstream file(filename);
@@ -37,7 +37,7 @@ int load_word2vec(std::string filename, std::unordered_map<std::string, std::vec
   }
   return w2v_size;
 }
-
+*/
 
 extern "C"
 char * query_x() {
@@ -52,7 +52,7 @@ char * query_x() {
   
   if (true) {
   
-    int w2v_size = load_word2vec("sku_vectors.csv", w2v);
+    int w2v_size = 0;//load_word2vec("sku_vectors.csv", w2v);
   
   
     std::vector<float> user_value;
