@@ -8,7 +8,7 @@ import pickle
 '''
 class DEA:
     def __init__(self, layer_shapes=[100, 64, 32, 2], batch_size=4096*4,
-                     learing_rate=0.0001, p_epochs=2, t_epochs=2):
+                     learing_rate=0.1, p_epochs=2, t_epochs=2):
 
         self.batch_size = batch_size
         self.lr = learing_rate
@@ -133,7 +133,7 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(p_epochs=5, t_epochs=20)
+    dea = DEA(p_epochs=20, t_epochs=20)
     dea.load_weights("weights.pkl")
     
     dea.train(data[:,2:])
