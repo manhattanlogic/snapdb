@@ -35,8 +35,8 @@ class DEA:
             ae["input"] = tf.placeholder(tf.float32, [None, layer_shapes[a - 1]])
             ae["target"] = tf.placeholder(tf.float32, [None, layer_shapes[a - 1]])
             ae["hidden"] =  tf.matmul(ae["input"], self.weights[a-1][0]) + self.weights[a-1][1]
-            if (a != len(layer_shapes) -1):
-                ae["hidden"] = tf.tanh(ae["hidden"])
+            #if (a != len(layer_shapes) -1):
+            #    ae["hidden"] = tf.tanh(ae["hidden"])
             t_idx = len(layer_shapes)*2-a-2
             ae["output"]  =  tf.matmul(ae["hidden"], self.weights[t_idx][0]) + self.weights[t_idx][1]
             if a > 1:
@@ -54,7 +54,7 @@ class DEA:
         self.ae = {"layers":[self.input]}
         for i in range(0, len(self.weights)):
             hidden = tf.matmul(self.ae["layers"][-1], self.weights[i][0]) + self.weights[i][1]
-            if i != (len(self.weights) - 1) and i != (len(layer_shapes) - 2):
+            if i != (len(self.weights) - 1):
                 hidden = tf.tanh(hidden)
             self.ae["layers"].append(hidden)
         self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
