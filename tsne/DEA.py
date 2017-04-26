@@ -75,7 +75,7 @@ class DEA:
                 np.random.shuffle(shuffler)
                 epoch_erros = []
                 for i in range(0, shuffler.shape[0] // self.batch_size):
-                    print ("   " + str(i *100.0 / shuffler.shape[0] // self.batch_size ), "\033[1A")
+                    print ("   " + str(i *100.0 / (shuffler.shape[0] // self.batch_size) ), "\033[1A")
                     batch_index = shuffler[i * self.batch_size : (i+1) * self.batch_size]
                     #batch_input = (data[batch_index] - self.means) / self.stds
                     batch_input = data[batch_index]
@@ -95,7 +95,7 @@ class DEA:
             np.random.shuffle(shuffler)
             epoch_erros = []
             for i in range(0, shuffler.shape[0] // self.batch_size):
-                print ("   " + str(i *100.0 / shuffler.shape[0] // self.batch_size ), "\033[1A")
+                print ("   " + str(i *100.0 / (shuffler.shape[0] // self.batch_size) ), "\033[1A")
                 batch_index = shuffler[i * self.batch_size : (i+1) * self.batch_size]
                 batch_input = data[batch_index]
                 _,error = self.sess.run(self.ae["learn"], feed_dict={self.input: batch_input,
@@ -122,11 +122,16 @@ class DEA:
             print ("weights not loaded")
             
 if __name__ == "__main__":
-    data = np.loadtxt("short.csv", delimiter="\t")
-    means = np.mean(data[:,2:], axis=0)
-    stds = np.std(data[:,2:], axis=0)
-    print ("means shape:", means.shape, stds.shape)
-    data[:,2:] = (data[:,2:] - means) / stds
+    try:
+        data = np.load(open("data.np","rb"))
+        print ("numpy data loaded")
+    except:
+        data = np.loadtxt("short.csv", delimiter="\t")
+        means = np.mean(data[:,2:], axis=0)
+        stds = np.std(data[:,2:], axis=0)
+        data[:,2:] = (data[:,2:] - means) / stds
+        np.save(open("data.np","wb"), data)
+        print ("csv data loaded. numpy data saved")
 
     dea = DEA(p_epochs=5, t_epochs=20)
     dea.load_weights("weights.pkl")
