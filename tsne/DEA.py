@@ -75,6 +75,7 @@ class DEA:
                 np.random.shuffle(shuffler)
                 epoch_erros = []
                 for i in range(0, shuffler.shape[0] // self.batch_size):
+                    print (i, "\033[<1>A")
                     batch_index = shuffler[i * 100 : (i+1) * self.batch_size]
                     #batch_input = (data[batch_index] - self.means) / self.stds
                     batch_input = data[batch_index]
