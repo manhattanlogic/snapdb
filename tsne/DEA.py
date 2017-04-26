@@ -9,7 +9,7 @@ import sys
 '''
 class DEA:
     def __init__(self, layer_shapes=[100, 64, 32, 2], batch_size=4096*4,
-                     learing_rate=0.01, p_epochs=2, t_epochs=2):
+                     learing_rate=0.001, p_epochs=2, t_epochs=2):
 
         self.batch_size = batch_size
         self.lr = learing_rate
@@ -139,20 +139,21 @@ if __name__ == "__main__":
     dea = DEA(p_epochs=20, t_epochs=100)
     dea.load_weights("weights.pkl")
 
-    if len(sys.argv) > 1 and sys.argv[1] == "skip":
-        dea.train(data[:,2:], pretrain=False)
-    else:
-        dea.train(data[:,2:], pretrain=True)
+    for epoch in range(0, 100000):
+        if len(sys.argv) > 1 and sys.argv[1] == "skip":
+            dea.train(data[:,2:], pretrain=False)
+        else:
+            dea.train(data[:,2:], pretrain=True)
 
-    dea.save_weights("weights.pkl")
+        dea.save_weights("weights.pkl")
 
-    converters = np.where(data[:,1]==1)[0]
-    non_converters = np.where(data[:,1]==0)[0]
+        converters = np.where(data[:,1]==1)[0]
+        non_converters = np.where(data[:,1]==0)[0]
 
-    plt.figure(figsize=(30, 30))
-    projection = dea.get_projection(data[non_converters,2:])
-    plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
-    projection = dea.get_projection(data[converters,2:])
-    plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
-    
-    plt.savefig('graph.png')
+        plt.figure(figsize=(30, 30))
+        projection = dea.get_projection(data[non_converters,2:])
+        plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
+        projection = dea.get_projection(data[converters,2:])
+        plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
+
+        plt.savefig('graph_'+str(epoch)+'.png')
