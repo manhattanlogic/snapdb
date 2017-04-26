@@ -154,4 +154,4 @@ if __name__ == "__main__":
     projection = dea.get_projection(data[converters,2:])
     plt.scatter(projection[:,0],projection[:,1], s=0.1, color="red")
     
-    plt.savefig('graph.png')
+    plt.savefig('graph.png',dpi=400)
