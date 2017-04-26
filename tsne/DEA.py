@@ -7,7 +7,7 @@ import pickle
 [100,32,2,32,100]
 '''
 class DEA:
-    def __init__(self, layer_shapes=[100, 64, 32, 2], batch_size=256,
+    def __init__(self, layer_shapes=[100, 64, 32, 2], batch_size=4096*4,
                      learing_rate=0.0001, p_epochs=2, t_epochs=2):
 
         self.batch_size = batch_size
