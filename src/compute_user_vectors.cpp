@@ -90,6 +90,7 @@ char * query_x() {
       auto end =  i->second->history.rbegin()->second.ts;
       if (end - start < 1000) continue;
       bool is_converter = false;
+      
       for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
 	
 	if (j->second.events.size() != 1) continue;
@@ -112,7 +113,7 @@ char * query_x() {
 		  n++;
 		}
 	      }
-	      if ((is_product) || (event.ensighten.items[it].tag == "order")) {
+	      if (event.ensighten.items[it].tag == "order") {
 		is_converter = true;
 	      }
 	    } // items
