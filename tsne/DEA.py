@@ -75,7 +75,7 @@ class DEA:
                 np.random.shuffle(shuffler)
                 epoch_erros = []
                 for i in range(0, shuffler.shape[0] // self.batch_size):
-                    print (i, "\033[1A")
+                    print ("   " + str(i *100.0 / shuffler.shape[0] // self.batch_size ), "\033[1A")
                     batch_index = shuffler[i * self.batch_size : (i+1) * self.batch_size]
                     #batch_input = (data[batch_index] - self.means) / self.stds
                     batch_input = data[batch_index]
@@ -95,6 +95,7 @@ class DEA:
             np.random.shuffle(shuffler)
             epoch_erros = []
             for i in range(0, shuffler.shape[0] // self.batch_size):
+                print ("   " + str(i *100.0 / shuffler.shape[0] // self.batch_size ), "\033[1A")
                 batch_index = shuffler[i * self.batch_size : (i+1) * self.batch_size]
                 batch_input = data[batch_index]
                 _,error = self.sess.run(self.ae["learn"], feed_dict={self.input: batch_input,
@@ -136,4 +137,4 @@ if __name__ == "__main__":
     
     projection = dea.get_projection(data[:,2:])
     plt.scatter(projection[:,0],projection[:,1], s=1, c=data[:,1])
-    savefig('graph.pdf')
+    plt.savefig('graph.pdf')
