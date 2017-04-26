@@ -43,8 +43,6 @@ extern "C"
 char * query_x() {
   std::unordered_map<std::string, std::vector<float> > * w2v = new std::unordered_map<std::string, std::vector<float> >;
   std::stringstream result;
-
-  result << "roma durak\n";
   
   std::cerr << "query started\n";
   std::cout << "query started\n";
@@ -119,6 +117,7 @@ char * query_x() {
 	    } // items
 	  } // ensighten
 	} // enents
+	if (is_converter) break;
       } // history
       if (n > 0) {
 	result << i->first << "\t" << is_converter;
