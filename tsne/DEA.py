@@ -56,8 +56,7 @@ class DEA:
         self.sess.run(tf.global_variables_initializer())
         
     def train(self, data):
-        self.means = np.mean(data, axis=0)
-        self.stds = np.std(data, axis=0)
+        
         shuffler = np.array(range(0, data.shape[0]))
         for a in range(0, len(self.aes)):
             print ("training ae:", a)
@@ -67,7 +66,8 @@ class DEA:
                 epoch_erros = []
                 for i in range(0, shuffler.shape[0] // self.batch_size):
                     batch_index = shuffler[i * 100 : (i+1) * self.batch_size]
-                    batch_input = (data[batch_index] - self.means) / self.stds
+                    #batch_input = (data[batch_index] - self.means) / self.stds
+                    batch_input = data[batch_index]
                     if (a > 0):
                         batch_input=self.sess.run(self.ae["layers"][a], feed_dict={self.input:batch_input})
                     _, error = self.sess.run(self.aes[a]["learn"], feed_dict={self.aes[a]["input"]: batch_input,
@@ -75,14 +75,39 @@ class DEA:
                                                                                   self.learning_rate: self.lr})
                     epoch_erros.append(error)
                 print ("   error:", np.mean(epoch_erros))
-    def get_projection(self, data):
-        return self.sess.run(self.ae["projection"], feed_dict={self.input: (data - self.means) / self.stds})
+
         
+        for e in range(0, self.t_epochs):
+            print ("global epoch:", e)
+            np.random.shuffle(shuffler)
+            epoch_erros = []
+            for i in range(0, shuffler.shape[0] // self.batch_size):
+                batch_index = shuffler[i * 100 : (i+1) * self.batch_size]
+                batch_input = data[batch_index]
+                _,error = self.sess.run(self.ae["learn"], feed_dict={self.input: batch_input,
+                                                                         self.target: batch_input,
+                                                                         self.learning_rate: self.lr})
+                epoch_erros.append(error)
+            print ("   error:", np.mean(epoch_erros))
+                        
+    def get_projection(self, data):
+        return self.sess.run(self.ae["projection"], feed_dict={self.input: data})
+
+    
+    
 if __name__ == "__main__":
     data = np.loadtxt("short.csv", delimiter="\t")
-    dea = DEA(p_epochs=20, t_epochs=20)
+    means = np.mean(data[:,2:], axis=0)
+    stds = np.std(data[:,2:], axis=0)
+    print ("means shape:", means.shape, stds.shape)
+    data[:,2:] = (data[:,2:] - means) / stds
+
+    dea = DEA(p_epochs=5, t_epochs=5)
+    
     dea.train(data[:,2:])
 
+    
+    
     projection = dea.get_projection(data[:,2:])
     plt.scatter(projection[:,0],projection[:,1], c=data[:,1])
     plt.show()
