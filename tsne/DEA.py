@@ -136,7 +136,7 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(p_epochs=20, t_epochs=10)
+    dea = DEA(p_epochs=20, t_epochs=100)
     dea.load_weights("weights.pkl")
 
     if len(sys.argv) > 1 and sys.argv[1] == "skip":
@@ -149,9 +149,10 @@ if __name__ == "__main__":
     converters = np.where(data[:,1]==1)[0]
     non_converters = np.where(data[:,1]==0)[0]
 
+    plt.figure(figsize=(30, 30))
     projection = dea.get_projection(data[non_converters,2:])
-    plt.scatter(projection[:,0],projection[:,1], s=0.1, color="black")
+    plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
     projection = dea.get_projection(data[converters,2:])
-    plt.scatter(projection[:,0],projection[:,1], s=0.1, color="red")
+    plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
     
-    plt.savefig('graph.png',dpi=400)
+    plt.savefig('graph.png')
