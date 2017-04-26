@@ -2,13 +2,14 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle
+import sys
 '''
        0  1 2   3
 [100,32,2,32,100]
 '''
 class DEA:
     def __init__(self, layer_shapes=[100, 64, 32, 2], batch_size=4096*4,
-                     learing_rate=0.1, p_epochs=2, t_epochs=2):
+                     learing_rate=0.01, p_epochs=2, t_epochs=2):
 
         self.batch_size = batch_size
         self.lr = learing_rate
@@ -65,29 +66,31 @@ class DEA:
         writer = tf.summary.FileWriter('logs', self.sess.graph)
         self.sess.run(tf.global_variables_initializer())
         
-    def train(self, data):
+    def train(self, data, pretrain=True):
         
         shuffler = np.array(range(0, data.shape[0]))
-        for a in range(0, len(self.aes)):
-            print ("training ae:", a)
-            for e in range(0, self.p_epochs):
-                print ("  epoch:", e)
-                np.random.shuffle(shuffler)
-                epoch_erros = []
-                for i in range(0, shuffler.shape[0] // self.batch_size):
-                    print ("   " + str(i *100.0 / (shuffler.shape[0] // self.batch_size) ), "\033[1A")
-                    batch_index = shuffler[i * self.batch_size : (i+1) * self.batch_size]
-                    #batch_input = (data[batch_index] - self.means) / self.stds
-                    batch_input = data[batch_index]
-                    if (a > 0):
-                        batch_input=self.sess.run(self.ae["layers"][a], feed_dict={self.ae["layers"][0]:batch_input})
-                    batch_noise = np.random.randint(low=0,high=2,size=batch_input.shape)
-                    batch_input_noised = batch_input * batch_noise
-                    _, error = self.sess.run(self.aes[a]["learn"], feed_dict={self.aes[a]["input"]: batch_input_noised,
-                                                                                  self.aes[a]["target"]: batch_input,
-                                                                                  self.learning_rate: self.lr})
-                    epoch_erros.append(error)
-                print ("   error:", np.mean(epoch_erros))
+
+        if pretrain:
+            for a in range(0, len(self.aes)):
+                print ("training ae:", a)
+                for e in range(0, self.p_epochs):
+                    print ("  epoch:", e)
+                    np.random.shuffle(shuffler)
+                    epoch_erros = []
+                    for i in range(0, shuffler.shape[0] // self.batch_size):
+                        print ("   " + str(i *100.0 / (shuffler.shape[0] // self.batch_size) ), "\033[1A")
+                        batch_index = shuffler[i * self.batch_size : (i+1) * self.batch_size]
+                        #batch_input = (data[batch_index] - self.means) / self.stds
+                        batch_input = data[batch_index]
+                        if (a > 0):
+                            batch_input=self.sess.run(self.ae["layers"][a], feed_dict={self.ae["layers"][0]:batch_input})
+                        batch_noise = np.random.randint(low=0,high=2,size=batch_input.shape)
+                        batch_input_noised = batch_input * batch_noise
+                        _, error = self.sess.run(self.aes[a]["learn"], feed_dict={self.aes[a]["input"]: batch_input_noised,
+                                                                                      self.aes[a]["target"]: batch_input,
+                                                                                      self.learning_rate: self.lr})
+                        epoch_erros.append(error)
+                    print ("   error:", np.mean(epoch_erros))
 
         
         for e in range(0, self.t_epochs):
@@ -133,10 +136,13 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(p_epochs=20, t_epochs=20)
+    dea = DEA(p_epochs=20, t_epochs=100)
     dea.load_weights("weights.pkl")
-    
-    dea.train(data[:,2:])
+
+    if len(sys.argv) > 1 and sys.argv[1] == "skip":
+        dea.train(data[:,2:], pretrain=False)
+    else:
+        dea.train(data[:,2:], pretrain=True)
 
     dea.save_weights("weights.pkl")
     
