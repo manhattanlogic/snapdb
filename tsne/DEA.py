@@ -76,7 +76,7 @@ class DEA:
                 epoch_erros = []
                 for i in range(0, shuffler.shape[0] // self.batch_size):
                     print (i, "\033[1A")
-                    batch_index = shuffler[i * 100 : (i+1) * self.batch_size]
+                    batch_index = shuffler[i * self.batch_size : (i+1) * self.batch_size]
                     #batch_input = (data[batch_index] - self.means) / self.stds
                     batch_input = data[batch_index]
                     if (a > 0):
@@ -95,7 +95,7 @@ class DEA:
             np.random.shuffle(shuffler)
             epoch_erros = []
             for i in range(0, shuffler.shape[0] // self.batch_size):
-                batch_index = shuffler[i * 100 : (i+1) * self.batch_size]
+                batch_index = shuffler[i * self.batch_size : (i+1) * self.batch_size]
                 batch_input = data[batch_index]
                 _,error = self.sess.run(self.ae["learn"], feed_dict={self.input: batch_input,
                                                                          self.target: batch_input,
