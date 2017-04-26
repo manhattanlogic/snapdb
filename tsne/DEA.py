@@ -134,5 +134,5 @@ if __name__ == "__main__":
     dea.save_weights("weights.pkl")
     
     projection = dea.get_projection(data[:,2:])
-    plt.scatter(projection[:,0],projection[:,1], c=data[:,1])
+    plt.scatter(projection[:,0],projection[:,1], s=1, c=data[:,1])
     savefig('graph.pdf')
