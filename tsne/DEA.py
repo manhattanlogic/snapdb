@@ -80,7 +80,7 @@ class DEA:
                     #batch_input = (data[batch_index] - self.means) / self.stds
                     batch_input = data[batch_index]
                     if (a > 0):
-                        batch_input=self.sess.run(self.ae["layers"][a], feed_dict={self.input:batch_input})
+                        batch_input=self.sess.run(self.ae["layers"][a], feed_dict={self.ae["layers"][0]:batch_input})
                     batch_noise = np.random.randint(low=0,high=2,size=batch_input.shape)
                     batch_input_noised = batch_input * batch_noise
                     _, error = self.sess.run(self.aes[a]["learn"], feed_dict={self.aes[a]["input"]: batch_input_noised,
