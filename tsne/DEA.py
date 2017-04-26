@@ -142,4 +142,4 @@ if __name__ == "__main__":
     
     projection = dea.get_projection(data[:,2:])
     plt.scatter(projection[:,0],projection[:,1], s=1, c=data[:,1])
-    plt.savefig('graph.pdf')
+    plt.savefig('graph.png')
