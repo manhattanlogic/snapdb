@@ -10,6 +10,16 @@ import png
 image_width = 1024
 image_height = 1024
 
+
+def draw_circle(_x, _y, data, diameter, color=[255,255,255]):
+    angles = np.arange(0, 360) / 360.0 * np.pi
+    x = np.cos(angles) * diameter
+    y = np.sin(angles) * diameter
+    for i in range(0, len(x)):
+        data[int(x[i]), int(y[i]), :] = color
+        
+
+
 if __name__ == "__main__":
     try:
         data = np.load(open("data.np","rb"))
@@ -35,5 +45,12 @@ if __name__ == "__main__":
         y = int(projection[p,0] * image_width / 2 + image_width / 2)
         x = int(-projection[p,1] * image_height / 2 + image_height / 2)
         image_data[x,y,0] = 255
+
+
+    for i in range(0, kmeans.cluster_centers_.shape[0]):
+        y = int(kmeans.cluster_centers_[i,0] * image_width / 2 + image_width / 2)
+        x = int(-kmeans.cluster_centers_[i,1] * image_height / 2 + image_height / 2)
+        draw_circle(x, y, image_data, 100)
+        
     w.write(f, np.reshape(image_data, [image_height,-1]))
     f.close()
