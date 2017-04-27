@@ -30,10 +30,10 @@ if __name__ == "__main__":
 
     image_data = np.zeros([image_width, image_height, 3])
     f = open('clusters.png', 'wb')
-    w = png.Writer(255, 1, greyscale=False)
+    w = png.Writer(image_width, image_height, greyscale=False)
     for p in range(0, projection.shape[0]):
-        x = int(projection[p,0] * image_width / 2 + image_width / 2)
-        y = int(projection[p,1] * image_height / 2 + image_height / 2)
+        y = int(projection[p,0] * image_width / 2 + image_width / 2)
+        x = int(projection[p,1] * image_height / 2 + image_height / 2)
         image_data[x,y,0] = 255
     w.write(f, np.reshape(image_data, [image_height,-1]))
     f.close()
