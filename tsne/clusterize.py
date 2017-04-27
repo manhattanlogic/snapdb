@@ -13,8 +13,8 @@ image_height = 1024
 
 def draw_circle(_x, _y, data, diameter, color=[255,255,255]):
     angles = np.arange(0, 360) / 360.0 * np.pi
-    x = np.cos(angles) * diameter
-    y = np.sin(angles) * diameter
+    x = _x + np.cos(angles) * diameter
+    y = _y + np.sin(angles) * diameter
     for i in range(0, len(x)):
         data[int(x[i]), int(y[i]), :] = color
         
@@ -36,7 +36,7 @@ if __name__ == "__main__":
     dea.load_weights("weights.pkl")
 
     projection = dea.get_projection(data[:,2:])
-    kmeans = KMeans(n_clusters=8, random_state=0).fit(projection)
+    kmeans = KMeans(n_clusters=8, random_state=0, n_jobs=-1).fit(projection)
 
     image_data = np.zeros([image_width, image_height, 3])
     f = open('clusters.png', 'wb')
@@ -51,6 +51,8 @@ if __name__ == "__main__":
         y = int(kmeans.cluster_centers_[i,0] * image_width / 2 + image_width / 2)
         x = int(-kmeans.cluster_centers_[i,1] * image_height / 2 + image_height / 2)
         draw_circle(x, y, image_data, 100)
+
+    print (kmeans.cluster_centers_)
         
     w.write(f, np.reshape(image_data, [image_height,-1]))
     f.close()
