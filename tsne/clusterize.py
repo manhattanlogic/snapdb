@@ -33,7 +33,7 @@ if __name__ == "__main__":
     w = png.Writer(image_width, image_height, greyscale=False)
     for p in range(0, projection.shape[0]):
         y = int(projection[p,0] * image_width / 2 + image_width / 2)
-        x = int(projection[p,1] * image_height / 2 + image_height / 2)
+        x = int(-projection[p,1] * image_height / 2 + image_height / 2)
         image_data[x,y,0] = 255
     w.write(f, np.reshape(image_data, [image_height,-1]))
     f.close()
