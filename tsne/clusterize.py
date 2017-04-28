@@ -49,7 +49,7 @@ if __name__ == "__main__":
     dea.load_weights("weights.pkl")
 
     projection = dea.get_projection(data[:,2:])
-    kmeans = KMeans(n_clusters=18, random_state=0, n_jobs=1).fit(projection)
+    kmeans = KMeans(n_clusters=18, random_state=0, n_jobs=1, algorithm="elkan", max_iter=1000).fit(projection)
     centroids = kmeans.cluster_centers_
     predictions = kmeans.predict(projection)
     diameters = []
