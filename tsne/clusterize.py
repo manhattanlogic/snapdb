@@ -31,6 +31,7 @@ def draw_circle(_x, _y, data, diameter, color=[255,255,255]):
 if __name__ == "__main__":
     try:
         data = np.load(open("data.np","rb"))
+        id_data = np.load(open("id_data.np","rb"))
         print ("numpy data loaded")
     except:
         data = np.loadtxt("short.csv", delimiter="\t")
@@ -38,8 +39,12 @@ if __name__ == "__main__":
         stds = np.std(data[:,2:], axis=0)
         data[:,2:] = (data[:,2:] - means) / stds
         np.save(open("data.np","wb"), data)
+        id_data = np.loadtxt("short.csv", delimiter="\t", dtype=np.uint64, usecols=[0])
+        np.save(open("id_data.np","wb"), id_data)
         print ("csv data loaded. numpy data saved")
 
+    print (data.shape, id_data.shape)
+        
     dea = DEA(p_epochs=20, t_epochs=100)
     dea.load_weights("weights.pkl")
 
@@ -63,7 +68,9 @@ if __name__ == "__main__":
         y = int(projection[p,0] * image_width / 2 + image_width / 2)
         x = int(-projection[p,1] * image_height / 2 + image_height / 2)
         image_data[x,y,:] = colors[predictions[p]]
-        image_id_matrix[x,y] = data[p,0]
+        image_id_matrix[x,y] = id_data[p]
+        if p == 0:
+            print (id_data[p])
 
     for i in range(0, kmeans.cluster_centers_.shape[0]):
         y = int(kmeans.cluster_centers_[i,0] * image_width / 2 + image_width / 2)

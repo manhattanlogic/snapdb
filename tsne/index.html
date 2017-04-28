@@ -1,0 +1,29 @@
+<html>
+    <head>
+	<script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    </head>
+    <body>
+	<center>
+	    <img id="the_image" src="clusters.png"/>
+	</center>
+	<div style="width: 300px; height:200px;" id="result"></div>
+    </body>
+    <script>
+     $(function() {
+	 $("#the_image").click(function(e) {
+
+	     var offset = $(this).offset();
+	     var relativeX = (e.pageX - offset.left);
+	     var relativeY = (e.pageY - offset.top);
+
+	     $.get("get_vid.php?x=" + relativeX + "&y=" + relativeY, function(data, status){
+		 var vid = parseInt(data);
+		 if (vid > 0) {
+		     var url = "http://34.197.33.213/REVJET/?vid=" + data;
+		     window.open(url, 'window name');
+		 }
+	     });
+	 });
+     });
+    </script>
+</html>
