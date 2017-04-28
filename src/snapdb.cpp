@@ -79,7 +79,6 @@ std::unordered_map<unsigned long, single_json_history *> json_history;
 
 
 rapidjson::Document parse_json(char * line) {
-  
   rapidjson::Document d;
   char * tab_p = strchr(line, '\t');
   if (tab_p == NULL) return d;
@@ -122,6 +121,7 @@ json_history_entry parse_data(char * line) {
   json_history_entry result = {};
 
   rapidjson::Document d;
+  rapidjson::Document p_d;
   
   char * tab_p = strchr(line, '\t');
   if (tab_p == NULL) return result;
@@ -131,7 +131,13 @@ json_history_entry parse_data(char * line) {
 
   *tab = 0;
   
-  result.pixels = tab_p;
+  result.pixels = tab_p + 1;
+  p_d.Parse(tab_p + 1);
+  if (d.HasParseError()) {
+    std::cerr << "PIXEL PARSE ERROR !!!\n";
+  }
+  
+
   
   std::string json = (tab+1);
   json = replace_all(json, "\\'","'");
