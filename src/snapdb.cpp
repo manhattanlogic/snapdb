@@ -138,8 +138,6 @@ json_history_entry parse_data(char * line) {
   if (d.HasParseError()) {
     std::cerr << "PIXEL PARSE ERROR !!!\n";
   }
-
-  std::cerr << "PIXEL (" << pixel_json << ") TYPE:" << kTypeNames[p_d.GetType()] << "\n";
   
   if ((p_d.Size() < 1) || (p_d[p_d.Size()-1].GetInt() != 1210)) {
     return result;
@@ -357,8 +355,10 @@ void thread_runner(int id) {
   long file_position;
   while ((file_position = get_next_line(line)) >= 0) {
     auto result = parse_data(line);
-    result.file_position = file_position;
-    process_result(result, file_position);
+    if (result.ts != 0) {
+      result.file_position = file_position;
+      process_result(result, file_position);
+    }
   }
 }
 
