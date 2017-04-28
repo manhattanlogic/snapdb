@@ -355,10 +355,8 @@ void thread_runner(int id) {
   long file_position;
   while ((file_position = get_next_line(line)) >= 0) {
     auto result = parse_data(line);
-    if (result.ts != 0) {
-      result.file_position = file_position;
-      process_result(result, file_position);
-    }
+    result.file_position = file_position;
+    process_result(result, file_position);
   }
 }
 
