@@ -137,6 +137,8 @@ json_history_entry parse_data(char * line) {
     std::cerr << "PIXEL PARSE ERROR !!!\n";
   }
 
+  std::cerr << "PIXEL TYPE:" << kTypeNames[p_d.GetType()] << "\n";
+  
   if ((p_d.Size() < 1) || (p_d[p_d.Size()-1].GetInt() != 1210)) {
     return result;
   }
