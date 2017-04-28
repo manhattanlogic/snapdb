@@ -139,7 +139,7 @@ json_history_entry parse_data(char * line) {
     std::cerr << "PIXEL PARSE ERROR !!!\n";
   }
   
-  if ((p_d.Size() < 1) || (p_d[p_d.Size()-1].GetInt() != 1210)) {
+  if ((p_d.Size() < 1) || (p_d[p_d.Size()-1].GetInt() != 1310)) {
     return result;
   }
 
