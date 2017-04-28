@@ -133,7 +133,7 @@ json_history_entry parse_data(char * line) {
   
   result.pixels = tab_p + 1;
   std::string pixel_json = tab_p + 1;
-  pixel_json = replace_all(pixel_json, "'", "\"");
+  pixel_json = replace_all(pixel_json, "'", "");
   p_d.Parse(pixel_json.c_str());
   if (d.HasParseError()) {
     std::cerr << "PIXEL PARSE ERROR !!!\n";
