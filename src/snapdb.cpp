@@ -136,7 +136,10 @@ json_history_entry parse_data(char * line) {
   if (d.HasParseError()) {
     std::cerr << "PIXEL PARSE ERROR !!!\n";
   }
-  
+
+  if ((p_d.Size() < 1) || (p_d[p_d.Size()-1].GetInt() != 1210)) {
+    return result;
+  }
 
   
   std::string json = (tab+1);
