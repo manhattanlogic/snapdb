@@ -67,6 +67,7 @@ class DEA:
         self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
         self.ae["learn"] = (self.optimizer.minimize(self.ae["error"]), self.ae["error"])
         self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
+        self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-2]
 
         
         
@@ -110,7 +111,10 @@ class DEA:
                                                                          self.learning_rate: self.lr})
                 epoch_erros.append(error)
             print ("   error:", np.mean(epoch_erros))
-                        
+
+    def get_preprojection(self, data):
+        return self.sess.run(self.ae["preprojection"], feed_dict={self.input: data})
+
     def get_projection(self, data):
         return self.sess.run(self.ae["projection"], feed_dict={self.input: data})
 
@@ -160,9 +164,9 @@ if __name__ == "__main__":
         non_converters = np.where(data[:,1]==0)[0]
 
         plt.figure(figsize=(30, 30))
-        projection = dea.get_projection(data[non_converters,2:])
+        projection = dea.get_preprojection(data[non_converters,2:])
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
-        projection = dea.get_projection(data[converters,2:])
+        projection = dea.get_preprojection(data[converters,2:])
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
 
         print ("saving fig")
