@@ -51,13 +51,27 @@ class DEA:
             ae["output"]  =  tf.matmul(ae["hidden"], self.weights[t_idx][0]) + self.weights[t_idx][1]
             if a > 1:
                 ae["output"] = tf.tanh(ae["output"])
-            ae["error"] = tf.reduce_mean(tf.square(ae["output"] - ae["target"]))
-            ae["learn"] = (self.optimizer.minimize(ae["error"], var_list=[
-                self.weights[a-1][0],
-                self.weights[a-1][1],
-                self.weights[t_idx][0],
-                self.weights[t_idx][1]
-                ]), ae["error"])
+            if a != 0:
+                ae["error"] = tf.reduce_mean(tf.square(ae["output"] - ae["target"]))
+                ae["learn"] = (self.optimizer.minimize(ae["error"], var_list=[
+                    self.weights[a-1][0],
+                    self.weights[a-1][1],
+                    self.weights[t_idx][0],
+                    self.weights[t_idx][1]
+                    ]), ae["error"])
+            else:
+                    dot = tf.reduce_sum(ae["output"] * ae["target"], axis=1)
+                    n1 = tf.sqrt(tf.reduce_sum(ae["output"] * ae["output"], axis=1))
+                    n2 = tf.sqrt(tf.reduce_sum(ae["target"] * ae["target"], axis=1))
+                    ae["error"] = tf.reduce_mean(dot / (n1 * n2))
+                    ae["learn"] = (self.optimizer.minimize(-ae["error"], var_list=[
+                        self.weights[a-1][0],
+                        self.weights[a-1][1],
+                        self.weights[t_idx][0],
+                        self.weights[t_idx][1]
+                        ]), ae["error"])
+
+                    
             self.aes.append(ae)
 
         self.weight_noiser = []
@@ -90,7 +104,6 @@ class DEA:
         dot = tf.reduce_sum(self.ae["layers"][-1] * self.target, axis=1)
         n1 = tf.sqrt(tf.reduce_sum(self.ae["layers"][-1] * self.ae["layers"][-1], axis=1))
         n2 = tf.sqrt(tf.reduce_sum(self.target * self.target, axis=1))
-        print ("CP:", dot, n1, n1, sep="\n")
             
         self.ae["error"] = tf.reduce_mean(dot / (n1 * n2))
         self.ae["learn"] = (self.optimizer.minimize(-self.ae["error"]), self.ae["error"])
