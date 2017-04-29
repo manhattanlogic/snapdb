@@ -58,7 +58,7 @@ class DEA:
                 ]), ae["error"])
             self.aes.append(ae)
 
-
+            
         self.ae = {"layers":[self.input]}
         for i in range(0, len(self.weights)):
             hidden = tf.matmul(self.ae["layers"][-1], self.weights[i][0]) + self.weights[i][1]
@@ -68,7 +68,8 @@ class DEA:
                 else:
                     hidden = projection_function(hidden)
             if i == 0:
-                hidden = tf.nn.dropout(hidden, self.keep_prob)
+                #hidden = tf.nn.dropout(hidden, self.keep_prob)
+                nop = 0
             self.ae["layers"].append(hidden)
         self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
         self.ae["learn"] = (self.optimizer.minimize(self.ae["error"]), self.ae["error"])
@@ -167,7 +168,7 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(layer_shapes = [100, 128, 2, 32, 16], pretrain = [0,1,2],
+    dea = DEA(layer_shapes = [100, 32, 2, 32, 16], pretrain = [0,1,2],
                   p_epochs=5, t_epochs=10, projection_function=tf.nn.softmax)
     dea.sess = tf.Session()
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
