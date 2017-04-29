@@ -72,8 +72,15 @@ class DEA:
                 #hidden = tf.nn.dropout(hidden, self.keep_prob)
                 nop = 0
             self.ae["layers"].append(hidden)
-        self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
-        self.ae["learn"] = (self.optimizer.minimize(self.ae["error"]), self.ae["error"])
+        #self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
+
+        dot = tf.reduce_sum(self.ae["layers"][-1] * self.target, axis=1)
+        n1 = tf.sqrt(tf.reduce_sum(self.ae["layers"][-1] * self.ae["layers"][-1], axis=1))
+        n2 = tf.sqrt(tf.reduce_sum(self.target * self.target, axis=1))
+        print ("CP:", dot, n1, n1, sep="\n")
+            
+        self.ae["error"] = tf.reduce_mean(dot / (n1 * n2))
+        self.ae["learn"] = (self.optimizer.minimize(-self.ae["error"]), self.ae["error"])
         self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
         self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-3]
 
@@ -169,7 +176,7 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(layer_shapes = [100, 32, 2, 32, 16], pretrain = [0,1,2],
+    dea = DEA(layer_shapes = [100, 32, 2, 8, 16], pretrain = [0,1,2],
                   p_epochs=5, t_epochs=10, projection_function=tf.nn.softmax, projection_factor=10)
     dea.sess = tf.Session()
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
@@ -207,6 +214,9 @@ if __name__ == "__main__":
         projection = _projection
         tmp1 = np.argmax(postprojection, axis=1)
         color_projection = np.array(colors)[tmp1] / 256
+
+        for u in np.unique(tmp1):
+            print ("cluster:", u, np.where(tmp1==u)[0].shape[0])
         
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  c=color_projection)
         plt.savefig('clust_'+("%04d" % epoch)+'.png')
