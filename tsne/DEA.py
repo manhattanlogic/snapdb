@@ -111,8 +111,8 @@ class DEA:
             self.ae["learn"] = (self.optimizer.minimize(-self.ae["error"]), self.ae["error"])
             self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
             self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-3]
-
-
+            self.ae["gradients_and_vars"] = (self.optimizer.compute_gradients(-self.ae["error"]), self.ae["error"])
+            #self.ae["apply_gradients"] = self.optimizer.compute_gradients(self.gradients_and_vars)
     def noise_weights(self, stdev=1.0):
         self.sess.run(self.weight_noiser, feed_dict={self.weight_noise_sigma: stdev})
         
@@ -160,6 +160,16 @@ class DEA:
                 epoch_erros.append(error)
             print ("   error:", np.mean(epoch_erros))
 
+    def get_gradients(self, batch_input, batch_target):
+        gradients_and_vars = self.sess.run(self.ae["gradients_and_vars"],
+                                               feed_dict={self.input: batch_input,
+                                                              self.target: batch_target,
+                                                              self.learning_rate: self.lr,
+                                                              self.keep_prob: 1.0})
+        return (gradients_and_vars)
+    def apply_gradients(self, gradients_and_vars):
+        self.sess.run(self.ae["apply_gradients"], feed_dict={grads_and_vars: gradients_and_vars})
+            
     def get_preprojection(self, data):
         return self.sess.run(self.ae["preprojection"], feed_dict={self.input: data, self.keep_prob: 1.0})
 
@@ -207,13 +217,19 @@ if __name__ == "__main__":
         print ("csv data loaded. numpy data saved")
 
     dea = DEA(layer_shapes = [100, 64, 32, 8, 2], pretrain = [0,1,2],
-                  p_epochs=5, t_epochs=10, device='/gpu:1')
-    dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True))
+                  p_epochs=5, t_epochs=10, device='/gpu:0')
+    dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
     
     dea.load_weights("weights.pkl")
 
+    # g_and_v = dea.get_gradients(data[:,2:],data[:,2:])
+    # print (len(g_and_v[0]))
+    # print (g_and_v[1].shape)
+    
+
+    
     for epoch in range(0, 100000):
         dea.noise_weights(0.01)
         if epoch > 0 or (len(sys.argv) > 1 and sys.argv[1] == "skip"):
@@ -221,6 +237,8 @@ if __name__ == "__main__":
         else:
             dea.train(data[:,2:], pretrain=True)
 
+        
+            
         print ("saving weights")
         dea.save_weights("weights.pkl")
 

@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
     print (data.shape, id_data.shape)
         
-    dea = DEA(p_epochs=20, t_epochs=100)
+    dea = DEA(p_epochs=20, t_epochs=100, device='/gpu:1')
     dea.sess = tf.Session()
     dea.sess.run(tf.global_variables_initializer())
     
@@ -56,7 +56,6 @@ if __name__ == "__main__":
 
     projection = dea.get_projection(data[:,2:])
 
-    
     kmeans = KMeans(n_clusters=18, random_state=0, n_jobs=1, algorithm="elkan", max_iter=1000).fit(projection)
     centroids = kmeans.cluster_centers_
     predictions = kmeans.predict(projection)
