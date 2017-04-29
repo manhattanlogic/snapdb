@@ -67,7 +67,7 @@ class DEA:
                     hidden = tf.tanh(hidden)
                 else:
                     hidden = projection_function(hidden)
-            if i == 0 or i == (len(self.weights) - 1):
+            if i == 0 or i == (len(self.weights) - 2):
                 hidden = tf.nn.dropout(hidden, self.keep_prob)
             self.ae["layers"].append(hidden)
         self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
