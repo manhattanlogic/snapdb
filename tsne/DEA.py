@@ -15,6 +15,7 @@ class DEA:
         self.pretrain = pretrain
         self.keep_prob = tf.placeholder(tf.float32)
         self.projection_function = projection_function
+        self.projection_factor = projection_factor
         self.batch_size = batch_size
         self.lr = learing_rate
         self.p_epochs = p_epochs
@@ -44,7 +45,7 @@ class DEA:
             if (a != len(layer_shapes) -1):
                 ae["hidden"] = tf.tanh(ae["hidden"])
             else:
-                ae["hidden"] = projection_function(ae["hidden"])
+                ae["hidden"] = projection_function(ae["hidden"] * self.projection_factor)
             t_idx = len(layer_shapes)*2-a-2
             ae["output"]  =  tf.matmul(ae["hidden"], self.weights[t_idx][0]) + self.weights[t_idx][1]
             if a > 1:
@@ -169,7 +170,7 @@ if __name__ == "__main__":
         print ("csv data loaded. numpy data saved")
 
     dea = DEA(layer_shapes = [100, 32, 2, 32, 16], pretrain = [0,1,2],
-                  p_epochs=5, t_epochs=10, projection_function=tf.nn.softmax)
+                  p_epochs=5, t_epochs=10, projection_function=tf.nn.softmax, projection_factor=1000)
     dea.sess = tf.Session()
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
