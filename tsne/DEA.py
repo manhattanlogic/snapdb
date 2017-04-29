@@ -18,6 +18,7 @@ class DEA:
         self.projection_factor = projection_factor
         self.batch_size = batch_size
         self.lr = learing_rate
+        self.weight_noise_sigma = tf.placeholder(tf.float32)
         self.p_epochs = p_epochs
         self.t_epochs = t_epochs
         self.aes = []
@@ -59,6 +60,17 @@ class DEA:
                 ]), ae["error"])
             self.aes.append(ae)
 
+        self.weight_noiser = []
+        for i in range(0, len(self.weights)):
+            self.weight_noiser.append((
+            self.weights[i][0].assign(self.weights[i][0] + tf.random_normal(tf.shape(self.weights[i][0]),
+                                                                                stddev=self.weight_noise_sigma)),
+            self.weights[i][1].assign(self.weights[i][1] + tf.random_normal(tf.shape(self.weights[i][1]),
+                                                                                stddev=self.weight_noise_sigma))
+                                                                            ))
+        
+
+
             
         self.ae = {"layers":[self.input]}
         for i in range(0, len(self.weights)):
@@ -68,6 +80,7 @@ class DEA:
                     hidden = tf.tanh(hidden)
                 else:
                     hidden = projection_function(hidden)
+                    print ("softmax attached to:", hidden)
             if i == 0:
                 #hidden = tf.nn.dropout(hidden, self.keep_prob)
                 nop = 0
@@ -84,7 +97,9 @@ class DEA:
         self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
         self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-3]
 
-        
+
+    def noise_weights(self, stdev=1.0):
+        self.sess.run(self.weight_noiser, feed_dict={self.weight_noise_sigma: stdev})
         
     def train(self, data, pretrain=True):
         
@@ -185,6 +200,7 @@ if __name__ == "__main__":
     dea.load_weights("weights.pkl")
 
     for epoch in range(0, 100000):
+        dea.noise_weights(0.01)
         if epoch > 0 or (len(sys.argv) > 1 and sys.argv[1] == "skip"):
             dea.train(data[:,2:], pretrain=False)
         else:
