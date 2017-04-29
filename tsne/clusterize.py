@@ -48,7 +48,7 @@ if __name__ == "__main__":
     print (data.shape, id_data.shape)
         
     dea = DEA(p_epochs=20, t_epochs=100, layer_shapes = [100, 64, 32, 8, 2], device='/gpu:1')
-    dea.sess = tf.Session()
+    dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
     dea.sess.run(tf.global_variables_initializer())
     
     
