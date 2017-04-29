@@ -118,6 +118,9 @@ class DEA:
     def get_projection(self, data):
         return self.sess.run(self.ae["projection"], feed_dict={self.input: data})
 
+    def get_projections(self, data):
+        return self.sess.run([self.ae["preprojection"], self.ae["projection"]], feed_dict={self.input: data})
+    
     def save_weights(self, filename):
         weights = self.sess.run(self.weights)
         pickle.dump(weights, open(filename,"wb"))
@@ -175,9 +178,11 @@ if __name__ == "__main__":
         non_converters = np.where(data[:,1]==0)[0]
 
         f1 = plt.figure(figsize=(20, 20))
-        _projection = dea.get_preprojection(data[:,2:])
+        #_projection = dea.get_preprojection(data[:,2:])
         
 
+
+        _projection, postprojection = dea.get_projections(data[:,2:])
         
         projection = _projection[non_converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
@@ -188,7 +193,7 @@ if __name__ == "__main__":
         f2 = plt.figure(figsize=(20, 20))
         
         projection = _projection
-        tmp1 = np.argmax(dea.get_projection(data[:,2:]), axis=1)
+        tmp1 = np.argmax(postprojection, axis=1)
         color_projection = np.array(colors)[tmp1] / 256
         
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  c=color_projection)
