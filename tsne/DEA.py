@@ -11,6 +11,7 @@ class DEA:
     def __init__(self, layer_shapes=[100, 64, 32, 2], batch_size=1024,
                      learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.tanh):
 
+        self.keep_prob = tf.placeholder(tf.float32)
         self.projection_function = projection_function
         self.batch_size = batch_size
         self.lr = learing_rate
@@ -20,6 +21,7 @@ class DEA:
         self.weights = []
         self.input = tf.placeholder(tf.float32, [None, layer_shapes[0]])
         self.target = tf.placeholder(tf.float32, [None, layer_shapes[0]])
+        
         self.learning_rate = tf.placeholder(tf.float32)
         self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
         backward_weights = []
@@ -63,6 +65,8 @@ class DEA:
                     hidden = tf.tanh(hidden)
                 else:
                     hidden = projection_function(hidden)
+            if i == 0:
+                hidden = tf.nn.dropout(hidden, self.keep_prob)
             self.ae["layers"].append(hidden)
         self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
         self.ae["learn"] = (self.optimizer.minimize(self.ae["error"]), self.ae["error"])
@@ -88,12 +92,13 @@ class DEA:
                         #batch_input = (data[batch_index] - self.means) / self.stds
                         batch_input = data[batch_index]
                         if (a > 0):
-                            batch_input=self.sess.run(self.ae["layers"][a], feed_dict={self.ae["layers"][0]:batch_input})
+                            batch_input=self.sess.run(self.ae["layers"][a], feed_dict={self.ae["layers"][0]:batch_input, self.keep_prob: 1.0})
                         batch_noise = np.random.randint(low=0,high=2,size=batch_input.shape)
                         batch_input_noised = batch_input * batch_noise
                         _, error = self.sess.run(self.aes[a]["learn"], feed_dict={self.aes[a]["input"]: batch_input_noised,
                                                                                       self.aes[a]["target"]: batch_input,
-                                                                                      self.learning_rate: self.lr})
+                                                                                      self.learning_rate: self.lr,
+                                                                                      self.keep_prob: 1.0})
                         epoch_erros.append(error)
                     print ("   error:", np.mean(epoch_erros))
 
@@ -108,18 +113,19 @@ class DEA:
                 batch_input = data[batch_index]
                 _,error = self.sess.run(self.ae["learn"], feed_dict={self.input: batch_input,
                                                                          self.target: batch_input,
-                                                                         self.learning_rate: self.lr})
+                                                                         self.learning_rate: self.lr,
+                                                                         self.keep_prob: 0.5})
                 epoch_erros.append(error)
             print ("   error:", np.mean(epoch_erros))
 
     def get_preprojection(self, data):
-        return self.sess.run(self.ae["preprojection"], feed_dict={self.input: data})
+        return self.sess.run(self.ae["preprojection"], feed_dict={self.input: data, self.keep_prob: 1.0})
 
     def get_projection(self, data):
-        return self.sess.run(self.ae["projection"], feed_dict={self.input: data})
+        return self.sess.run(self.ae["projection"], feed_dict={self.input: data, self.keep_prob: 1.0})
 
     def get_projections(self, data):
-        return self.sess.run([self.ae["preprojection"], self.ae["projection"]], feed_dict={self.input: data})
+        return self.sess.run([self.ae["preprojection"], self.ae["projection"]], feed_dict={self.input: data, self.keep_prob: 1.0})
     
     def save_weights(self, filename):
         weights = self.sess.run(self.weights)
@@ -158,7 +164,7 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(layer_shapes = [100, 64, 32, 2, 16], p_epochs=50, t_epochs=10, projection_function=tf.nn.softmax)
+    dea = DEA(layer_shapes = [100, 128, 32, 2, 16], p_epochs=10, t_epochs=10, projection_function=tf.nn.softmax)
     dea.sess = tf.Session()
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
