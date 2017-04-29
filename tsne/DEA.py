@@ -168,7 +168,7 @@ if __name__ == "__main__":
         print ("csv data loaded. numpy data saved")
 
     dea = DEA(layer_shapes = [100, 128, 32, 2, 16], pretrain = [0,1,2],
-                  p_epochs=10, t_epochs=10, projection_function=tf.nn.softmax)
+                  p_epochs=5, t_epochs=10, projection_function=tf.nn.softmax)
     dea.sess = tf.Session()
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
