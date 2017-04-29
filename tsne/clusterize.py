@@ -7,6 +7,8 @@ from DEA import DEA
 from sklearn.cluster import KMeans
 import png
 
+
+
 image_width = 1024
 image_height = 1024
 
@@ -46,9 +48,15 @@ if __name__ == "__main__":
     print (data.shape, id_data.shape)
         
     dea = DEA(p_epochs=20, t_epochs=100)
+    dea.sess = tf.Session()
+    dea.sess.run(tf.global_variables_initializer())
+    
+    
     dea.load_weights("weights.pkl")
 
     projection = dea.get_projection(data[:,2:])
+
+    
     kmeans = KMeans(n_clusters=18, random_state=0, n_jobs=1, algorithm="elkan", max_iter=1000).fit(projection)
     centroids = kmeans.cluster_centers_
     predictions = kmeans.predict(projection)

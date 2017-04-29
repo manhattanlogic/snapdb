@@ -9,8 +9,9 @@ import sys
 '''
 class DEA:
     def __init__(self, layer_shapes=[100, 64, 32, 2], batch_size=4096*4,
-                     learing_rate=0.001, p_epochs=2, t_epochs=2):
+                     learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.tanh):
 
+        self.projection_function = projection_function
         self.batch_size = batch_size
         self.lr = learing_rate
         self.p_epochs = p_epochs
@@ -36,8 +37,10 @@ class DEA:
             ae["input"] = tf.placeholder(tf.float32, [None, layer_shapes[a - 1]])
             ae["target"] = tf.placeholder(tf.float32, [None, layer_shapes[a - 1]])
             ae["hidden"] =  tf.matmul(ae["input"], self.weights[a-1][0]) + self.weights[a-1][1]
-            #if (a != len(layer_shapes) -1):
-            #    ae["hidden"] = tf.tanh(ae["hidden"])
+            if (a != len(layer_shapes) -1):
+                ae["hidden"] = tf.tanh(ae["hidden"])
+            else:
+                ae["hidden"] = projection_function(ae["hidden"])
             t_idx = len(layer_shapes)*2-a-2
             ae["output"]  =  tf.matmul(ae["hidden"], self.weights[t_idx][0]) + self.weights[t_idx][1]
             if a > 1:
@@ -56,15 +59,16 @@ class DEA:
         for i in range(0, len(self.weights)):
             hidden = tf.matmul(self.ae["layers"][-1], self.weights[i][0]) + self.weights[i][1]
             if i != (len(self.weights) - 1):
-                hidden = tf.tanh(hidden)
+                if i != (len(layer_shapes) -1):
+                    hidden = tf.tanh(hidden)
+                else:
+                    hidden = projection_function(hidden)
             self.ae["layers"].append(hidden)
         self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
         self.ae["learn"] = (self.optimizer.minimize(self.ae["error"]), self.ae["error"])
         self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
 
-        self.sess = tf.Session()
-        writer = tf.summary.FileWriter('logs', self.sess.graph)
-        self.sess.run(tf.global_variables_initializer())
+        
         
     def train(self, data, pretrain=True):
         
@@ -136,15 +140,20 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(p_epochs=20, t_epochs=100)
+    dea = DEA(layer_shapes = [100, 64, 32, 2, 16], p_epochs=20, t_epochs=10, projection_function=tf.nn.softmax)
+    dea.sess = tf.Session()
+    #writer = tf.summary.FileWriter('logs', self.sess.graph)
+    dea.sess.run(tf.global_variables_initializer())
+    
     dea.load_weights("weights.pkl")
 
     for epoch in range(0, 100000):
-        if len(sys.argv) > 1 and sys.argv[1] == "skip":
+        if epoch > 0 or (len(sys.argv) > 1 and sys.argv[1] == "skip"):
             dea.train(data[:,2:], pretrain=False)
         else:
             dea.train(data[:,2:], pretrain=True)
 
+        print ("saving weights")
         dea.save_weights("weights.pkl")
 
         converters = np.where(data[:,1]==1)[0]
@@ -156,4 +165,5 @@ if __name__ == "__main__":
         projection = dea.get_projection(data[converters,2:])
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
 
-        plt.savefig('graph_'+str(epoch)+'.png')
+        print ("saving fig")
+        plt.savefig('graph_'+("%04d" % epoch)+'.png')
