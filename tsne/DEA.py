@@ -131,8 +131,19 @@ class DEA:
                 self.sess.run(self.weights[i][1].assign(weights[i][1]))
         except:
             print ("weights not loaded")
+
             
 if __name__ == "__main__":
+
+
+    colors = [(255, 200, 220),(170, 110, 40),(255, 150, 0),
+              (255, 215, 180),(128, 128, 0),(255, 235, 0),
+              (255, 250, 200),(190, 255, 0),(0, 190, 0),
+              (170, 255, 195),(0, 128, 128),(100, 255, 255),
+              (0, 0, 128),(67, 133, 255), (130, 0, 150),
+              (230, 190, 255),(255, 0, 255),(128, 128, 128)]
+
+    
     try:
         data = np.load(open("data.np","rb"))
         print ("numpy data loaded")
@@ -144,7 +155,7 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(layer_shapes = [100, 64, 32, 2, 16], p_epochs=20, t_epochs=10, projection_function=tf.nn.softmax)
+    dea = DEA(layer_shapes = [100, 64, 32, 2, 16], p_epochs=20, t_epochs=100, projection_function=tf.nn.softmax)
     dea.sess = tf.Session()
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
@@ -163,11 +174,24 @@ if __name__ == "__main__":
         converters = np.where(data[:,1]==1)[0]
         non_converters = np.where(data[:,1]==0)[0]
 
-        plt.figure(figsize=(30, 30))
+        f1 = plt.figure(figsize=(20, 20))
         projection = dea.get_preprojection(data[non_converters,2:])
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
         projection = dea.get_preprojection(data[converters,2:])
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
-
-        print ("saving fig")
         plt.savefig('graph_'+("%04d" % epoch)+'.png')
+        
+        f2 = plt.figure(figsize=(20, 20))
+        
+        projection = dea.get_preprojection(data[:,2:])
+        tmp1 = np.argmax(dea.get_projection(data[:,2:]), axis=1)
+        print (tmp1.shape)
+        print (tmp1)
+        color_projection = np.array(colors)[tmp1] / 256
+        
+        plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  c=color_projection)
+        plt.savefig('clust_'+("%04d" % epoch)+'.png')
+
+        plt.close(f1)
+        plt.close(f2)
+        
