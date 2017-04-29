@@ -8,7 +8,7 @@ import sys
 [100,32,2,32,100]
 '''
 class DEA:
-    def __init__(self, layer_shapes=[100, 64, 32, 2], batch_size=4096*4,
+    def __init__(self, layer_shapes=[100, 64, 32, 2], batch_size=1024,
                      learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.tanh):
 
         self.projection_function = projection_function
@@ -155,7 +155,7 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(layer_shapes = [100, 64, 32, 2, 16], p_epochs=20, t_epochs=100, projection_function=tf.nn.softmax)
+    dea = DEA(layer_shapes = [100, 64, 32, 2, 16], p_epochs=50, t_epochs=100, projection_function=tf.nn.softmax)
     dea.sess = tf.Session()
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
