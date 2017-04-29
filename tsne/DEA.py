@@ -204,8 +204,8 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(layer_shapes = [100, 32, 2, 8, 16], pretrain = [0,1,2],
-                  p_epochs=5, t_epochs=10, projection_function=tf.nn.softmax, projection_factor=100)
+    dea = DEA(layer_shapes = [100, 64, 32, 8, 2], pretrain = [0,1,2],
+                  p_epochs=5, t_epochs=10)
     dea.sess = tf.Session()
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
@@ -230,14 +230,15 @@ if __name__ == "__main__":
         
 
 
-        _projection, postprojection = dea.get_projections(data[:,2:])
+        _projection = dea.get_projection(data[:,2:])
         
         projection = _projection[non_converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
         projection = _projection[converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
         plt.savefig('graph_'+("%04d" % epoch)+'.png')
-        
+
+        '''
         f2 = plt.figure(figsize=(20, 20))
         
         projection = _projection
@@ -249,7 +250,9 @@ if __name__ == "__main__":
         
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  c=color_projection)
         plt.savefig('clust_'+("%04d" % epoch)+'.png')
-
-        plt.close(f1)
         plt.close(f2)
+        '''
+        
+        plt.close(f1)
+
         
