@@ -9,8 +9,8 @@ import sys
 '''
 class DEA:
     def __init__(self, layer_shapes=[100, 64, 32, 2], pretrain = [],
-                     batch_size=1024,
-                     learing_rate=0.01, p_epochs=2, t_epochs=2, projection_function=tf.tanh):
+                     batch_size=1024 * 16,
+                     learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.tanh):
 
         self.pretrain = pretrain
         self.keep_prob = tf.placeholder(tf.float32)
