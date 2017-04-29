@@ -155,7 +155,7 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(layer_shapes = [100, 64, 32, 2, 16], p_epochs=50, t_epochs=100, projection_function=tf.nn.softmax)
+    dea = DEA(layer_shapes = [100, 64, 32, 2, 16], p_epochs=50, t_epochs=10, projection_function=tf.nn.softmax)
     dea.sess = tf.Session()
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
@@ -175,18 +175,20 @@ if __name__ == "__main__":
         non_converters = np.where(data[:,1]==0)[0]
 
         f1 = plt.figure(figsize=(20, 20))
-        projection = dea.get_preprojection(data[non_converters,2:])
+        _projection = dea.get_preprojection(data[:,2:])
+        
+
+        
+        projection = _projection[non_converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
-        projection = dea.get_preprojection(data[converters,2:])
+        projection = _projection[converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
         plt.savefig('graph_'+("%04d" % epoch)+'.png')
         
         f2 = plt.figure(figsize=(20, 20))
         
-        projection = dea.get_preprojection(data[:,2:])
+        projection = _projection
         tmp1 = np.argmax(dea.get_projection(data[:,2:]), axis=1)
-        print (tmp1.shape)
-        print (tmp1)
         color_projection = np.array(colors)[tmp1] / 256
         
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  c=color_projection)
