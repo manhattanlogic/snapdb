@@ -29,9 +29,9 @@ class DEA:
         backward_weights = []
         
         for i in range(1, len(layer_shapes)):
-            self.weights.append([tf.Variable(tf.random_normal([layer_shapes[i-1], layer_shapes[i]])),
+            self.weights.append([tf.Variable(tf.random_normal([layer_shapes[i-1], layer_shapes[i]], stddev=0.01)),
                 tf.Variable(tf.zeros([layer_shapes[i]]))])
-            backward_weights.append([tf.Variable(tf.random_normal([layer_shapes[i], layer_shapes[i-1]])),
+            backward_weights.append([tf.Variable(tf.random_normal([layer_shapes[i], layer_shapes[i-1]], stddev=0.01)),
                 tf.Variable(tf.zeros([layer_shapes[i-1]]))])
             
         self.weights += backward_weights[::-1]
