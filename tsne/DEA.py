@@ -207,7 +207,7 @@ if __name__ == "__main__":
         print ("csv data loaded. numpy data saved")
 
     dea = DEA(layer_shapes = [100, 64, 32, 8, 2], pretrain = [0,1,2],
-                  p_epochs=5, t_epochs=10, device='/gpu:0')
+                  p_epochs=5, t_epochs=10, device='/gpu:1')
     dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True))
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
