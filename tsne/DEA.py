@@ -10,105 +10,107 @@ import sys
 class DEA:
     def __init__(self, layer_shapes=[100, 64, 32, 2], pretrain = [],
                      batch_size=1024 * 16,
-                     learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.tanh, projection_factor=1):
+                     learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.tanh,
+                     projection_factor=1,
+                     device='/cpu:0'):
+        with tf.device(device):
+            self.pretrain = pretrain
+            self.keep_prob = tf.placeholder(tf.float32)
+            self.projection_function = projection_function
+            self.projection_factor = projection_factor
+            self.batch_size = batch_size
+            self.lr = learing_rate
+            self.weight_noise_sigma = tf.placeholder(tf.float32)
+            self.p_epochs = p_epochs
+            self.t_epochs = t_epochs
+            self.aes = []
+            self.weights = []
+            self.input = tf.placeholder(tf.float32, [None, layer_shapes[0]])
+            self.target = tf.placeholder(tf.float32, [None, layer_shapes[0]])
 
-        self.pretrain = pretrain
-        self.keep_prob = tf.placeholder(tf.float32)
-        self.projection_function = projection_function
-        self.projection_factor = projection_factor
-        self.batch_size = batch_size
-        self.lr = learing_rate
-        self.weight_noise_sigma = tf.placeholder(tf.float32)
-        self.p_epochs = p_epochs
-        self.t_epochs = t_epochs
-        self.aes = []
-        self.weights = []
-        self.input = tf.placeholder(tf.float32, [None, layer_shapes[0]])
-        self.target = tf.placeholder(tf.float32, [None, layer_shapes[0]])
-        
-        self.learning_rate = tf.placeholder(tf.float32)
-        self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
-        backward_weights = []
-        
-        for i in range(1, len(layer_shapes)):
-            self.weights.append([tf.Variable(tf.random_normal([layer_shapes[i-1], layer_shapes[i]], stddev=0.01)),
-                tf.Variable(tf.zeros([layer_shapes[i]]))])
-            backward_weights.append([tf.Variable(tf.random_normal([layer_shapes[i], layer_shapes[i-1]], stddev=0.01)),
-                tf.Variable(tf.zeros([layer_shapes[i-1]]))])
-            
-        self.weights += backward_weights[::-1]
-        
-        for a in range (1, len(layer_shapes)):
-            ae = {}
-            ae["input"] = tf.placeholder(tf.float32, [None, layer_shapes[a - 1]])
-            ae["target"] = tf.placeholder(tf.float32, [None, layer_shapes[a - 1]])
-            ae["hidden"] =  tf.matmul(ae["input"], self.weights[a-1][0]) + self.weights[a-1][1]
-            if (a != len(layer_shapes) -1):
-                ae["hidden"] = tf.tanh(ae["hidden"])
-            else:
-                ae["hidden"] = projection_function(ae["hidden"] * self.projection_factor)
-            t_idx = len(layer_shapes)*2-a-2
-            ae["output"]  =  tf.matmul(ae["hidden"], self.weights[t_idx][0]) + self.weights[t_idx][1]
-            if a > 1:
-                ae["output"] = tf.tanh(ae["output"])
-            if a != 0:
-                ae["error"] = tf.reduce_mean(tf.square(ae["output"] - ae["target"]))
-                ae["learn"] = (self.optimizer.minimize(ae["error"], var_list=[
-                    self.weights[a-1][0],
-                    self.weights[a-1][1],
-                    self.weights[t_idx][0],
-                    self.weights[t_idx][1]
-                    ]), ae["error"])
-            else:
-                    dot = tf.reduce_sum(ae["output"] * ae["target"], axis=1)
-                    n1 = tf.sqrt(tf.reduce_sum(ae["output"] * ae["output"], axis=1))
-                    n2 = tf.sqrt(tf.reduce_sum(ae["target"] * ae["target"], axis=1))
-                    ae["error"] = tf.reduce_mean(dot / (n1 * n2))
-                    ae["learn"] = (self.optimizer.minimize(-ae["error"], var_list=[
+            self.learning_rate = tf.placeholder(tf.float32)
+            self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
+            backward_weights = []
+
+            for i in range(1, len(layer_shapes)):
+                self.weights.append([tf.Variable(tf.random_normal([layer_shapes[i-1], layer_shapes[i]], stddev=0.01)),
+                    tf.Variable(tf.zeros([layer_shapes[i]]))])
+                backward_weights.append([tf.Variable(tf.random_normal([layer_shapes[i], layer_shapes[i-1]], stddev=0.01)),
+                    tf.Variable(tf.zeros([layer_shapes[i-1]]))])
+
+            self.weights += backward_weights[::-1]
+
+            for a in range (1, len(layer_shapes)):
+                ae = {}
+                ae["input"] = tf.placeholder(tf.float32, [None, layer_shapes[a - 1]])
+                ae["target"] = tf.placeholder(tf.float32, [None, layer_shapes[a - 1]])
+                ae["hidden"] =  tf.matmul(ae["input"], self.weights[a-1][0]) + self.weights[a-1][1]
+                if (a != len(layer_shapes) -1):
+                    ae["hidden"] = tf.tanh(ae["hidden"])
+                else:
+                    ae["hidden"] = projection_function(ae["hidden"] * self.projection_factor)
+                t_idx = len(layer_shapes)*2-a-2
+                ae["output"]  =  tf.matmul(ae["hidden"], self.weights[t_idx][0]) + self.weights[t_idx][1]
+                if a > 1:
+                    ae["output"] = tf.tanh(ae["output"])
+                if a != 0:
+                    ae["error"] = tf.reduce_mean(tf.square(ae["output"] - ae["target"]))
+                    ae["learn"] = (self.optimizer.minimize(ae["error"], var_list=[
                         self.weights[a-1][0],
                         self.weights[a-1][1],
                         self.weights[t_idx][0],
                         self.weights[t_idx][1]
                         ]), ae["error"])
-
-                    
-            self.aes.append(ae)
-
-        self.weight_noiser = []
-        for i in range(0, len(self.weights)):
-            self.weight_noiser.append((
-            self.weights[i][0].assign(self.weights[i][0] + tf.random_normal(tf.shape(self.weights[i][0]),
-                                                                                stddev=self.weight_noise_sigma)),
-            self.weights[i][1].assign(self.weights[i][1] + tf.random_normal(tf.shape(self.weights[i][1]),
-                                                                                stddev=self.weight_noise_sigma))
-                                                                            ))
-        
-
-
-            
-        self.ae = {"layers":[self.input]}
-        for i in range(0, len(self.weights)):
-            hidden = tf.matmul(self.ae["layers"][-1], self.weights[i][0]) + self.weights[i][1]
-            if i != (len(self.weights) - 1):
-                if i != (len(layer_shapes) - 2):
-                    hidden = tf.tanh(hidden)
                 else:
-                    hidden = projection_function(hidden)
-                    print ("softmax attached to:", hidden)
-            if i == 0:
-                #hidden = tf.nn.dropout(hidden, self.keep_prob)
-                nop = 0
-            self.ae["layers"].append(hidden)
-        #self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
+                        dot = tf.reduce_sum(ae["output"] * ae["target"], axis=1)
+                        n1 = tf.sqrt(tf.reduce_sum(ae["output"] * ae["output"], axis=1))
+                        n2 = tf.sqrt(tf.reduce_sum(ae["target"] * ae["target"], axis=1))
+                        ae["error"] = tf.reduce_mean(dot / (n1 * n2))
+                        ae["learn"] = (self.optimizer.minimize(-ae["error"], var_list=[
+                            self.weights[a-1][0],
+                            self.weights[a-1][1],
+                            self.weights[t_idx][0],
+                            self.weights[t_idx][1]
+                            ]), ae["error"])
 
-        dot = tf.reduce_sum(self.ae["layers"][-1] * self.target, axis=1)
-        n1 = tf.sqrt(tf.reduce_sum(self.ae["layers"][-1] * self.ae["layers"][-1], axis=1))
-        n2 = tf.sqrt(tf.reduce_sum(self.target * self.target, axis=1))
-            
-        self.ae["error"] = tf.reduce_mean(dot / (n1 * n2))
-        self.ae["learn"] = (self.optimizer.minimize(-self.ae["error"]), self.ae["error"])
-        self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
-        self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-3]
+
+                self.aes.append(ae)
+
+            self.weight_noiser = []
+            for i in range(0, len(self.weights)):
+                self.weight_noiser.append((
+                self.weights[i][0].assign(self.weights[i][0] + tf.random_normal(tf.shape(self.weights[i][0]),
+                                                                                    stddev=self.weight_noise_sigma)),
+                self.weights[i][1].assign(self.weights[i][1] + tf.random_normal(tf.shape(self.weights[i][1]),
+                                                                                    stddev=self.weight_noise_sigma))
+                                                                                ))
+
+
+
+
+            self.ae = {"layers":[self.input]}
+            for i in range(0, len(self.weights)):
+                hidden = tf.matmul(self.ae["layers"][-1], self.weights[i][0]) + self.weights[i][1]
+                if i != (len(self.weights) - 1):
+                    if i != (len(layer_shapes) - 2):
+                        hidden = tf.tanh(hidden)
+                    else:
+                        hidden = projection_function(hidden)
+                        print ("softmax attached to:", hidden)
+                if i == 0:
+                    #hidden = tf.nn.dropout(hidden, self.keep_prob)
+                    nop = 0
+                self.ae["layers"].append(hidden)
+            #self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
+
+            dot = tf.reduce_sum(self.ae["layers"][-1] * self.target, axis=1)
+            n1 = tf.sqrt(tf.reduce_sum(self.ae["layers"][-1] * self.ae["layers"][-1], axis=1))
+            n2 = tf.sqrt(tf.reduce_sum(self.target * self.target, axis=1))
+
+            self.ae["error"] = tf.reduce_mean(dot / (n1 * n2))
+            self.ae["learn"] = (self.optimizer.minimize(-self.ae["error"]), self.ae["error"])
+            self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
+            self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-3]
 
 
     def noise_weights(self, stdev=1.0):
@@ -205,8 +207,8 @@ if __name__ == "__main__":
         print ("csv data loaded. numpy data saved")
 
     dea = DEA(layer_shapes = [100, 64, 32, 8, 2], pretrain = [0,1,2],
-                  p_epochs=5, t_epochs=10)
-    dea.sess = tf.Session()
+                  p_epochs=5, t_epochs=10, device='/gpu:0')
+    dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True))
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
     
