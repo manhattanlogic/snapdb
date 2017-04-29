@@ -8,9 +8,11 @@ import sys
 [100,32,2,32,100]
 '''
 class DEA:
-    def __init__(self, layer_shapes=[100, 64, 32, 2], batch_size=1024,
+    def __init__(self, layer_shapes=[100, 64, 32, 2], pretrain = []
+                     batch_size=1024,
                      learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.tanh):
 
+        self.pretrain = pretrain
         self.keep_prob = tf.placeholder(tf.float32)
         self.projection_function = projection_function
         self.batch_size = batch_size
@@ -65,7 +67,7 @@ class DEA:
                     hidden = tf.tanh(hidden)
                 else:
                     hidden = projection_function(hidden)
-            if i == 0:
+            if i == 0 or i == (len(self.weights) - 1):
                 hidden = tf.nn.dropout(hidden, self.keep_prob)
             self.ae["layers"].append(hidden)
         self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
@@ -81,6 +83,7 @@ class DEA:
 
         if pretrain:
             for a in range(0, len(self.aes)):
+              if len(self.pretrain) == 0 or a in self.pretrain:
                 print ("training ae:", a)
                 for e in range(0, self.p_epochs):
                     print ("  epoch:", e)
@@ -164,7 +167,8 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(layer_shapes = [100, 128, 32, 2, 16], p_epochs=10, t_epochs=10, projection_function=tf.nn.softmax)
+    dea = DEA(layer_shapes = [100, 128, 32, 2, 16], pretrain = [0,1,2],
+                  p_epochs=10, t_epochs=10, projection_function=tf.nn.softmax)
     dea.sess = tf.Session()
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
