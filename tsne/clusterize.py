@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
 
     for i in range(0, 1000000):
-        dea.sess.run(dea.weight_noiser)
+        dea.sess.run(variator.weight_noiser)
         _, error = variator.sess.run(variator.train_op, feed_dict = {variator.input: projection})
         clusters = np.argmax(dea.sess.run(variator.output, feed_dict = {variator.input: projection}), axis=1)
         c_colors = np.array(colors)[clusters]
