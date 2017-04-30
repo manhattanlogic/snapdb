@@ -13,7 +13,7 @@ class DEA:
                      learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.tanh,
                      projection_factor=1,
                      device='/cpu:0'):
-        with tf.device(device):
+        
             self.pretrain = pretrain
             self.keep_prob = tf.placeholder(tf.float32)
             self.projection_function = projection_function
