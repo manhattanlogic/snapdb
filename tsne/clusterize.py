@@ -43,7 +43,7 @@ class VARIATOR:
             ]
             ]
         hidden = tf.tanh(tf.matmul(self.input, self.weights[0][0]) + self.weights[0][1])
-        self.output = tf.nn.softmax(tf.matmul(hidden, self.weights[1][0]) + self.weights[1][1])
+        self.output = tf.nn.softmax((tf.matmul(hidden, self.weights[1][0]) + self.weights[1][1]) * 100)
         variances = []
         for i in range(0, num_clusters):
             mean, var = tf.nn.moments(self.input * tf.slice(self.output, [0, i], [tf.shape(self.output)[0], 1]), axes=[0])
