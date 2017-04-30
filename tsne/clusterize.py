@@ -31,7 +31,7 @@ def draw_circle(_x, _y, data, diameter, color=[255,255,255]):
 
 class VARIATOR:
     def __init__(self, input_size=2, num_clusters = 16, hidden_size = 8):
-        self.weight_noise_sigma = 0.1
+        
         self.num_clusters = num_clusters
         self.input_size = input_size
         self.input = tf.placeholder(tf.float32, [None, input_size])
@@ -58,9 +58,9 @@ class VARIATOR:
         for i in range(0, len(self.weights)):
             self.weight_noiser.append((
             self.weights[i][0].assign(self.weights[i][0] + tf.random_normal(tf.shape(self.weights[i][0]),
-                                                                                stddev=self.weight_noise_sigma)),
+                                                                                stddev=0.1)),
             self.weights[i][1].assign(self.weights[i][1] + tf.random_normal(tf.shape(self.weights[i][1]),
-                                                                                stddev=self.weight_noise_sigma))
+                                                                                stddev=0.1))
                                                                             ))
 
 
@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     for i in range(0, 1000000):
         dea.sess.run(dea.weight_noiser)
-        _, error = dea.sess.run(variator.train_op, feed_dict = {variator.input: projection})
+        _, error = variator.sess.run(variator.train_op, feed_dict = {variator.input: projection})
         clusters = np.argmax(dea.sess.run(variator.output, feed_dict = {variator.input: projection}), axis=1)
         c_colors = np.array(colors)[clusters]
         image_data = np.zeros([image_width, image_height, 3])
