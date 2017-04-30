@@ -46,8 +46,9 @@ class VARIATOR:
         self.output = tf.nn.softmax(tf.matmul(hidden, self.weights[1][0]) + self.weights[1][1])
         variances = []
         for i in range(0, num_clusters):
-            mean, var = tf.nn.moments(self.input * tf.slice(self.output, [0, i], [tf.shape(self.output)[0], 1]), axes=[1])
-            variances.append(var)
+            mean, var = tf.nn.moments(self.input * tf.slice(self.output, [0, i], [tf.shape(self.output)[0], 1]), axes=[0])
+            
+            variances.append(tf.reduce_sum(var))
 
         self.optimizer = tf.train.AdamOptimizer(0.01)
         self.train_op = (self.optimizer.minimize(tf.reduce_mean(variances)), tf.reduce_mean(variances))
@@ -76,8 +77,8 @@ if __name__ == "__main__":
 
     print (data.shape, id_data.shape)
         
-    dea = DEA(p_epochs=20, t_epochs=100, layer_shapes = [100, 64, 32, 8, 2], device='/gpu:1')
-    variator.sess = dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
+    dea = DEA(p_epochs=20, t_epochs=100, layer_shapes = [100, 64, 32, 8, 2])
+    variator.sess = dea.sess = tf.Session()
     dea.sess.run(tf.global_variables_initializer())
     dea.load_weights("weights.pkl")
 
@@ -89,12 +90,14 @@ if __name__ == "__main__":
         clusters = np.argmax(dea.sess.run(variator.output, feed_dict = {variator.input: projection}), axis=1)
         c_colors = np.array(colors)[clusters]
         image_data = np.zeros([image_width, image_height, 3])
-        f = open('clusters_' + ("%04d" % i) + '.png', 'wb')
+        
         w = png.Writer(image_width, image_height, greyscale=False)
         for p in range(0, projection.shape[0]):
             y = int(projection[p,0] * image_width / 2 + image_width / 2)
             x = int(-projection[p,1] * image_height / 2 + image_height / 2)
             image_data[x,y,:] = c_colors[p]
+            
+        f = open('clusters_' + ("%04d" % i) + '.png', 'wb')
         w.write(f, np.reshape(image_data, [image_height,-1]))
         f.close()
         variator.save_weights("variator_weights.pkl")
