@@ -17,7 +17,7 @@ colors = [(255, 200, 220),(170, 110, 40),(255, 150, 0),
               (255, 250, 200),(190, 255, 0),(0, 190, 0),
               (170, 255, 195),(0, 128, 128),(100, 255, 255),
               (0, 0, 128),(67, 133, 255), (130, 0, 150),
-              (230, 190, 255),(255, 0, 255),(128, 128, 128)]
+              (230, 190, 255),(255, 0, 255),(128, 128, 128)] * 64
 
 def draw_circle(_x, _y, data, diameter, color=[255,255,255]):
     angles = np.arange(-180, 180) / 180.0 * np.pi
@@ -96,37 +96,37 @@ if __name__ == "__main__":
 
     projection = dea.get_projection(data[:,2:])
 
+    if False:
+        for i in range(0, 1000000):
+            dea.sess.run(variator.weight_noiser)
+            _, error = variator.sess.run(variator.train_op, feed_dict = {variator.input: projection})
+            clusters = np.argmax(dea.sess.run(variator.output, feed_dict = {variator.input: projection}), axis=1)
+            c_colors = np.array(colors)[clusters]
+            image_data = np.zeros([image_width, image_height, 3])
 
-    for i in range(0, 1000000):
-        dea.sess.run(variator.weight_noiser)
-        _, error = variator.sess.run(variator.train_op, feed_dict = {variator.input: projection})
-        clusters = np.argmax(dea.sess.run(variator.output, feed_dict = {variator.input: projection}), axis=1)
-        c_colors = np.array(colors)[clusters]
-        image_data = np.zeros([image_width, image_height, 3])
+            w = png.Writer(image_width, image_height, greyscale=False)
+            for p in range(0, projection.shape[0]):
+                y = int(projection[p,0] * image_width / 2 + image_width / 2)
+                x = int(-projection[p,1] * image_height / 2 + image_height / 2)
+                image_data[x,y,:] = c_colors[p]
+
+            f = open('clusters_' + ("%04d" % i) + '.png', 'wb')
+            w.write(f, np.reshape(image_data, [image_height,-1]))
+            f.close()
+            variator.save_weights("variator_weights.pkl")
+            print (i, " : ", error)
+
+        sys.exit()
         
-        w = png.Writer(image_width, image_height, greyscale=False)
-        for p in range(0, projection.shape[0]):
-            y = int(projection[p,0] * image_width / 2 + image_width / 2)
-            x = int(-projection[p,1] * image_height / 2 + image_height / 2)
-            image_data[x,y,:] = c_colors[p]
-            
-        f = open('clusters_' + ("%04d" % i) + '.png', 'wb')
-        w.write(f, np.reshape(image_data, [image_height,-1]))
-        f.close()
-        variator.save_weights("variator_weights.pkl")
-        print (i, " : ", error)
-        
-    sys.exit()
-        
-    kmeans = KMeans(n_clusters=18, random_state=0, n_jobs=1, algorithm="elkan", max_iter=1000).fit(projection)
-    centroids = kmeans.cluster_centers_
-    predictions = kmeans.predict(projection)
-    diameters = []
+    #kmeans = KMeans(n_clusters=64, random_state=0, n_jobs=1).fit(projection.astype(np.float64))
+    #centroids = kmeans.cluster_centers_
+    #predictions = kmeans.predict(projection)
+    #diameters = []
     
-    for i in range(0, kmeans.cluster_centers_.shape[0]):
-        diff = kmeans.cluster_centers_[i, :] - projection[np.where(predictions==i)[0], :]
-        distance = np.max([np.sqrt(diff[d].dot(diff[d])) for d in range(0, diff.shape[0])])
-        diameters.append(int(distance * image_width / 2))
+    #for i in range(0, kmeans.cluster_centers_.shape[0]):
+    #    diff = kmeans.cluster_centers_[i, :] - projection[np.where(predictions==i)[0], :]
+    #    distance = np.max([np.sqrt(diff[d].dot(diff[d])) for d in range(0, diff.shape[0])])
+    #    diameters.append(int(distance * image_width / 2))
         
     image_data = np.zeros([image_width, image_height, 3])
     image_id_matrix = np.zeros([image_width, image_height], dtype=np.uint64)
@@ -136,17 +136,24 @@ if __name__ == "__main__":
     for p in range(0, projection.shape[0]):
         y = int(projection[p,0] * image_width / 2 + image_width / 2)
         x = int(-projection[p,1] * image_height / 2 + image_height / 2)
-        image_data[x,y,:] = colors[predictions[p]]
-        image_id_matrix[x,y] = id_data[p]
-        if p == 0:
-            print (id_data[p])
+        if data[p, 1] == 0:
+            val = image_data[x,y,2]
+            val = min(val+8, 255)
+            image_data[x,y,2] = val
+        else:
+            val = image_data[x,y,0]
+            val = min(val+64, 255)
+            image_data[x,y,0] = val
+        #image_data[x,y,:] = colors[predictions[p]]
+        #image_id_matrix[x,y] = id_data[p]
+        
 
-    for i in range(0, kmeans.cluster_centers_.shape[0]):
-        y = int(kmeans.cluster_centers_[i,0] * image_width / 2 + image_width / 2)
-        x = int(-kmeans.cluster_centers_[i,1] * image_height / 2 + image_height / 2)
-        draw_circle(x, y, image_data, diameters[i])
+    # for i in range(0, kmeans.cluster_centers_.shape[0]):
+    #    y = int(kmeans.cluster_centers_[i,0] * image_width / 2 + image_width / 2)
+    #    x = int(-kmeans.cluster_centers_[i,1] * image_height / 2 + image_height / 2)
+    #    draw_circle(x, y, image_data, diameters[i])
 
-    print (kmeans.cluster_centers_)
+    #print (kmeans.cluster_centers_)
         
     w.write(f, np.reshape(image_data, [image_height,-1]))
     f.close()

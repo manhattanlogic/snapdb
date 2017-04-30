@@ -10,7 +10,7 @@ import sys
 class DEA:
     def __init__(self, layer_shapes=[100, 64, 32, 2], pretrain = [],
                      batch_size=1024 * 16,
-                     learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.tanh,
+                     learing_rate=0.0001, p_epochs=2, t_epochs=2, projection_function=tf.tanh,
                      projection_factor=1,
                      device='/cpu:0'):
         
@@ -231,7 +231,7 @@ if __name__ == "__main__":
 
     
     for epoch in range(0, 100000):
-        dea.noise_weights(0.01)
+        # dea.noise_weights(0.01)
         if epoch > 0 or (len(sys.argv) > 1 and sys.argv[1] == "skip"):
             dea.train(data[:,2:], pretrain=False)
         else:
