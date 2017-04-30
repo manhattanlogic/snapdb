@@ -52,9 +52,9 @@ class VARIATOR:
         self.optimizer = tf.train.AdamOptimizer(0.01)
         self.train_op = (self.optimizer.minimize(tf.reduce_mean(variances)), tf.reduce_mean(variances))
 
-        def save_weights(self, filename):
-            weights = self.sess.run(self.weights)
-            pickle.dump(weights, open(filename,"wb"))
+    def save_weights(self, filename):
+        weights = self.sess.run(self.weights)
+        pickle.dump(weights, open(filename,"wb"))
         
 if __name__ == "__main__":
 
