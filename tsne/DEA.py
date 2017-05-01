@@ -29,7 +29,7 @@ class DEA:
             self.target = tf.placeholder(tf.float32, [None, layer_shapes[0]])
 
             self.softmax_temperature = tf.Variable(tf.ones(1)) 
-            self.softmax_temperature_lambda = 1.0
+            self.softmax_temperature_lambda = 10
             self.learning_rate = tf.placeholder(tf.float32)
             self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
             backward_weights = []
@@ -256,6 +256,13 @@ if __name__ == "__main__":
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
         plt.savefig('graph_'+("%04d" % epoch)+'.png')
 
+        tmp1 = np.argmax(_projection, axis=1)
+        color_projection = np.array(colors)[tmp1] / 256
+        for u in np.unique(tmp1):
+            print ("cluster:", u, np.where(tmp1==u)[0].shape[0])
+        plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  c=color_projection)
+        plt.savefig('clust_'+("%04d" % epoch)+'.png')
+        
         '''
         f2 = plt.figure(figsize=(20, 20))
         
