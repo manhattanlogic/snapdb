@@ -9,8 +9,8 @@ import png
 
 
 
-image_width = 1024
-image_height = 1024
+image_width = 640
+image_height = 640
 
 colors = [(255, 200, 220),(170, 110, 40),(255, 150, 0),
               (255, 215, 180),(128, 128, 0),(255, 235, 0),
@@ -96,6 +96,9 @@ if __name__ == "__main__":
 
     projection = dea.get_projection(data[:,2:])
 
+    np.save(open("projection.np", "wb"), projection)
+    print ("prediction points saved\n")
+    
     if False:
         for i in range(0, 1000000):
             dea.sess.run(variator.weight_noiser)
@@ -138,11 +141,11 @@ if __name__ == "__main__":
         x = int(-projection[p,1] * image_height / 2 + image_height / 2)
         if data[p, 1] == 0:
             val = image_data[x,y,2]
-            val = min(val+8, 255)
+            val = min(val+31, 255)
             image_data[x,y,2] = val
         else:
             val = image_data[x,y,0]
-            val = min(val+64, 255)
+            val = min(val+127, 255)
             image_data[x,y,0] = val
         #image_data[x,y,:] = colors[predictions[p]]
         #image_id_matrix[x,y] = id_data[p]

@@ -10,7 +10,7 @@ import sys
 class DEA:
     def __init__(self, layer_shapes=[100, 64, 32, 2], pretrain = [],
                      batch_size=1024,
-                     learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.tanh,
+                     learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.nn.softmax,
                      projection_factor=1,
                      device='/cpu:0'):
         
@@ -28,6 +28,8 @@ class DEA:
             self.input = tf.placeholder(tf.float32, [None, layer_shapes[0]])
             self.target = tf.placeholder(tf.float32, [None, layer_shapes[0]])
 
+            self.softmax_temperature = tf.Variable(tf.ones(1)) 
+            self.softmax_temperature_lambda = 100
             self.learning_rate = tf.placeholder(tf.float32)
             self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
             backward_weights = []
@@ -95,7 +97,7 @@ class DEA:
                     if i != (len(layer_shapes) - 2):
                         hidden = tf.tanh(hidden)
                     else:
-                        hidden = projection_function(hidden)
+                        hidden = projection_function(hidden / self.softmax_temperature)
                         print ("softmax attached to:", hidden)
                 if i == 0:
                     #hidden = tf.nn.dropout(hidden, self.keep_prob)
@@ -110,8 +112,9 @@ class DEA:
             self.ae["error"] = tf.reduce_mean(dot / (n1 * n2))
             self.ae["learn"] = (self.optimizer.minimize(-self.ae["error"]), self.ae["error"])
             self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
-            self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-3]
-            self.ae["gradients_and_vars"] = (self.optimizer.compute_gradients(-self.ae["error"]), self.ae["error"])
+            self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-2]
+            self.ae["gradients_and_vars"] = (self.optimizer.compute_gradients(
+                    -self.ae["error"] + self.softmax_temperature / self.softmax_temperature_lambda), self.ae["error"])
             #self.ae["apply_gradients"] = self.optimizer.compute_gradients(self.gradients_and_vars)
     def noise_weights(self, stdev=1.0):
         self.sess.run(self.weight_noiser, feed_dict={self.weight_noise_sigma: stdev})
@@ -216,18 +219,13 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
-    dea = DEA(layer_shapes = [100, 64, 32, 8, 2], pretrain = [0,1,2],
+    dea = DEA(layer_shapes = [100, 64, 32, 8, 2, 16], pretrain = [0,1,2],
                   p_epochs=5, t_epochs=10, device='/gpu:0')
     dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
     
     dea.load_weights("weights.pkl")
-
-    # g_and_v = dea.get_gradients(data[:,2:],data[:,2:])
-    # print (len(g_and_v[0]))
-    # print (g_and_v[1].shape)
-    
 
     
     for epoch in range(0, 100000):
@@ -238,23 +236,23 @@ if __name__ == "__main__":
             dea.train(data[:,2:], pretrain=True)
 
         
-            
+        print (dea.sess.run(dea.softmax_temperature))
         print ("saving weights")
         dea.save_weights("weights.pkl")
 
         converters = np.where(data[:,1]==1)[0]
         non_converters = np.where(data[:,1]==0)[0]
 
-        f1 = plt.figure(figsize=(20, 20))
+        f1 = plt.figure(figsize=(10, 10))
         #_projection = dea.get_preprojection(data[:,2:])
         
 
 
-        _projection = dea.get_projection(data[:,2:])
+        _preprojection, _projection = dea.get_projections(data[:,2:])
         
-        projection = _projection[non_converters,:]
+        projection = _preprojection[non_converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
-        projection = _projection[converters,:]
+        projection = _preprojection[converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
         plt.savefig('graph_'+("%04d" % epoch)+'.png')
 
