@@ -29,7 +29,7 @@ class DEA:
             self.target = tf.placeholder(tf.float32, [None, layer_shapes[0]])
 
             self.softmax_temperature = tf.Variable(tf.ones(1)) 
-            self.softmax_temperature_lambda = 10
+            self.softmax_temperature_lambda = 1.0
             self.learning_rate = tf.placeholder(tf.float32)
             self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
             backward_weights = []
