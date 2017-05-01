@@ -113,6 +113,7 @@ class DEA:
             self.ae["learn"] = (self.optimizer.minimize(-self.ae["error"]), self.ae["error"])
             self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
             self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-2]
+            self.ae["postprojection"] = self.ae["layers"][len(layer_shapes)]
             self.ae["gradients_and_vars"] = (self.optimizer.compute_gradients(
                     -self.ae["error"] + self.softmax_temperature / self.softmax_temperature_lambda), self.ae["error"])
             #self.ae["apply_gradients"] = self.optimizer.compute_gradients(self.gradients_and_vars)
@@ -180,7 +181,7 @@ class DEA:
         return self.sess.run(self.ae["projection"], feed_dict={self.input: data, self.keep_prob: 1.0})
 
     def get_projections(self, data):
-        return self.sess.run([self.ae["preprojection"], self.ae["projection"]], feed_dict={self.input: data, self.keep_prob: 1.0})
+        return self.sess.run([self.ae["preprojection"], self.ae["projection"], self.ae["postprojection"]], feed_dict={self.input: data, self.keep_prob: 1.0})
     
     def save_weights(self, filename):
         weights = self.sess.run(self.weights)
@@ -219,8 +220,13 @@ if __name__ == "__main__":
         np.save(open("data.np","wb"), data)
         print ("csv data loaded. numpy data saved")
 
+    if (len(sys.argv) > 2 and sys.argv[2] == "graph"):
+        t_epochs = 0
+    else:
+        t_epochs = 10
+        
     dea = DEA(layer_shapes = [100, 64, 32, 8, 2, 16], pretrain = [0,1,2],
-                  p_epochs=5, t_epochs=10, device='/gpu:0')
+                  p_epochs=5, t_epochs=t_epochs, device='/gpu:0')
     dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
@@ -248,7 +254,7 @@ if __name__ == "__main__":
         
 
 
-        _preprojection, _projection = dea.get_projections(data[:,2:])
+        _preprojection, _projection, _postprojection = dea.get_projections(data[:,2:])
         
         projection = _preprojection[non_converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
@@ -265,22 +271,17 @@ if __name__ == "__main__":
         plt.scatter(_preprojection[:,0],_preprojection[:,1], s=1, marker=",",  c=color_projection)
         plt.savefig('clust_'+("%04d" % epoch)+'.png')
         plt.close(f2)
-        
-        '''
-        f2 = plt.figure(figsize=(20, 20))
-        
-        projection = _projection
-        tmp1 = np.argmax(postprojection, axis=1)
-        color_projection = np.array(colors)[tmp1] / 256
 
-        for u in np.unique(tmp1):
-            print ("cluster:", u, np.where(tmp1==u)[0].shape[0])
+        print ("_preprojection:", _preprojection.shape)
+        print ("_projection:", _projection.shape)
+        print ("_postprojection:", _postprojection.shape)
         
-        plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  c=color_projection)
-        plt.savefig('clust_'+("%04d" % epoch)+'.png')
-        plt.close(f2)
-        '''
+        f3 = plt.figure(figsize=(10, 10))
+        plt.scatter(_postprojection[:,0],_postprojection[:,1], s=1, marker=",",  c=color_projection)
+        plt.savefig('postclust_'+("%04d" % epoch)+'.png')
+        plt.close(f3)
         
         
-
+        if t_epochs == 0:
+            break
         
