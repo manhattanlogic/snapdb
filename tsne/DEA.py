@@ -255,13 +255,16 @@ if __name__ == "__main__":
         projection = _preprojection[converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
         plt.savefig('graph_'+("%04d" % epoch)+'.png')
+        plt.close(f1)
 
+        f2 = plt.figure(figsize=(10, 10))
         tmp1 = np.argmax(_projection, axis=1)
         color_projection = np.array(colors)[tmp1] / 256
         for u in np.unique(tmp1):
             print ("cluster:", u, np.where(tmp1==u)[0].shape[0])
         plt.scatter(_projection[:,0],_projection[:,1], s=1, marker=",",  c=color_projection)
         plt.savefig('clust_'+("%04d" % epoch)+'.png')
+        plt.close(f2)
         
         '''
         f2 = plt.figure(figsize=(20, 20))
@@ -278,6 +281,6 @@ if __name__ == "__main__":
         plt.close(f2)
         '''
         
-        plt.close(f1)
+        
 
         
