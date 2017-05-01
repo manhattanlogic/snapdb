@@ -260,7 +260,7 @@ if __name__ == "__main__":
         color_projection = np.array(colors)[tmp1] / 256
         for u in np.unique(tmp1):
             print ("cluster:", u, np.where(tmp1==u)[0].shape[0])
-        plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  c=color_projection)
+        plt.scatter(_projection[:,0],_projection[:,1], s=1, marker=",",  c=color_projection)
         plt.savefig('clust_'+("%04d" % epoch)+'.png')
         
         '''
