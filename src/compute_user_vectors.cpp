@@ -80,8 +80,9 @@ char * query_x() {
     user_value.resize(w2v_size);
 
     long shor_hist = 0;
-    
-  
+    long non_ones = 0;
+    long counted = 0;
+    long true_counted = 0;
     for (auto i = json_history.begin(); i != json_history.end(); i++) {
       std::fill(user_value.begin(), user_value.end(), 0.0);
       std::vector <std::string> skus;
@@ -97,15 +98,18 @@ char * query_x() {
       
       for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
 	
-	if (j->second.events->size() != 1) continue;
+	if (j->second.events->size() != 1) {
+	  non_ones ++;
+	  continue;
+	}
 	for (int e = 0; e < j->second.events->size(); e++) {
 	  auto event = (*j->second.events)[e];
-	 
 	  if (event.ensighten.exists) {
 	    bool is_product = event.ensighten.pageType == "PRODUCT";
-	    
+	    counted ++;
 	    for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	      if ((is_product) || (event.ensighten.items[it].tag == "productpage")) {
+		true_counted ++;
 		skus.push_back(event.ensighten.items[it].sku);
 		auto sku_vector = w2v->find(event.ensighten.items[it].sku);
 		
@@ -135,6 +139,9 @@ char * query_x() {
 
     } // user
     std::cerr << shor_hist << " short histories\n";
+    std::cerr << non_ones << " non_ones\n";
+    std::cerr << counted << " counted\n";
+    std::cerr << true_counted << " non_true_counted\n";
   }
 
   delete w2v;
