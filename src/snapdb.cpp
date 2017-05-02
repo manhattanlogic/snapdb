@@ -513,10 +513,11 @@ void start_web_server(int port) {
 
 
 int main (int argc, char**argv) {
+  std::string filename = "";
   if(cmdOptionExists(argv, argv+argc, "-data")) {
-    char * filename = getCmdOption(argv, argv + argc, "-data");
+    filename = getCmdOption(argv, argv + argc, "-data");
     std::cerr << "loading file:" << filename << "\n";
-    file = fopen(filename, "r");
+    file = fopen(filename.c_str(), "r");
   } else {
     file = fopen("1day.tsv", "r");
   }
@@ -545,11 +546,14 @@ int main (int argc, char**argv) {
 
   std::cerr << "valid users:" << valid_users.size() << "\n";
   json_history.clear();
-  fseek(file, 0, SEEK_SET);
-
+  fclose(file);
+  file = fopen(filename.c_str(), "r");
+  has_more_lines = true;
+  
   for (int i = 0; i < THREADS; i++) {
     threads[i] = std::thread(thread_runner, i, false);
   }
+  
   for (int i = 0; i < THREADS; i++) {
     std::cerr << "join:" << i << "\n";
     threads[i].join();
