@@ -119,7 +119,8 @@ rapidjson::Document parse_json(char * line) {
 
 json_history_entry parse_data(char * line) {
   json_history_entry result = {};
-
+  result.events = new std::vector<json_simgle_event_type>;
+  
   rapidjson::Document d;
   rapidjson::Document p_d;
   
