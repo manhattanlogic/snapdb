@@ -528,9 +528,9 @@ int main (int argc, char**argv) {
     threads[i] = std::thread(thread_runner, i, true);
   }
   for (int i = 0; i < THREADS; i++) {
-    std::cerr << "join:" << i << "\n";
+    // std::cerr << "join:" << i << "\n";
     threads[i].join();
-    std::cerr << "\n";
+    //std::cerr << "\n";
   }
 
   std::cerr << "total users:" << json_history.size() << "\n";
@@ -555,11 +555,12 @@ int main (int argc, char**argv) {
   }
   
   for (int i = 0; i < THREADS; i++) {
-    std::cerr << "join:" << i << "\n";
+    // std::cerr << "join:" << i << "\n";
     threads[i].join();
-    std::cerr << "\n";
+    // std::cerr << "\n";
   }
 
+  valid_users.clear();
   
   std::cerr << json_history.size() << " users loaded\n";
   start_web_server(8080);
