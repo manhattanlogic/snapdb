@@ -67,7 +67,7 @@ std::string replace_all(
   return result;
 }
 
-#define THREADS 16
+#define THREADS 32
 
 static const char* kTypeNames[] = 
   { "Null", "False", "True", "Object", "Array", "String", "Number" };
