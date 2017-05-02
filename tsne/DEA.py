@@ -241,8 +241,8 @@ if __name__ == "__main__":
         else:
             dea.train(data[:,2:], pretrain=True)
 
-        
-        print (dea.sess.run(dea.softmax_temperature))
+        t = dea.sess.run(dea.softmax_temperature)
+        print (t * t)
         print ("saving weights")
         dea.save_weights("weights.pkl")
 
