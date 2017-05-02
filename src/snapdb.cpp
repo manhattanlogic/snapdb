@@ -532,6 +532,8 @@ int main (int argc, char**argv) {
     std::cerr << "\n";
   }
 
+  std::cerr << "total users:" << json_history.size() << "\n";
+  
   for (auto it = json_history.begin(); it != json_history.end(); it ++) {
     auto first = it->second->history.begin();
     auto last = it->second->history.rbegin();
@@ -541,8 +543,32 @@ int main (int argc, char**argv) {
     }
   }
 
+  std::cerr << "valid users:" << valid_users.size() << "\n";
+  json_history.clear();
+  fseek(file, 0, SEEK_SET);
+
+  for (int i = 0; i < THREADS; i++) {
+    threads[i] = std::thread(thread_runner, i, false);
+  }
+  for (int i = 0; i < THREADS; i++) {
+    std::cerr << "join:" << i << "\n";
+    threads[i].join();
+    std::cerr << "\n";
+  }
 
   
   std::cerr << json_history.size() << " users loaded\n";
   start_web_server(8080);
 }
+
+/*
+define funnel steps
+step 1: site visit
+?
+?
+?
+last step: purchase
+
+define in terms of distance to order
+
+ */
