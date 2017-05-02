@@ -518,7 +518,7 @@ int main (int argc, char**argv) {
   std::thread threads[THREADS];
   
   for (int i = 0; i < THREADS; i++) {
-    threads[i] = std::thread(thread_runner, i, false);
+    threads[i] = std::thread(thread_runner, i, true);
   }
   for (int i = 0; i < THREADS; i++) {
     std::cerr << "join:" << i << "\n";
