@@ -321,7 +321,7 @@ void process_result(json_history_entry data, unsigned long file_position) {
   
   counter += 1;
   if (counter % 10000 == 0) {
-    std::cerr << counter <<  "\n";
+    std::cerr << "    " << counter <<  "\n" << "\033[1A";
   }
   
   auto it = json_history.find(vid);
