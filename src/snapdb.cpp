@@ -120,7 +120,6 @@ rapidjson::Document parse_json(char * line) {
 json_history_entry parse_data(char * line, bool preprocess) {
   json_history_entry result = {};
   
-  
   rapidjson::Document d;
   rapidjson::Document p_d;
   
@@ -283,6 +282,10 @@ json_history_entry parse_data(char * line, bool preprocess) {
       
     }
     result.events->push_back(event);
+  }
+
+  if (result.events->size() > 100) {
+    std::cerr << "many events:" << result.events->size()  << "\n";
   }
   
   return result;
