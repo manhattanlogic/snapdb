@@ -97,7 +97,7 @@ class DEA:
                     if i != (len(layer_shapes) - 2):
                         hidden = tf.tanh(hidden)
                     else:
-                        hidden = projection_function(hidden / self.softmax_temperature)
+                        hidden = projection_function(hidden / (self.softmax_temperature * self.softmax_temperature))
                         print ("softmax attached to:", hidden)
                 if i == 0:
                     #hidden = tf.nn.dropout(hidden, self.keep_prob)
