@@ -45,7 +45,6 @@ char * query_x() {
   std::stringstream result;
   
   std::cerr << "query started\n";
-  std::cout << "query started\n";
 
   std::string filename = "sku_vectors.csv";
   
@@ -139,6 +138,8 @@ char * query_x() {
   }
 
   delete w2v;
+
+  std::cerr << "result size: " << result.str().size() << "\n";
   
   // end of custom code
   char * buffer = (char *)malloc(result.str().size() + 1);
