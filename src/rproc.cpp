@@ -5,6 +5,7 @@
 #include "snapdb.hpp"
 #include <sstream>
 #include <unordered_set>
+#include <unordered_map>
 #include <memory.h>
 
 extern std::string test_string;
@@ -12,6 +13,25 @@ extern std::string test_string;
 
 extern "C"
 char * f1() {
+  std::unordered_map<int, int> vector_stats;
+  std::stringstream result;
+  for (auto i = json_history.begin(); i != json_history.end(); i++) {
+    for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
+      auto it = vector_stats.find(j->second.events->size());
+      if (it == vector_stats.end()) {
+	vector_stats[j->second.events->size()] = 1;
+      } else {
+	it->second++;
+      }
+    }
+  }
+
+  for (auto i = vector_stats.begin(); i != vector_stats.end(); i++) {
+    result << i->first << "," << i->second << "\n";
+  }
+
+
+  /*
   std::stringstream result;
   history_filter.clear();
 
@@ -83,7 +103,7 @@ char * f1() {
   result << stats[1][0] << "," << stats[1][1] << "\n";
   result << stats[2][0] << "," << stats[2][1] << "\n";
   result << stats[3][0] << "," << stats[3][1] << "\n";
-  
+  */
   
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());
