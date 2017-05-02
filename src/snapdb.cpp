@@ -320,7 +320,7 @@ void process_result(json_history_entry data, unsigned long file_position) {
 
   auto id_it = ids.find(id);
   if (id_it != ids.end()) {
-    std::cerr << "id collision\n";
+    // std::cerr << "id collision\n";
   }
   ids.insert(id);
   
