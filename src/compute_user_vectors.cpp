@@ -97,7 +97,8 @@ char * query_x() {
       bool is_converter = false;
       
       for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
-	
+	if (non_ones > 100) break;
+	std::cerr << "j->second.events->size():" << j->second.events->size() << "\n";
 	if (j->second.events->size() != 1) {
 	  non_ones ++;
 	  continue;
