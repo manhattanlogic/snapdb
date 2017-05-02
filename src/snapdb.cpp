@@ -117,9 +117,9 @@ rapidjson::Document parse_json(char * line) {
   
 }
 
-json_history_entry parse_data(char * line) {
+json_history_entry parse_data(char * line, bool preprocess) {
   json_history_entry result = {};
-  result.events = new std::vector<json_simgle_event_type>;
+  
   
   rapidjson::Document d;
   rapidjson::Document p_d;
@@ -188,7 +188,11 @@ json_history_entry parse_data(char * line) {
     }
   } catch (...) {
   }
-
+  if (preprocess) {
+    return result;
+  }
+  result.events = new std::vector<json_simgle_event_type>;
+  
   bool is_active_event = false;
   for (int i = 0; i < d["events"].Size(); i++) {
     if (d["events"][i]["subids"].HasMember("ensighten") && d["events"][i]["subids"]["ensighten"].IsObject()) {
@@ -355,12 +359,8 @@ void thread_runner(int id, bool preprocess) {
   char * line = (char *) malloc(1024 * 1024 * 64); // 64 MB to be safe
   long file_position;
   while ((file_position = get_next_line(line)) >= 0) {
-    auto result = parse_data(line);
+    auto result = parse_data(line, preprocess);
     result.file_position = file_position;
-    if (preprocess) {
-      delete result.events;
-      result.events = NULL;
-    }
     process_result(result, file_position);
   }
 }
