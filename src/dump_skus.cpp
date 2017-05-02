@@ -18,8 +18,8 @@ char * query_x() {
     auto start =  i->second->history.begin()->second.ts;
     auto end =  i->second->history.rbegin()->second.ts;
     if (end - start < 1000) {
-      continue;
       short_hist ++;
+      continue;
     }
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       if (j->second.events->size() != 1) continue;
