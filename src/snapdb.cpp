@@ -187,12 +187,13 @@ json_history_entry parse_data(char * line, bool preprocess) {
     }
   } catch (...) {
   }
+  /*
   if (preprocess) {
     return result;
   }
   if (valid_users.find(result.vid) == valid_users.end()) {
     return result;
-  }
+    }*/
   result.events = new std::vector<json_simgle_event_type>;
   
   bool is_active_event = false;
@@ -284,9 +285,20 @@ json_history_entry parse_data(char * line, bool preprocess) {
     result.events->push_back(event);
   }
 
+
+
+
+  
   if (result.events->size() > 100) {
     std::cerr << "many events:" << result.events->size()  << "\n";
   }
+
+  if ((preprocess) || (valid_users.find(result.vid) == valid_users.end())) {
+    delete (result.events);
+  }
+
+
+
   
   return result;
   
