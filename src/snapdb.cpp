@@ -271,7 +271,7 @@ json_history_entry parse_data(char * line) {
       }
       
     }
-    result.events.push_back(event);
+    result.events->push_back(event);
   }
   
   return result;
@@ -357,7 +357,8 @@ void thread_runner(int id, bool preprocess) {
     auto result = parse_data(line);
     result.file_position = file_position;
     if (preprocess) {
-      result.events.clear();
+      delete result.events;
+      result.events = NULL;
     }
     process_result(result, file_position);
   }

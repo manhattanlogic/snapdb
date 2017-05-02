@@ -42,16 +42,18 @@ char * query() {
      if (end - start < 1000) continue;
      
       for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
-	for (int e = 0; e < j->second.events.size(); e++) {
-	  auto event = j->second.events[e];
-	  if (event.ensighten.exists) {
-	    camSources.insert(event.ensighten.camSource);
-	    camGroups.insert(event.ensighten.camGroup);
-	    auto browser = event.ensighten.browser;
-	    browsers.insert(browser);
-	    //if (browser != "") browsers.insert(browser);
-	    for (int it = 0; it < event.ensighten.items.size(); it ++) {
-	      if (event.ensighten.items[it].tag == "order") is_converter = true;
+	if (j->second.events != NULL) {
+	  for (int e = 0; e < j->second.events->size(); e++) {
+	    auto event = (*j->second.events)[e];
+	    if (event.ensighten.exists) {
+	      camSources.insert(event.ensighten.camSource);
+	      camGroups.insert(event.ensighten.camGroup);
+	      auto browser = event.ensighten.browser;
+	      browsers.insert(browser);
+	      //if (browser != "") browsers.insert(browser);
+	      for (int it = 0; it < event.ensighten.items.size(); it ++) {
+		if (event.ensighten.items[it].tag == "order") is_converter = true;
+	      }
 	    }
 	  }
 	}

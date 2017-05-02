@@ -20,9 +20,9 @@ char * query_x() {
     if (end - start < 1000) continue;
      
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
-      if (j->second.events.size() != 1) continue;
-      for (int e = 0; e < j->second.events.size(); e++) {
-	auto event = j->second.events[e];
+      if (j->second.events->size() != 1) continue;
+      for (int e = 0; e < j->second.events->size(); e++) {
+	auto event = (*j->second.events)[e];
 	if (event.ensighten.exists) {
 	  bool is_product = event.ensighten.pageType == "PRODUCT";
 	  for (int it = 0; it < event.ensighten.items.size(); it ++) {

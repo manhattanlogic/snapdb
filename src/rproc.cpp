@@ -30,7 +30,7 @@ char * f1() {
     // all single(1), all plural(2), some single-some plural(3)
     int plural  = 0;
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
-      if (j->second.events.size() <= 0) continue;
+      if ((j->second.events == NULL) || (j->second.events->size() <= 0)) continue;
       bool comma = j->second.pixels.find_first_of(",") != std::string::npos;
       switch (plural) {
       case 0:
@@ -47,8 +47,8 @@ char * f1() {
 	if (!(comma)) plural = 3;
 	break;
       }
-      for (int e = 0; e < j->second.events.size(); e++) {
-	auto event = j->second.events[e];
+      for (int e = 0; e < j->second.events->size(); e++) {
+	auto event = (*(j->second.events))[e];
 	if (!(event.ensighten.exists)) continue;
 
 	if ((event.ensighten.camGroup == "DglBrand") ||
