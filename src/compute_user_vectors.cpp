@@ -73,11 +73,15 @@ char * query_x() {
       }
     }
 
+    std::cerr << w2v->size() << " vectors loaded\n";
+    
     //int w2v_size = load_word2vec("sku_vectors.csv", w2v);
   
     std::vector<float> user_value;
     user_value.resize(w2v_size);
 
+    long shor_hist = 0;
+    
   
     for (auto i = json_history.begin(); i != json_history.end(); i++) {
       std::fill(user_value.begin(), user_value.end(), 0.0);
@@ -86,7 +90,10 @@ char * query_x() {
     
       auto start =  i->second->history.begin()->second.ts;
       auto end =  i->second->history.rbegin()->second.ts;
-      if (end - start < 1000) continue;
+      if (end - start < 1000) {
+	shor_hist++;
+	continue;
+      }
       bool is_converter = false;
       
       for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
@@ -128,6 +135,7 @@ char * query_x() {
       }
 
     } // user
+    std::cerr << shor_hist << " short histories\n";
   }
 
   delete w2v;
