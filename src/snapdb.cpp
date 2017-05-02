@@ -75,7 +75,7 @@ static const char* kTypeNames[] =
 std::unordered_set<unsigned long> ids;
 std::unordered_set<unsigned long> history_filter;
 std::unordered_map<unsigned long, single_json_history *> json_history;
-
+std::unordered_set<unsigned long> valid_users;
 
 
 rapidjson::Document parse_json(char * line) {
@@ -189,6 +189,9 @@ json_history_entry parse_data(char * line, bool preprocess) {
   } catch (...) {
   }
   if (preprocess) {
+    return result;
+  }
+  if (valid_users.find(result.vid) == valid_users.end()) {
     return result;
   }
   result.events = new std::vector<json_simgle_event_type>;
@@ -360,6 +363,9 @@ void thread_runner(int id, bool preprocess) {
   long file_position;
   while ((file_position = get_next_line(line)) >= 0) {
     auto result = parse_data(line, preprocess);
+    if (!(preprocess)) {
+      if (valid_users.find(result.vid) == valid_users.end()) continue;
+    }
     result.file_position = file_position;
     process_result(result, file_position);
   }
@@ -526,6 +532,17 @@ int main (int argc, char**argv) {
     std::cerr << "\n";
   }
 
+  for (auto it = json_history.begin(); it != json_history.end(); it ++) {
+    auto first = it->second->history.begin();
+    auto last = it->second->history.rbegin();
+    auto diatance = last->second.ts - first->second.ts;
+    if (diatance > 100) {
+      valid_users.insert(it->first);
+    }
+  }
+
+
+  
   std::cerr << json_history.size() << " users loaded\n";
   start_web_server(8080);
 }
