@@ -205,6 +205,8 @@ json_history_entry parse_data(char * line, bool preprocess) {
       is_active_event = false;
     }
     json_simgle_event_type event;
+
+    /*
     try {
       if (d["events"][i]["subids"].HasMember("location") && d["events"][i]["subids"]["location"].IsString()) {
 	  event.location = d["events"][i]["subids"]["location"].GetString();
@@ -216,7 +218,8 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	  event.referrer = d["events"][i]["subids"]["referrer"].GetString();
 	}
     } catch (...) {}
-    
+    */
+
     if (is_active_event) {
       event.ensighten.exists = true;
       try {
@@ -290,7 +293,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
 
 std::mutex line_read_mutex;
 std::mutex result_processor_mutex;
-bool has_more_lines = true;
+volatile bool has_more_lines = true;
 
 
 FILE * file;
@@ -369,6 +372,7 @@ void thread_runner(int id, bool preprocess) {
     result.file_position = file_position;
     process_result(result, file_position);
   }
+  free(line);
 }
 
 

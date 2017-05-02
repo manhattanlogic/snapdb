@@ -27,8 +27,8 @@ struct ensighten_type {
 };
 
 struct json_simgle_event_type {
-  std::string location;
-  std::string referrer;
+  //std::string location;
+  //std::string referrer;
   ensighten_type ensighten;
 };
 
