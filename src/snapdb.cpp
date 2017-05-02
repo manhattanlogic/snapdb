@@ -552,7 +552,9 @@ int main (int argc, char**argv) {
   json_history.clear();
   fclose(file);
   file = fopen(filename.c_str(), "r");
+
   has_more_lines = true;
+  counter = 0;
   
   for (int i = 0; i < THREADS; i++) {
     threads[i] = std::thread(thread_runner, i, false);
