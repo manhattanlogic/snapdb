@@ -350,12 +350,15 @@ void process_result(json_history_entry data, unsigned long file_position) {
 }
 
 
-void thread_runner(int id) {
+void thread_runner(int id, bool preprocess) {
   char * line = (char *) malloc(1024 * 1024 * 64); // 64 MB to be safe
   long file_position;
   while ((file_position = get_next_line(line)) >= 0) {
     auto result = parse_data(line);
     result.file_position = file_position;
+    if (preprocess) {
+      result.events.clear();
+    }
     process_result(result, file_position);
   }
 }
@@ -513,7 +516,7 @@ int main (int argc, char**argv) {
   std::thread threads[THREADS];
   
   for (int i = 0; i < THREADS; i++) {
-    threads[i] = std::thread(thread_runner, i);
+    threads[i] = std::thread(thread_runner, i, true);
   }
   for (int i = 0; i < THREADS; i++) {
     std::cerr << "join:" << i << "\n";
