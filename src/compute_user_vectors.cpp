@@ -59,7 +59,7 @@ char * query_x() {
       }
     }
 
-    std::cerr << w2v->size() << " vectors loaded\n";
+    std::cerr << w2v->size() << " vectors of " << w2v_size <<  "loaded\n";
 
     std::vector<float> user_value;
     user_value.resize(w2v_size);

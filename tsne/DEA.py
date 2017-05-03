@@ -10,7 +10,7 @@ import sys
 class DEA:
     def __init__(self, layer_shapes=[100, 64, 32, 2], pretrain = [],
                      batch_size=1024,
-                     learing_rate=0.01, p_epochs=2, t_epochs=2, projection_function=tf.nn.softmax,
+                     learing_rate=0.01, p_epochs=2, t_epochs=2, projection_function=tf.tanh,
                      projection_factor=1,
                      device='/cpu:0'):
         
@@ -97,7 +97,8 @@ class DEA:
                     if i != (len(layer_shapes) - 2):
                         hidden = tf.tanh(hidden)
                     else:
-                        hidden = projection_function(hidden / (self.softmax_temperature * self.softmax_temperature))
+                        hidden = projection_function(hidden)
+                        # hidden = projection_function(hidden / (self.softmax_temperature * self.softmax_temperature))
                         print ("softmax attached to:", hidden)
                 if i == 0:
                     #hidden = tf.nn.dropout(hidden, self.keep_prob)
@@ -115,7 +116,7 @@ class DEA:
             self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-2]
             self.ae["postprojection"] = self.ae["layers"][len(layer_shapes)]
             self.ae["gradients_and_vars"] = (self.optimizer.compute_gradients(
-                    -self.ae["error"] + (self.softmax_temperature * self.softmax_temperature) / self.softmax_temperature_lambda), self.ae["error"])
+                    -self.ae["error"], self.ae["error"])
             #self.ae["apply_gradients"] = self.optimizer.compute_gradients(self.gradients_and_vars)
     def noise_weights(self, stdev=1.0):
         self.sess.run(self.weight_noiser, feed_dict={self.weight_noise_sigma: stdev})
@@ -225,7 +226,7 @@ if __name__ == "__main__":
     else:
         t_epochs = 10
         
-    dea = DEA(layer_shapes = [100, 64, 32, 8, 2], pretrain = [0,1,2],
+    dea = DEA(layer_shapes = [100, 64, 32, 8, 2], pretrain = [0,1,2,3],
                   p_epochs=5, t_epochs=t_epochs, device='/gpu:0')
     dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
@@ -241,8 +242,8 @@ if __name__ == "__main__":
         else:
             dea.train(data[:,2:], pretrain=True)
 
-        t = dea.sess.run(dea.softmax_temperature)
-        print (t * t)
+        # t = dea.sess.run(dea.softmax_temperature)
+        # print (t * t)
         print ("saving weights")
         dea.save_weights("weights.pkl")
 
