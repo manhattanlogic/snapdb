@@ -30,7 +30,7 @@ char * query_x() {
   std::stringstream str_result;
   str_result << "done";
   
-  std::ofstream d_result("w2v_result_d.csv");
+  std::ofstream result("w2v_result_d.csv");
   std::ofstream m_result("w2v_result_m.csv");
   std::ofstream t_result("w2v_result_t.csv");
   
