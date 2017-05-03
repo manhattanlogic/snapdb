@@ -29,8 +29,10 @@ char * query_x() {
 	  bool is_product = event.ensighten.pageType == "PRODUCT";
 	  for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	    if ((is_product) || (event.ensighten.items[it].tag == "productpage")) {
-		skus.push_back(event.ensighten.items[it].sku);
-	      }
+	      skus.push_back(event.ensighten.items[it].sku);
+	    } else if ( (it == 0) && (event.ensighten.items[it].tag  == "cart") ) {
+	      skus.push_back("cart");
+	    }
 	  } // items
 	} // ensighten
       } // enents

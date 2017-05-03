@@ -29,8 +29,10 @@ char * query_x() {
   std::unordered_map<std::string, std::vector<float> > * w2v = new std::unordered_map<std::string, std::vector<float> >;
   std::stringstream str_result;
   str_result << "done";
-  std::ofstream result("w2v_result.csv");
   
+  std::ofstream d_result("w2v_result_d.csv");
+  std::ofstream m_result("w2v_result_m.csv");
+  std::ofstream t_result("w2v_result_t.csv");
   
   std::cerr << "query started\n";
 

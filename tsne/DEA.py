@@ -57,23 +57,13 @@ class DEA:
                     ae["output"] = tf.tanh(ae["output"])
                 if a != 0:
                     ae["error"] = tf.reduce_mean(tf.square(ae["output"] - ae["target"]))
-                    ae["learn"] = (self.optimizer.minimize(ae["error"], var_list=[
-                        self.weights[a-1][0],
-                        self.weights[a-1][1],
-                        self.weights[t_idx][0],
-                        self.weights[t_idx][1]
-                        ]), ae["error"])
+                    ae["learn"] = (self.optimizer.minimize(ae["error"]), ae["error"])
                 else:
                         dot = tf.reduce_sum(ae["output"] * ae["target"], axis=1)
                         n1 = tf.sqrt(tf.reduce_sum(ae["output"] * ae["output"], axis=1))
                         n2 = tf.sqrt(tf.reduce_sum(ae["target"] * ae["target"], axis=1))
                         ae["error"] = tf.reduce_mean(dot / (n1 * n2))
-                        ae["learn"] = (self.optimizer.minimize(-ae["error"], var_list=[
-                            self.weights[a-1][0],
-                            self.weights[a-1][1],
-                            self.weights[t_idx][0],
-                            self.weights[t_idx][1]
-                            ]), ae["error"])
+                        ae["learn"] = (self.optimizer.minimize(-ae["error"]), ae["error"])
 
 
                 self.aes.append(ae)
