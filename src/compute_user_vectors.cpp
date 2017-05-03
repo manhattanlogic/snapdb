@@ -30,9 +30,10 @@ char * query_x() {
   std::stringstream str_result;
   str_result << "done";
   
-  std::ofstream result("w2v_result_d.csv");
+  std::ofstream d_result("w2v_result_d.csv");
   std::ofstream m_result("w2v_result_m.csv");
   std::ofstream t_result("w2v_result_t.csv");
+  std::ofstream o_result("w2v_result_o.csv");
   
   std::cerr << "query started\n";
 
@@ -65,14 +66,17 @@ char * query_x() {
 
     std::vector<float> user_value;
     user_value.resize(w2v_size);
+    
     for (auto i = json_history.begin(); i != json_history.end(); i++) {
       bool is_converter = false;
       int n = 0;
+      std::string browser = "";
       std::fill(user_value.begin(), user_value.end(), 0.0);
       for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
 	if (j->second.events->size() == 0) continue;
 	auto event = (*(j->second.events))[j->second.events->size() - 1];
 	if (event.ensighten.exists) {
+	  browser = event.ensighten.browser;
 	  bool is_product = event.ensighten.pageType == "PRODUCT";
 	  for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	    if (event.ensighten.items[it].tag == "order") {
@@ -91,12 +95,22 @@ char * query_x() {
 	}
 	if (is_converter) break;
       } //user
+
+      auto result = &o_result;
+      
+      if (browser == "m") {
+	result = &m_result;
+      } else if (browser == "t") {
+	result = &t_result;
+      } else if (browser=="d") {
+	result = &d_result;
+      }
       if (n > 0) {
-	result << i->first << "\t" << is_converter;
+	(*result) << i->first << "\t" << is_converter;
 	for (int z = 0; z < w2v_size; z++) {
-	  result << "\t" << user_value[z] / n;
+	  (*result) << "\t" << user_value[z] / n;
 	}
-	result << "\n";
+	(*result) << "\n";
       }
     } // history
   }
