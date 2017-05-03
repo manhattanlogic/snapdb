@@ -226,7 +226,7 @@ if __name__ == "__main__":
     else:
         t_epochs = 10
         
-    dea = DEA(layer_shapes = [100, 64, 32, 8, 2], pretrain = [0,1,2,3],
+    dea = DEA(layer_shapes = [100, 100, 100, 100, 2], pretrain = [0,1,2,3],
                   p_epochs=5, t_epochs=t_epochs, device='/gpu:0')
     dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
