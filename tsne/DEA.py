@@ -115,8 +115,8 @@ class DEA:
             self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
             self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-2]
             self.ae["postprojection"] = self.ae["layers"][len(layer_shapes)]
-            self.ae["gradients_and_vars"] = (self.optimizer.compute_gradients(
-                    -self.ae["error"], self.ae["error"])
+            self.ae["gradients_and_vars"] = (self.optimizer.compute_gradients(-self.ae["error"]), self.ae["error"])
+            
             #self.ae["apply_gradients"] = self.optimizer.compute_gradients(self.gradients_and_vars)
     def noise_weights(self, stdev=1.0):
         self.sess.run(self.weight_noiser, feed_dict={self.weight_noise_sigma: stdev})
