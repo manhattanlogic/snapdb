@@ -10,7 +10,7 @@ import sys
 class DEA:
     def __init__(self, layer_shapes=[100, 64, 32, 2], pretrain = [],
                      batch_size=1024 * 8,
-                     learing_rate=0.001, p_epochs=2, t_epochs=2, projection_function=tf.tanh,
+                     learing_rate=0.0001, p_epochs=2, t_epochs=2, projection_function=tf.tanh,
                      projection_factor=1,
                      device='/cpu:0'):
         
