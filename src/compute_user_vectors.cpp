@@ -27,7 +27,10 @@ std::vector<std::string> split_string(std::string line) {
 extern "C"
 char * query_x() {
   std::unordered_map<std::string, std::vector<float> > * w2v = new std::unordered_map<std::string, std::vector<float> >;
-  std::stringstream result;
+  std::stringstream str_result;
+  str_result << "done";
+  std::ofstream result("w2v_result.csv");
+  
   
   std::cerr << "query started\n";
 
@@ -95,12 +98,12 @@ char * query_x() {
 
   delete w2v;
 
-  std::cerr << "result size: " << result.str().size() << "\n";
+  std::cerr << "result size: " << str_result.str().size() << "\n";
   
   // end of custom code
-  char * buffer = (char *)malloc(result.str().size() + 1);
-  memcpy(buffer, result.str().c_str(), result.str().size());
-  buffer[result.str().size()] = 0;
+  char * buffer = (char *)malloc(str_result.str().size() + 1);
+  memcpy(buffer, str_result.str().c_str(), str_result.str().size());
+  buffer[str_result.str().size()] = 0;
   return buffer;
 }
 

@@ -225,7 +225,7 @@ if __name__ == "__main__":
     else:
         t_epochs = 10
         
-    dea = DEA(layer_shapes = [100, 64, 32, 8, 2, 16], pretrain = [0,1,2],
+    dea = DEA(layer_shapes = [100, 64, 32, 8, 2], pretrain = [0,1,2],
                   p_epochs=5, t_epochs=t_epochs, device='/gpu:0')
     dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
@@ -256,13 +256,14 @@ if __name__ == "__main__":
 
         _preprojection, _projection, _postprojection = dea.get_projections(data[:,2:])
         
-        projection = _preprojection[non_converters,:]
+        projection = _projection[non_converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
-        projection = _preprojection[converters,:]
+        projection = _projection[converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
         plt.savefig('graph_'+("%04d" % epoch)+'.png')
         plt.close(f1)
 
+        '''
         f2 = plt.figure(figsize=(10, 10))
         tmp1 = np.argmax(_projection, axis=1)
         color_projection = np.array(colors)[tmp1] / 256
@@ -271,16 +272,16 @@ if __name__ == "__main__":
         plt.scatter(_preprojection[:,0],_preprojection[:,1], s=1, marker=",",  c=color_projection)
         plt.savefig('clust_'+("%04d" % epoch)+'.png')
         plt.close(f2)
-
+        '''
         print ("_preprojection:", _preprojection.shape)
         print ("_projection:", _projection.shape)
         print ("_postprojection:", _postprojection.shape)
-        
+        '''
         f3 = plt.figure(figsize=(10, 10))
         plt.scatter(_postprojection[:,0],_postprojection[:,1], s=1, marker=",",  c=color_projection)
         plt.savefig('postclust_'+("%04d" % epoch)+'.png')
         plt.close(f3)
-        
+        '''
         
         if t_epochs == 0:
             break
