@@ -49,7 +49,7 @@ char * query_x() {
       }
       std::vector<std::string> strs = split_string(line);
       std::vector<float> vector;
-      for (int i = 1; i < strs.size() - 1; i++) {
+      for (int i = 1; i < strs.size(); i++) {
 	vector.push_back(std::stof(strs[i]));
       }
       (*w2v)[strs[0]] = vector;
