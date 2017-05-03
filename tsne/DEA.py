@@ -55,7 +55,7 @@ class DEA:
                 ae["output"]  =  tf.matmul(ae["hidden"], self.weights[t_idx][0]) + self.weights[t_idx][1]
                 if a > 1:
                     ae["output"] = tf.tanh(ae["output"])
-                if a != 0:
+                if a != 1:
                     ae["error"] = tf.reduce_mean(tf.square(ae["output"] - ae["target"]))
                     ae["learn"] = (self.optimizer.minimize(ae["error"], var_list=[
                         self.weights[a-1][0],
