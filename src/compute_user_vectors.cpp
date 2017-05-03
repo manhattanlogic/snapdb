@@ -73,6 +73,9 @@ char * query_x() {
 	if (event.ensighten.exists) {
 	  bool is_product = event.ensighten.pageType == "PRODUCT";
 	  for (int it = 0; it < event.ensighten.items.size(); it ++) {
+	    if (event.ensighten.items[it].tag == "order") {
+	      is_converter = true;
+	    }
 	    if ((is_product) || (event.ensighten.items[it].tag == "productpage")) {
 	      auto sku_vector = w2v->find(event.ensighten.items[it].sku);
 	      if (sku_vector != w2v->end()) {
