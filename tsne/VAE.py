@@ -281,14 +281,10 @@ if __name__ == "__main__":
 
         
 
-        alpha = 1.0
-
-        kmeans = KMeans(n_clusters=8, random_state=0, max_iter=1000)
-        kmeans.fit(_projection.astype(np.float64))
-        self_y_pred = kmeans.predict(_projection.astype(np.float64))
+        
         
 
-        '''
+        
         f1 = plt.figure(figsize=(10, 10))
         projection = _projection[non_converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
@@ -296,14 +292,20 @@ if __name__ == "__main__":
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
         plt.savefig('graph_'+("%04d" % epoch)+'.png')
         plt.close(f1)
-        '''
+        
 
+        '''
+        alpha = 1.0
+
+        kmeans = KMeans(n_clusters=8, random_state=0, max_iter=1000)
+        kmeans.fit(_projection.astype(np.float64))
+        self_y_pred = kmeans.predict(_projection.astype(np.float64))
         f2 = plt.figure(figsize=(10, 10))
         projection = _projection
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,c=np.array(colors)[self_y_pred] / 256)
         plt.savefig('clust_'+("%04d" % epoch)+'.png')
         plt.close(f2)
-        
+        '''
         
         
         if t_epochs == 0:
