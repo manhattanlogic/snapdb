@@ -55,8 +55,9 @@ class DEA:
                     ae["hidden"] = tf.tanh(ae["hidden"])
                 else:
                     # this is the latent layer
-                     encoded = projection_function(ae["hidden"])
-
+                     #encoded = projection_function(ae["hidden"])
+                     encoded = ae["hidden"]
+                     
                      mean = encoded[:, :layer_shapes[-1]]
                      stddev = tf.sqrt(tf.exp(encoded[:, layer_shapes[-1]:]))
 
@@ -101,7 +102,8 @@ class DEA:
                         hidden = tf.tanh(hidden)
                     else:
                         # this is the latent variable
-                        encoded = projection_function(hidden)
+                        #encoded = projection_function(hidden)
+                        encoded=hidden
                         mean = encoded[:, :layer_shapes[-1]]
                         stddev = tf.sqrt(tf.exp(encoded[:, layer_shapes[-1]:]))
 
