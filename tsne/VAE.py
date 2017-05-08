@@ -36,8 +36,11 @@ class DEA:
             backward_weights = []
 
             for i in range(1, len(layer_shapes)):
-                self.weights.append([tf.Variable(tf.random_normal([layer_shapes[i-1], layer_shapes[i]], stddev=0.01)),
-                    tf.Variable(tf.zeros([layer_shapes[i]]))])
+                forward_width = layer_shapes[i]
+                if i == len(layer_shapes) - 1:
+                    forward_width *= 2
+                self.weights.append([tf.Variable(tf.random_normal([layer_shapes[i-1], forward_width], stddev=0.01)),
+                    tf.Variable(tf.zeros([forward_width]))])
                 backward_weights.append([tf.Variable(tf.random_normal([layer_shapes[i], layer_shapes[i-1]], stddev=0.01)),
                     tf.Variable(tf.zeros([layer_shapes[i-1]]))])
 
@@ -48,23 +51,32 @@ class DEA:
                 ae["input"] = tf.placeholder(tf.float32, [None, layer_shapes[a - 1]])
                 ae["target"] = tf.placeholder(tf.float32, [None, layer_shapes[a - 1]])
                 ae["hidden"] =  tf.matmul(ae["input"], self.weights[a-1][0]) + self.weights[a-1][1]
-                if (a != len(layer_shapes) -1):
+                if (a != len(layer_shapes) - 1):
                     ae["hidden"] = tf.tanh(ae["hidden"])
                 else:
-                    ae["hidden"] = projection_function(ae["hidden"] * self.projection_factor)
+                    # this is the latent layer
+                     encoded = projection_function(ae["hidden"])
+
+                     mean = encoded[:, :layer_shapes[-1]]
+                     stddev = tf.sqrt(tf.exp(encoded[:, layer_shapes[-1]:]))
+
+                     epsilon = tf.random_normal([tf.shape(mean)[0], layer_shapes[-1]])
+                     ae["hidden"] = mean + epsilon * stddev
+
                 t_idx = len(layer_shapes)*2-a-2
                 ae["output"]  =  tf.matmul(ae["hidden"], self.weights[t_idx][0]) + self.weights[t_idx][1]
                 if a > 1:
                     ae["output"] = tf.tanh(ae["output"])
+
                 if a != 1:
                     ae["error"] = tf.reduce_mean(tf.square(ae["output"] - ae["target"]))
                     ae["learn"] = (self.optimizer.minimize(ae["error"]), ae["error"])
                 else:
-                        dot = tf.reduce_sum(ae["output"] * ae["target"], axis=1)
-                        n1 = tf.sqrt(tf.reduce_sum(ae["output"] * ae["output"], axis=1))
-                        n2 = tf.sqrt(tf.reduce_sum(ae["target"] * ae["target"], axis=1))
-                        ae["error"] = tf.reduce_mean(dot / (n1 * n2))
-                        ae["learn"] = (self.optimizer.minimize(-ae["error"]), ae["error"])
+                    dot = tf.reduce_sum(ae["output"] * ae["target"], axis=1)
+                    n1 = tf.sqrt(tf.reduce_sum(ae["output"] * ae["output"], axis=1))
+                    n2 = tf.sqrt(tf.reduce_sum(ae["target"] * ae["target"], axis=1))
+                    ae["error"] = tf.reduce_mean(dot / (n1 * n2))
+                    ae["learn"] = (self.optimizer.minimize(-ae["error"]), ae["error"])
 
 
                 self.aes.append(ae)
@@ -88,11 +100,14 @@ class DEA:
                     if i != (len(layer_shapes) - 2):
                         hidden = tf.tanh(hidden)
                     else:
-                        hidden = projection_function(hidden)
-                        # hidden = projection_function(hidden / (self.softmax_temperature * self.softmax_temperature))
-                        print ("softmax attached to:", hidden)
+                        # this is the latent variable
+                        encoded = projection_function(hidden)
+                        mean = encoded[:, :layer_shapes[-1]]
+                        stddev = tf.sqrt(tf.exp(encoded[:, layer_shapes[-1]:]))
+
+                        epsilon = tf.random_normal([tf.shape(mean)[0], layer_shapes[-1]])
+                        hidden = mean + epsilon * stddev
                 if i == 0:
-                    #hidden = tf.nn.dropout(hidden, self.keep_prob)
                     nop = 0
                 self.ae["layers"].append(hidden)
             #self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
@@ -101,21 +116,28 @@ class DEA:
             n1 = tf.sqrt(tf.reduce_sum(self.ae["layers"][-1] * self.ae["layers"][-1], axis=1))
             n2 = tf.sqrt(tf.reduce_sum(self.target * self.target, axis=1))
 
+            self.vae_loss = self.__get_vae_cost(mean, stddev)
+            
             self.ae["error"] = tf.reduce_mean(dot / (n1 * n2))
-            self.ae["learn"] = (self.optimizer.minimize(-self.ae["error"]), self.ae["error"])
+            self.ae["learn"] = (self.optimizer.minimize(-self.ae["error"] + self.vae_loss), self.ae["error"], self.vae_loss)
             self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
             self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-2]
             self.ae["postprojection"] = self.ae["layers"][len(layer_shapes)]
             self.ae["gradients_and_vars"] = (self.optimizer.compute_gradients(-self.ae["error"]), self.ae["error"])
             
             #self.ae["apply_gradients"] = self.optimizer.compute_gradients(self.gradients_and_vars)
+
+    def __get_vae_cost(self, mean, stddev, epsilon=1e-8):
+        return tf.reduce_sum(0.5 * (tf.square(mean) + tf.square(stddev) -
+                                    2.0 * tf.log(stddev + epsilon) - 1.0))
+
+
+
     def noise_weights(self, stdev=1.0):
         self.sess.run(self.weight_noiser, feed_dict={self.weight_noise_sigma: stdev})
         
     def train(self, data, pretrain=True):
-        
         shuffler = np.array(range(0, data.shape[0]))
-
         if pretrain:
             for a in range(0, len(self.aes)):
               if len(self.pretrain) == 0 or a in self.pretrain:
@@ -124,6 +146,7 @@ class DEA:
                     print ("  epoch:", e)
                     np.random.shuffle(shuffler)
                     epoch_erros = []
+                    vae_epoch_erros = []
                     for i in range(0, shuffler.shape[0] // self.batch_size):
                         print ("   " + str(i *100.0 / (shuffler.shape[0] // self.batch_size) ), "\033[1A")
                         batch_index = shuffler[i * self.batch_size : (i+1) * self.batch_size]
@@ -138,6 +161,7 @@ class DEA:
                                                                                       self.learning_rate: self.lr,
                                                                                       self.keep_prob: 1.0})
                         epoch_erros.append(error)
+                        
                     print ("   error:", np.mean(epoch_erros))
 
         
@@ -145,16 +169,18 @@ class DEA:
             print ("global epoch:", e)
             np.random.shuffle(shuffler)
             epoch_erros = []
+            vae_epoch_erros = []
             for i in range(0, shuffler.shape[0] // self.batch_size):
                 print ("   " + str(i *100.0 / (shuffler.shape[0] // self.batch_size) ), "\033[1A")
                 batch_index = shuffler[i * self.batch_size : (i+1) * self.batch_size]
                 batch_input = data[batch_index]
-                _,error = self.sess.run(self.ae["learn"], feed_dict={self.input: batch_input,
+                _,error,vaerror = self.sess.run(self.ae["learn"], feed_dict={self.input: batch_input,
                                                                          self.target: batch_input,
                                                                          self.learning_rate: self.lr,
                                                                          self.keep_prob: 0.5})
                 epoch_erros.append(error)
-            print ("   error:", np.mean(epoch_erros))
+                vae_epoch_erros.append(vaerror)
+            print ("   error:", np.mean(epoch_erros),np.mean(vaerror))
 
     def get_gradients(self, batch_input, batch_target):
         gradients_and_vars = self.sess.run(self.ae["gradients_and_vars"],
@@ -218,7 +244,7 @@ if __name__ == "__main__":
         t_epochs = 10
         
     dea = DEA(layer_shapes = [100, 64, 32, 16, 2], pretrain = [0,1,2,3],
-                  p_epochs=10, t_epochs=t_epochs, device='/gpu:0')
+                  p_epochs=1, t_epochs=t_epochs, device='/gpu:0')
     dea.sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=False))
     #writer = tf.summary.FileWriter('logs', self.sess.graph)
     dea.sess.run(tf.global_variables_initializer())
