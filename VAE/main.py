@@ -18,7 +18,7 @@ if __name__ == "__main__":
     converters = np.where(data[:,1]==1)[0]
     non_converters = np.where(data[:,1]==0)[0]
 
-    for e in range(0, 100):
+    for e in range(0, 1000):
         error_1 = []
         error_2 = []
         for i in range(0, data.shape[0] // batch_size):
