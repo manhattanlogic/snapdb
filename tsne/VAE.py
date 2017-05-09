@@ -110,7 +110,7 @@ class DEA:
                         stddev = tf.sqrt(tf.exp(hidden[:, layer_shapes[-1]:]))
 
                         epsilon = tf.random_normal([tf.shape(mean)[0], layer_shapes[-1]])
-                        hidden = mean + stddev
+                        hidden = mean + stddev * epsilon
  
                 self.ae["layers"].append(hidden)
             #self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
