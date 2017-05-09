@@ -13,12 +13,13 @@ if __name__ == "__main__":
     
     batch_size = 1024 * 16
     shuffler = np.arange(0, data.shape[0])
-    np.random.shuffle(shuffler)
+    
 
     converters = np.where(data[:,1]==1)[0]
     non_converters = np.where(data[:,1]==0)[0]
 
     for e in range(1, 1000):
+        np.random.shuffle(shuffler)
         error_1 = []
         error_2 = []
         for i in range(0, data.shape[0] // batch_size):

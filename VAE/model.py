@@ -9,7 +9,7 @@ class Encoder:
         self.input = tf.placeholder(tf.float32, [None, input_size])
         for i in range(0, len(self.shape) - 1):
             m = 1 if i < (len(self.shape) - 2) else 2
-            w = [tf.Variable(tf.random_normal([self.shape[i], m * self.shape[i+1]])),
+            w = [tf.Variable(tf.random_normal([self.shape[i], m * self.shape[i+1]], stddev=0.01)),
                 tf.Variable(tf.zeros([m * self.shape[i+1]]))]
             self.weights.append(w)
 
@@ -32,7 +32,7 @@ class Encoder:
 
 class Decoder:
     def __init__(self, input_size=2, output_size=100, encoder=None):
-        self.encoder=encoder
+        self.encoder = encoder
         self.activation_function = tf.tanh
         self.shape = [input_size, 32, output_size]
         self.weights = []
@@ -41,7 +41,7 @@ class Decoder:
         self.optimizer = tf.train.AdamOptimizer(self.learning_rate)
         
         for i in range(0, len(self.shape) - 1):
-            w = [tf.Variable(tf.random_normal([self.shape[i], self.shape[i+1]])),
+            w = [tf.Variable(tf.random_normal([self.shape[i], self.shape[i+1]], stddev=0.01)),
                 tf.Variable(tf.zeros([self.shape[i+1]]))]
             self.weights.append(w)
         
