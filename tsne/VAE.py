@@ -103,6 +103,8 @@ class DEA:
                     else:
                         # this is the latent variable
                         #encoded = projection_function(hidden)
+
+                        
                         
                         mean = hidden[:, :layer_shapes[-1]]
                         stddev = tf.sqrt(tf.exp(hidden[:, layer_shapes[-1]:]))
@@ -120,7 +122,7 @@ class DEA:
             self.vae_loss = self.__get_vae_cost(mean, stddev)
             
             self.ae["error"] = tf.reduce_mean(dot / (n1 * n2))
-            self.ae["learn"] = (self.optimizer.minimize(-self.ae["error"] + self.vae_loss), self.ae["error"], self.vae_loss)
+            self.ae["learn"] = (self.optimizer.minimize(-self.ae["error"]), self.ae["error"], self.vae_loss)
             self.ae["projection"] = self.ae["layers"][len(layer_shapes)-1]
             self.ae["preprojection"] = self.ae["layers"][len(layer_shapes)-2]
             self.ae["postprojection"] = self.ae["layers"][len(layer_shapes)]
