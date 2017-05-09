@@ -25,7 +25,7 @@ class Encoder:
                 self.epsilon = epsilon = tf.random_normal([tf.shape(mean)[0], self.shape[-1]])
                 output = mean + epsilon * stddev
 
-                self.vae_loss = tf.reduce_sum(0.5 * (tf.square(mean) + tf.square(stddev) -
+                self.vae_loss = tf.reduce_mean(0.5 * (tf.square(mean) + tf.square(stddev) -
                                     2.0 * tf.log(stddev + 1e-8) - 1.0))
 
         self.output = output
