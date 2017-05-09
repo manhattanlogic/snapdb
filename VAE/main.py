@@ -18,7 +18,7 @@ if __name__ == "__main__":
     converters = np.where(data[:,1]==1)[0]
     non_converters = np.where(data[:,1]==0)[0]
 
-    for e in range(0, 1000):
+    for e in range(1, 1000):
         error_1 = []
         error_2 = []
         for i in range(0, data.shape[0] // batch_size):
@@ -32,6 +32,8 @@ if __name__ == "__main__":
         print (e, np.mean(error_1), np.mean(error_2))
         _projection = sess.run(decoder.encoder.output, feed_dict={decoder.encoder.input: data[:, 2:]})
 
+        if e % 10 != 0:
+            continue
         f1 = plt.figure(figsize=(10, 10))
         projection = _projection[non_converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
