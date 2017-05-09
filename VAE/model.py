@@ -54,9 +54,16 @@ class Decoder:
                 output = self.activation_function(output)
 
         self.output = output
+
+
+        dot = tf.reduce_sum(output * self.target, axis=1)
+        n1 = tf.sqrt(tf.reduce_sum(output * output, axis=1))
+        n2 = tf.sqrt(tf.reduce_sum(self.target * self.target, axis=1))
+        self.loss = - tf.reduce_mean(dot / (n1 * n2))
+
         
-        self.loss = tf.reduce_mean(tf.square(output - self.target)) + encoder.vae_loss * 0.01
+        #self.loss = tf.reduce_mean(tf.square(output - self.target)) + encoder.vae_loss * 0.01
         # encoder.vae_loss
-        self.learn = (self.optimizer.minimize(self.loss),
+        self.learn = (self.optimizer.minimize(self.loss + encoder.vae_loss * 0.01),
                           self.loss, encoder.vae_loss)
         
