@@ -3,6 +3,7 @@ import tensorflow as tf
 
 class Encoder:
     def __init__(self, input_size=100, output_size=2):
+        self.keep_prob = tf.placeholder(tf.float32)
         self.activation_function = tf.tanh
         self.shape = [input_size, 64, 8, output_size]
         self.weights = []
@@ -17,7 +18,7 @@ class Encoder:
         for i in range(0, len(self.shape) - 1):
             output = tf.matmul(output, self.weights[i][0]) + self.weights[i][1]
             if i < (len(self.shape) - 2):
-                output =  self.activation_function(output)
+                output = tf.nn.dropout(self.activation_function(output), keep_prob=self.keep_prob)
             else:
                 self.mean = mean = output[:, :self.shape[-1]]
                 self.stddev = stddev = tf.sqrt(tf.exp(output[:, self.shape[-1]:]))

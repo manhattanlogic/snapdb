@@ -28,14 +28,17 @@ if __name__ == "__main__":
             batch_data = data[batch_data_idx][:,2:]
             _, e1, e2 = sess.run(decoder.learn, feed_dict={decoder.encoder.input: batch_data,
                                                                decoder.target: batch_data,
-                                                               decoder.learning_rate: 0.001})
+                                                               decoder.learning_rate: 0.001,
+                                                               decoder.encoder.keep_prob: 0.5})
             error_1.append(e1)
             error_2.append(e2)
         print (e, np.mean(error_1), np.mean(error_2))
-        _projection = sess.run(decoder.encoder.output, feed_dict={decoder.encoder.input: data[:, 2:]})
-
         if e % 10 != 0:
             continue
+        _projection = sess.run(decoder.encoder.output, feed_dict={decoder.encoder.input: data[:, 2:],
+                                                                      decoder.encoder.keep_prob: 1.0})
+
+       
         f1 = plt.figure(figsize=(10, 10))
         projection = _projection[non_converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
