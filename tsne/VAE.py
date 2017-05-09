@@ -103,14 +103,13 @@ class DEA:
                     else:
                         # this is the latent variable
                         #encoded = projection_function(hidden)
-                        encoded=hidden
-                        mean = encoded[:, :layer_shapes[-1]]
-                        stddev = tf.sqrt(tf.exp(encoded[:, layer_shapes[-1]:]))
+                        
+                        mean = hidden[:, :layer_shapes[-1]]
+                        stddev = tf.sqrt(tf.exp(hidden[:, layer_shapes[-1]:]))
 
                         epsilon = tf.random_normal([tf.shape(mean)[0], layer_shapes[-1]])
                         hidden = mean + epsilon * stddev
-                if i == 0:
-                    nop = 0
+ 
                 self.ae["layers"].append(hidden)
             #self.ae["error"] = tf.reduce_mean(tf.square(self.ae["layers"][-1] - self.target))
 
