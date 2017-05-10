@@ -65,7 +65,7 @@ if __name__ == "__main__":
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
         projection = _projection[converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
-        plt.savefig('graph_'+("%04d" % (start + e))+'.png')
+        plt.savefig('graph_'+("%06d" % (start + e))+'.png')
         plt.close(f1)
         
         w = sess.run([decoder.encoder.weights, decoder.weights])

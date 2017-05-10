@@ -24,11 +24,14 @@ class Encoder:
                 self.stddev = stddev = tf.sqrt(tf.exp(output[:, self.shape[-1]:]))
 
                 self.epsilon = epsilon = tf.random_normal([tf.shape(mean)[0], self.shape[-1]])
-                output = mean + epsilon * stddev
+                #output = mean + epsilon * stddev
+                output = mean + tf.exp(stddev / 2) * epsilon
+                
+                # self.vae_loss = tf.reduce_mean(0.5 * (tf.square(mean) + tf.square(stddev) -
+                #                    2.0 * tf.log(stddev + 1e-8) - 1.0))
 
-                self.vae_loss = tf.reduce_mean(0.5 * (tf.square(mean) + tf.square(stddev) -
-                                    2.0 * tf.log(stddev + 1e-8) - 1.0))
-
+                self.vae_loss = -0.5 * tf.reduce_mean(1 + stddev - tf.square(mean) - tf.exp(stddev))
+                
         self.output = output
 
 class Decoder:
@@ -64,6 +67,6 @@ class Decoder:
         
         #self.loss = tf.reduce_mean(tf.square(output - self.target)) + encoder.vae_loss * 0.01
         # encoder.vae_loss
-        self.learn = (self.optimizer.minimize(- self.loss + encoder.vae_loss * 0.01),
+        self.learn = (self.optimizer.minimize(- self.loss + encoder.vae_loss),
                           self.loss, encoder.vae_loss)
         
