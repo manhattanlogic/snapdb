@@ -272,14 +272,27 @@ if __name__ == "__main__":
         plt.close(f1)
         '''
 
+        '''
         f2 = plt.figure(figsize=(10, 10))
         projection = _projection
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,c=np.array(colors)[self_y_pred] / 256)
         plt.savefig('clust_'+("%04d" % epoch)+'.png')
         plt.close(f2)
+        '''
+
         
         
+        
+                
         
         if t_epochs == 0:
+            d = open("short.csv", "r")
+            c = open("clusters.csv", "w")
+            for i in range(0, data[:,0].shape[0]):
+                vid = d.readline().split("\t")[0]
+                c.write(vid)
+                c.write("," + str(self_y_pred[i]) + "\n")
+            c.close()
+            d.close()
             break
         
