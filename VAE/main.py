@@ -13,7 +13,7 @@ if __name__ == "__main__":
     sess.run(tf.global_variables_initializer())
     writer = tf.summary.FileWriter('logs', sess.graph)
     
-    batch_size = 1024 * 16 * 4
+    batch_size = 1024
     shuffler = np.arange(0, data.shape[0])
     
 
