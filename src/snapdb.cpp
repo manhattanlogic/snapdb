@@ -268,6 +268,14 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	      item.price = std::atof(d["events"][i]["subids"]["ensighten"]["items"][j]["price"].GetString());
 	    }
 	  } catch (...) {}
+
+	  try {
+	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("quantity") && d["events"][i]["subids"]["ensighten"]["items"][j]["quantity"].IsInt()) {
+	      item.quantity = d["events"][i]["subids"]["ensighten"]["items"][j]["quantity"].GetInt();
+	    }
+	  } catch (...) {}
+
+	  
 	  
 	  try {
 	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("productName") &&

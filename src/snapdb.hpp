@@ -14,6 +14,7 @@ struct ensighten_item {
   std::string tag = "";
   std::string productName;
   float price;
+  int quantity;
 };
 
 struct ensighten_type {
