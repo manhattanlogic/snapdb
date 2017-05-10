@@ -32,8 +32,13 @@ if __name__ == "__main__":
 
     except:
         print ("weights not loaded")
-    
-    for e in range(1, 1000):
+
+
+    start = 0
+    if len(sys.argv > 1):
+        start = int(sys.argv[1])
+        
+    for e in range(1, 1000000):
         np.random.shuffle(shuffler)
         error_1 = []
         error_2 = []
@@ -57,7 +62,7 @@ if __name__ == "__main__":
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
         projection = _projection[converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
-        plt.savefig('graph_'+("%04d" % e)+'.png')
+        plt.savefig('graph_'+("%04d" % (start + e))+'.png')
         plt.close(f1)
         
         w = sess.run([decoder.encoder.weights, decoder.weights])
