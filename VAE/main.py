@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 from model import Encoder, Decoder
 import matplotlib.pyplot as plt
+import pickle
 
 if __name__ == "__main__":
     data = np.load(open("data.np","rb"))
@@ -19,6 +20,19 @@ if __name__ == "__main__":
     converters = np.where(data[:,1]==1)[0]
     non_converters = np.where(data[:,1]==0)[0]
 
+    try:
+        w = pickle.load(open("weights.pkl", "rb"))
+        for i in range(0, len(decoder.encoder.weights)):
+            print ("loading weight:", i)
+            sess.run(decoder.encoder.weights[i][0].assign(w[0][i][0]))
+            sess.run(decoder.encoder.weights[i][1].assign(w[0][i][1]))
+
+            sess.run(decoder.weights[i][0].assign(w[1][i][0]))
+            sess.run(decoder.weights[i][1].assign(w[1][i][1]))
+
+    except:
+        print ("weights not loaded")
+    
     for e in range(1, 1000):
         np.random.shuffle(shuffler)
         error_1 = []
@@ -37,9 +51,8 @@ if __name__ == "__main__":
             continue
         _projection = sess.run(decoder.encoder.output, feed_dict={decoder.encoder.input: data[:, 2:],
                                                                       decoder.encoder.keep_prob: 1.0})
-
-       
-        f1 = plt.figure(figsize=(10, 10))
+        
+        f1 = plt.figure(figsize=(20, 20))
         projection = _projection[non_converters,:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
         projection = _projection[converters,:]
@@ -47,3 +60,5 @@ if __name__ == "__main__":
         plt.savefig('graph_'+("%04d" % e)+'.png')
         plt.close(f1)
         
+        w = sess.run([decoder.encoder.weights, decoder.weights])
+        pickle.dump(w, open("weights.pkl", "wb"))
