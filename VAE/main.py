@@ -3,6 +3,7 @@ import tensorflow as tf
 from model import Encoder, Decoder
 import matplotlib.pyplot as plt
 import pickle
+import sys
 
 if __name__ == "__main__":
     data = np.load(open("data.np","rb"))
