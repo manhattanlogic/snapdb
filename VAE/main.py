@@ -28,7 +28,7 @@ if __name__ == "__main__":
             batch_data = data[batch_data_idx][:,2:]
             _, e1, e2 = sess.run(decoder.learn, feed_dict={decoder.encoder.input: batch_data,
                                                                decoder.target: batch_data,
-                                                               decoder.learning_rate: 0.001,
+                                                               decoder.learning_rate: 0.0001,
                                                                decoder.encoder.keep_prob: 0.5})
             error_1.append(e1)
             error_2.append(e2)

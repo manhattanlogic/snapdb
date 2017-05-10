@@ -5,7 +5,7 @@ class Encoder:
     def __init__(self, input_size=100, output_size=2):
         self.keep_prob = tf.placeholder(tf.float32)
         self.activation_function = tf.tanh
-        self.shape = [input_size, 64, 8, output_size]
+        self.shape = [input_size, 128, 32, output_size]
         self.weights = []
         self.input = tf.placeholder(tf.float32, [None, input_size])
         for i in range(0, len(self.shape) - 1):
