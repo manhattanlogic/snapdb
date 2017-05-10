@@ -13,6 +13,7 @@ struct ensighten_item {
   std::string sku;
   std::string tag = "";
   std::string productName;
+  float price;
 };
 
 struct ensighten_type {

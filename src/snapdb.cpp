@@ -256,9 +256,16 @@ json_history_entry parse_data(char * line, bool preprocess) {
       if (d["events"][i]["subids"]["ensighten"].HasMember("items") && d["events"][i]["subids"]["ensighten"]["items"].IsArray()) {
 	for (int j = 0; j < d["events"][i]["subids"]["ensighten"]["items"].Size(); j++) {
 	  ensighten_item item;
+	  
 	  try {
 	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("sku") && d["events"][i]["subids"]["ensighten"]["items"][j]["sku"].IsString()) {
 	      item.sku = d["events"][i]["subids"]["ensighten"]["items"][j]["sku"].GetString();
+	    }
+	  } catch (...) {}
+
+	  try {
+	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("price") && d["events"][i]["subids"]["ensighten"]["items"][j]["price"].IsString()) {
+	      item.price = std::atof(d["events"][i]["subids"]["ensighten"]["items"][j]["price"].GetString());
 	    }
 	  } catch (...) {}
 	  
@@ -277,6 +284,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	      item.tag = d["events"][i]["subids"]["ensighten"]["items"][j]["tags"][0].GetString();
 	    }
 	  } catch (...) {}
+	  
 	  event.ensighten.items.push_back(item);
 	}
       }
