@@ -38,6 +38,8 @@ if __name__ == "__main__":
     start = 0
     if len(sys.argv) > 1:
         start = int(sys.argv[1])
+
+    print ("images start at", start)
         
     for e in range(1, 1000000):
         np.random.shuffle(shuffler)
