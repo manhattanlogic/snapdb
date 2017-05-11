@@ -26,7 +26,20 @@ void load_cluster_data(std::string filename) {
 struct u_stats {
   long users = 0;
   long converters = 0;
+  long event_history_length = 0;
+  long tempral_history_length = 0;
+  long sku_observed = 0;
+  double dollars_spent = 0;
+  double dollars_observed = 0;
 };
+
+/*
+hitory length in events
+history length in seconds
+$$$ spend per user
+sku price change within single history 
+ */
+
 
 extern "C"
 char * query() {
@@ -40,6 +53,8 @@ char * query() {
     if (it == json_history.end()) continue;
 
     bool converter = false;
+
+    double spending = 0;
     
     for (auto h = it->second->history.begin(); h != it->second->history.end(); h++) {
       if (h->second.events == NULL) continue;
@@ -61,6 +76,8 @@ char * query() {
       it2 = cluster_totals.find(c->second);
     } 
     it2->second.users++;
+    it2->second.event_history_length   += it->second->history.size();
+    it2->second.tempral_history_length += (it->second->history.rbegin()->first - it->second->history.begin()->first);
     if (converter) {
       it2->second.converters++;
     }
@@ -69,7 +86,8 @@ char * query() {
   std::stringstream str_result;
 
   for (auto it3 = cluster_totals.begin(); it3 != cluster_totals.end(); it3++) {
-    str_result << it3->first << "\t" << it3->second.users << "\t" << it3->second.converters << "\n";
+    str_result << it3->first << "\t" << it3->second.users << "\t" << it3->second.converters << "\t" <<
+      it3->second.event_history_length << "\t" << it3->second.tempral_history_length << "\n";
   }
 
 
