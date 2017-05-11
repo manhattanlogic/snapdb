@@ -77,7 +77,7 @@ char * query() {
     } 
     it2->second.users++;
     it2->second.event_history_length   += it->second->history.size();
-    it2->second.tempral_history_length += (it->second->history.rbegin()->first - it->second->history.begin()->first);
+    it2->second.tempral_history_length += (it->second->history.rbegin()->first - it->second->history.begin()->first) / 1000 / 60;
     if (converter) {
       it2->second.converters++;
     }
