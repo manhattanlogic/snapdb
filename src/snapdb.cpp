@@ -175,14 +175,14 @@ json_history_entry parse_data(char * line, bool preprocess) {
   } catch (...) {
   }
   try {
-    struct tm tm;
+    struct tm tm = {};
     if (d["events"][d["events"].Size()-1]["ts"].IsString()) {
       auto str_ts = d["events"][d["events"].Size()-1]["ts"].GetString();
       strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
       result.ts = mktime(&tm) * 1000;
       int ms;
       char * dot = strchr((char *)str_ts, '.');
-      sscanf(dot+1, "%d", &ms);
+      ms = strtoul(dot+1, NULL, 0);
       result.ts += ms;
     }
   } catch (...) {
