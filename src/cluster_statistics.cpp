@@ -43,6 +43,7 @@ sku price change within single history
 
 extern "C"
 char * query() {
+  history_filter.clear();
   load_cluster_data("../tsne/clusters.csv");
   std::cerr << clusters.size() << " clustered users loaded\n";
 
@@ -64,6 +65,7 @@ char * query() {
 	for (auto i = e->ensighten.items.begin(); i != e->ensighten.items.end(); i++) {
 	  if (i->tag == "order") {
 	    converter = true;
+	    history_filter.insert(c->first);
 	  }
 	}
 	
