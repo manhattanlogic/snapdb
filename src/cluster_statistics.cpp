@@ -86,8 +86,8 @@ char * query() {
   std::stringstream str_result;
 
   for (auto it3 = cluster_totals.begin(); it3 != cluster_totals.end(); it3++) {
-    str_result << it3->first << "\t" << it3->second.users << "\t" << it3->second.converters << "\t" <<
-      it3->second.event_history_length << "\t" << it3->second.tempral_history_length << "\n";
+    str_result << it3->first << "," << it3->second.users << "," << it3->second.converters << "," <<
+      it3->second.event_history_length << "," << it3->second.tempral_history_length << "\n";
   }
 
 
