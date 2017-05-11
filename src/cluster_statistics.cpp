@@ -32,6 +32,8 @@ struct u_stats {
   long sku_purchased = 0;
   double dollars_spent = 0;
   double dollars_observed = 0;
+  std::unordered_map<std::string, long> purchased_skus;
+  std::unordered_map<std::string, long> observed_skus;
 };
 
 /*
@@ -85,11 +87,33 @@ char * query() {
       }
     }
 
+
     auto it2 = cluster_totals.find(c->second);
     if (it2 == cluster_totals.end()) {
       cluster_totals[c->second] = {};
       it2 = cluster_totals.find(c->second);
     } 
+    
+
+    for (auto s = observed_skus.begin(); s != observed_skus.end(); s++) {
+      auto si = it2->second.observed_skus.find(*s);
+      if (si == it2->second.observed_skus.end()) {
+	it2->second.observed_skus[*s] = 1;
+      } else {
+	si->second++;
+      }
+    }
+
+    for (auto s = purchased_skus.begin(); s != purchased_skus.end(); s++) {
+      auto si = it2->second.purchased_skus.find(*s);
+      if (si == it2->second.purchased_skus.end()) {
+	it2->second.purchased_skus[*s] = 1;
+      } else {
+	si->second++;
+      }
+    }
+
+    
     it2->second.users++;
     it2->second.event_history_length   += it->second->history.size();
     it2->second.tempral_history_length += (it->second->history.rbegin()->first - it->second->history.begin()->first) / 1000 / 60 / 60;
@@ -104,7 +128,10 @@ char * query() {
 
   for (auto it3 = cluster_totals.begin(); it3 != cluster_totals.end(); it3++) {
     str_result << it3->first << "," << it3->second.users << "," << it3->second.converters << "," <<
-      it3->second.event_history_length << "," << it3->second.tempral_history_length << "\n";
+      it3->second.event_history_length << "," << it3->second.tempral_history_length << "," <<
+      it3->second.sku_observed  << "," << it3->second.sku_purchased << "," <<
+      it3->second.observed_skus.size()  << "," << it3->second.purchased_skus.size() << 
+      "\n";
   }
 
 

@@ -183,7 +183,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	  auto str_ts = d["events"][d["events"].Size()-1]["ts"].GetString();
 	  strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
 	  result.ts = mktime(&tm);
-	  if (result.ts == 483488000) {
+	  if (result.ts == 1483488000) {
 	    std::cerr << str_ts << "\n";
 	  }
 	  result.ts *= 1000;
