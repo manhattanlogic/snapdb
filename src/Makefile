@@ -14,7 +14,7 @@ LIBS = -L/usr/local/lib -lpthread -ldl
 
 OBJS = $(PROG).o
 
-all: $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so
+all: $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -32,6 +32,9 @@ dump_skus.so: dump_skus.cpp
 compute_user_vectors.so: compute_user_vectors.cpp
 	$(CXX) -Wall -fPIC -c compute_user_vectors.cpp -o compute_user_vectors.o
 	$(CXX) -shared -rdynamic -o compute_user_vectors.so compute_user_vectors.o
+cluster_statistics.so: cluster_statistics.cpp
+	$(CXX) -Wall -fPIC -c cluster_statistics.cpp -o cluster_statistics.o
+	$(CXX) -shared -rdynamic -o cluster_statistics.so cluster_statistics.o
 endif
 ifeq ($(UNAME_S),Darwin)
 $(PROG): $(OBJS)
@@ -44,6 +47,8 @@ dump_skus.so: dump_skus.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup dump_skus.cpp -o $@
 compute_user_vectors.so: compute_user_vectors.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup compute_user_vectors.cpp -o $@
+cluster_statistics.so: cluster_statistics.cpp
+	$(CXX) -dynamiclib -undefined dynamic_lookup cluster_statistics.cpp -o $@
 endif
 
 clean:
