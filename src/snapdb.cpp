@@ -67,7 +67,7 @@ std::string replace_all(
   return result;
 }
 
-#define THREADS 32
+int THREADS = 32;
 
 static const char* kTypeNames[] = 
   { "Null", "False", "True", "Object", "Array", "String", "Number" };
@@ -180,6 +180,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
       auto str_ts = d["events"][d["events"].Size()-1]["ts"].GetString();
       strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
       result.ts = mktime(&tm) * 1000;
+      std::cerr << str_ts << ":" << result.ts << "\n";
       int ms;
       char * dot = strchr((char *)str_ts, '.');
       ms = strtoul(dot+1, NULL, 0);
@@ -557,6 +558,10 @@ int main (int argc, char**argv) {
     file = fopen("1day.tsv", "r");
   }
 
+  if(cmdOptionExists(argv, argv+argc, "-threads")) {
+    THREADS = std::stoul(getCmdOption(argv, argv + argc, "-threads"), NULL, 0);
+  }
+  
   std::thread threads[THREADS];
   
   for (int i = 0; i < THREADS; i++) {
