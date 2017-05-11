@@ -7,6 +7,7 @@
 #include <memory.h>
 #include <fstream>
 #include <iostream>
+#include <map>
 
 std::unordered_map<unsigned long, int> clusters;
 
@@ -51,7 +52,8 @@ char * query() {
   std::cerr << clusters.size() << " clustered users loaded\n";
 
   std::map<int, u_stats> cluster_totals;
-
+  std::unordered_map<std::string, std::string> sku_names;
+  
   for (auto c = clusters.begin(); c != clusters.end(); c++) {
     auto it = json_history.find(c->first);
     if (it == json_history.end()) continue;
@@ -137,6 +139,25 @@ char * query() {
       it3->second.dollars_spent << "\n";
   }
 
+
+  for (auto it3 = cluster_totals.begin(); it3 != cluster_totals.end(); it3++) {
+    std::multimap<long, std::string> _observed_skus;
+    for (auto it = it3->second.observed_skus.begin(); it != it3->second.observed_skus.end(); it++) {
+      _observed_skus.insert(std::pair<long, std::string>(it->second, it->first));
+    }
+    int limit = 10;
+    for (auto it = _observed_skus.rbegin(); it != _observed_skus.rend(); it++) {
+      str_result << it3->first << "," << it->second << "," << it->first << "\n";
+      limit --;
+      if (limit == 0) {
+	break;
+      }
+    }
+  }
+
+
+
+  
 
   char * buffer = (char *)malloc(str_result.str().size() + 1);
   memcpy(buffer, str_result.str().c_str(), str_result.str().size());
