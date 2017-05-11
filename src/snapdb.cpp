@@ -33,6 +33,13 @@
 
 
 
+
+
+
+
+
+
+
 char* getCmdOption(char ** begin, char ** end, const std::string & option)
 {
     char ** itr = std::find(begin, end, option);
@@ -175,13 +182,15 @@ json_history_entry parse_data(char * line, bool preprocess) {
   } catch (...) {
   }
   try {
+    // 2017-04-13T02:50:37.480Z
+    // 2017-04-01T00:12:28.422Z
     struct tm tm = {};
     if (d["events"][d["events"].Size()-1]["pix"].IsInt()) {
       int pix = d["events"][d["events"].Size()-1]["pix"].GetInt();
       if (pix == 1310) {
 	if (d["events"][d["events"].Size()-1]["ts"].IsString()) {
 	  auto str_ts = d["events"][d["events"].Size()-1]["ts"].GetString();
-	  strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
+	  strptime(str_ts, "%Y-%m-%dT%H:%M:%S", &tm);
 	  result.ts = mktime(&tm);
 	  if (result.ts == 1483488000) {
 	    std::cerr << str_ts << "\n";
