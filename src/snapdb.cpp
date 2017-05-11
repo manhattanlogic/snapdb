@@ -179,7 +179,11 @@ json_history_entry parse_data(char * line, bool preprocess) {
     if (d["events"][d["events"].Size()-1]["ts"].IsString()) {
       auto str_ts = d["events"][d["events"].Size()-1]["ts"].GetString();
       strptime(str_ts, "%Y-%d-%mT%H:%M:%S", &tm);
-      result.ts = mktime(&tm) * 1000;
+      result.ts = mktime(&tm);
+      if (result.ts == 483488000678) {
+	std::cerr << str_ts << "\n";
+      }
+      result.ts *= 1000;
       //std::cerr << str_ts << ":" << result.ts << "\n";
       int ms;
       char * dot = strchr((char *)str_ts, '.');

@@ -29,6 +29,7 @@ struct u_stats {
   long event_history_length = 0;
   long tempral_history_length = 0;
   long sku_observed = 0;
+  long sku_purchased = 0;
   double dollars_spent = 0;
   double dollars_observed = 0;
 };
@@ -56,6 +57,12 @@ char * query() {
     bool converter = false;
 
     double spending = 0;
+
+    unsigned long last_order_time = 0;
+    unsigned long last_order_treshold = 1000 * 60 * 60; // 1 hour
+
+    std::unordered_set <std::string> purchased_skus;
+    std::unordered_set <std::string> observed_skus;
     
     for (auto h = it->second->history.begin(); h != it->second->history.end(); h++) {
       if (h->second.events == NULL) continue;
@@ -66,9 +73,15 @@ char * query() {
 	  if (i->tag == "order") {
 	    converter = true;
 	    history_filter.insert(c->first);
+	    if (!((purchased_skus.find(i->sku) != purchased_skus.end()) && (h->first - last_order_time < last_order_treshold))) {
+	      purchased_skus.insert(i->sku);
+	      last_order_time = h->first;
+	    }
+	  } 
+	  if ((e->ensighten.pageType == "PRODUCT") || (i->tag == "productpage")) {
+	      observed_skus.insert(i->sku);
 	  }
 	}
-	
       }
     }
 
@@ -80,8 +93,10 @@ char * query() {
     it2->second.users++;
     it2->second.event_history_length   += it->second->history.size();
     it2->second.tempral_history_length += (it->second->history.rbegin()->first - it->second->history.begin()->first) / 1000 / 60 / 60;
+    it2->second.sku_observed += observed_skus.size();
     if (converter) {
       it2->second.converters++;
+      it2->second.sku_purchased += purchased_skus.size();
     }
   }
 
