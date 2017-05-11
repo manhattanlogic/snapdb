@@ -78,6 +78,8 @@ char * query() {
 	    if (!((purchased_skus.find(i->sku) != purchased_skus.end()) && (h->first - last_order_time < last_order_treshold))) {
 	      purchased_skus.insert(i->sku);
 	      last_order_time = h->first;
+	      
+	      spending += i->price * i->quantity;
 	    }
 	  } 
 	  if ((e->ensighten.pageType == "PRODUCT") || (i->tag == "productpage")) {
@@ -118,6 +120,7 @@ char * query() {
     it2->second.event_history_length   += it->second->history.size();
     it2->second.tempral_history_length += (it->second->history.rbegin()->first - it->second->history.begin()->first) / 1000 / 60 / 60;
     it2->second.sku_observed += observed_skus.size();
+    it2->second.dollars_spent += spending; 
     if (converter) {
       it2->second.converters++;
       it2->second.sku_purchased += purchased_skus.size();
@@ -130,8 +133,8 @@ char * query() {
     str_result << it3->first << "," << it3->second.users << "," << it3->second.converters << "," <<
       it3->second.event_history_length << "," << it3->second.tempral_history_length << "," <<
       it3->second.sku_observed  << "," << it3->second.sku_purchased << "," <<
-      it3->second.observed_skus.size()  << "," << it3->second.purchased_skus.size() << 
-      "\n";
+      it3->second.observed_skus.size()  << "," << it3->second.purchased_skus.size() << "," <<
+      it3->second.dollars_spent << "\n";
   }
 
 
