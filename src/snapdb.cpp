@@ -182,8 +182,6 @@ json_history_entry parse_data(char * line, bool preprocess) {
   } catch (...) {
   }
   try {
-    // 2017-04-13T02:50:37.480Z
-    // 2017-04-01T00:12:28.422Z
     struct tm tm = {};
     if (d["events"][d["events"].Size()-1]["pix"].IsInt()) {
       int pix = d["events"][d["events"].Size()-1]["pix"].GetInt();
