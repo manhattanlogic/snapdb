@@ -14,7 +14,7 @@ void load_cluster_data(std::string filename) {
   std::ifstream file(filename);
   std::string line;
   while (std::getline(file, line)) {
-    char * comma = strchr(line.c_str(), ',');
+    char * comma = strchr((char *)line.c_str(), ',');
     if (comma == NULL) continue;
     unsigned long vid = strtoul (line.c_str(), NULL, 0);
     int cluster = strtoul (comma + 1, NULL, 0);
