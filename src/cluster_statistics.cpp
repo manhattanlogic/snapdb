@@ -72,14 +72,15 @@ char * query() {
       if (h->second.events == NULL) continue;
       for (auto e = h->second.events->begin(); e != h->second.events->end(); e++) {
 	if (!(e->ensighten.exists)) continue;
-	
+
+	unsigned long next_last_order_time = 0;
 	for (auto i = e->ensighten.items.begin(); i != e->ensighten.items.end(); i++) {
 	  if (i->tag == "order") {
 	    converter = true;
 	    history_filter.insert(c->first);
 	    if (!((purchased_skus.find(i->sku) != purchased_skus.end()) && (h->first - last_order_time < last_order_treshold))) {
 	      purchased_skus.insert(i->sku);
-	      last_order_time = h->first;
+	      next_last_order_time = h->first;
 	      
 	      spending += i->price * i->quantity;
 	    }
@@ -87,6 +88,9 @@ char * query() {
 	  if ((e->ensighten.pageType == "PRODUCT") || (i->tag == "productpage")) {
 	      observed_skus.insert(i->sku);
 	  }
+	}
+	if (next_last_order_time != 0) {
+	  last_order_time = next_last_order_time;
 	}
       }
     }
