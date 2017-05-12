@@ -35,6 +35,7 @@ struct u_stats {
   double dollars_observed = 0;
   std::unordered_map<std::string, long> purchased_skus;
   std::unordered_map<std::string, long> observed_skus;
+  long total_bought;
 };
 
 /*
@@ -67,6 +68,8 @@ char * query() {
 
     std::unordered_set <std::string> purchased_skus;
     std::unordered_set <std::string> observed_skus;
+
+    long total_bought = 0;
     
     for (auto h = it->second->history.begin(); h != it->second->history.end(); h++) {
       if (h->second.events == NULL) continue;
@@ -83,6 +86,7 @@ char * query() {
 	      next_last_order_time = h->first;
 	      
 	      spending += i->price * i->quantity;
+	      total_bought += i->quantity;
 	    }
 	  } 
 	  if ((e->ensighten.pageType == "PRODUCT") || (i->tag == "productpage")) {
@@ -121,7 +125,7 @@ char * query() {
       }
     }
 
-    
+    it2->second.total_bought += total_bought;
     it2->second.users++;
     it2->second.event_history_length   += it->second->history.size();
     it2->second.tempral_history_length += (it->second->history.rbegin()->first - it->second->history.begin()->first) / 1000 / 60 / 60;
@@ -140,7 +144,7 @@ char * query() {
       it3->second.event_history_length << "," << it3->second.tempral_history_length << "," <<
       it3->second.sku_observed  << "," << it3->second.sku_purchased << "," <<
       it3->second.observed_skus.size()  << "," << it3->second.purchased_skus.size() << "," <<
-      it3->second.dollars_spent << "\n";
+      it3->second.dollars_spent << "," << it3->second.total_bought <<"\n";
   }
 
 
