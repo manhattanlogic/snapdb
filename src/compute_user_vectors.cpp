@@ -10,9 +10,6 @@
 
 
 
-
-
-
 std::vector<std::string> split_string(std::string line) {
   std::vector <std::string> result;
   char * pch = strtok ((char *)line.c_str()," ");

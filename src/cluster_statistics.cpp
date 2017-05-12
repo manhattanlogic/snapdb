@@ -36,6 +36,7 @@ struct u_stats {
   std::unordered_map<std::string, long> purchased_skus;
   std::unordered_map<std::string, long> observed_skus;
   long total_bought;
+  std::unordered_map<std::string, long> crumbs;
 };
 
 /*
@@ -70,12 +71,14 @@ char * query() {
     std::unordered_set <std::string> observed_skus;
 
     long total_bought = 0;
+
+    std::vector<std::vector<std::string> > crumbs;
     
     for (auto h = it->second->history.begin(); h != it->second->history.end(); h++) {
       if (h->second.events == NULL) continue;
       for (auto e = h->second.events->begin(); e != h->second.events->end(); e++) {
 	if (!(e->ensighten.exists)) continue;
-
+	crumbs.push_back(e->ensighten.crumbs);
 	unsigned long next_last_order_time = 0;
 	for (auto i = e->ensighten.items.begin(); i != e->ensighten.items.end(); i++) {
 	  if (i->tag == "order") {
@@ -135,6 +138,18 @@ char * query() {
       it2->second.converters++;
       it2->second.sku_purchased += purchased_skus.size();
     }
+
+    for (auto i = crumbs.begin(); i != crumbs.end(); i++) {
+      for (auto j = i->begin(); j != i->end(); j++) {
+	auto it = it2->second.crumbs.find(*j);
+	if (it == it2->second.crumbs.end()) {
+	  it2->second.crumbs[*j] = 1;
+	} else {
+	  it->second ++;
+	}
+      }
+    }
+    
   }
 
   std::stringstream str_result;
@@ -147,7 +162,7 @@ char * query() {
       it3->second.dollars_spent << "," << it3->second.total_bought <<"\n";
   }
 
-
+  /*
   for (auto it3 = cluster_totals.begin(); it3 != cluster_totals.end(); it3++) {
     std::multimap<long, std::string> _observed_skus;
     for (auto it = it3->second.observed_skus.begin(); it != it3->second.observed_skus.end(); it++) {
@@ -162,7 +177,26 @@ char * query() {
       }
     }
   }
+  */
 
+  
+  for (auto it3 = cluster_totals.begin(); it3 != cluster_totals.end(); it3++) {
+    std::multimap<long, std::string> _observed_skus;
+    for (auto it = it3->second.crumbs.begin(); it != it3->second.crumbs.end(); it++) {
+      _observed_skus.insert(std::pair<long, std::string>(it->second, it->first));
+    }
+    int limit = 5;
+    for (auto it = _observed_skus.rbegin(); it != _observed_skus.rend(); it++) {
+      str_result << it3->first << "," << it->second << "," << it->first << "\n";
+      limit --;
+      if (limit == 0) {
+	break;
+      }
+    }
+  }
+  
+  
+  
 
 
   
