@@ -53,3 +53,4 @@ struct single_json_history {
 
 extern std::unordered_map<unsigned long, single_json_history *> json_history;
 extern std::unordered_set<unsigned long> history_filter;
+extern rapidjson::Document load_json_at_position(unsigned long position);

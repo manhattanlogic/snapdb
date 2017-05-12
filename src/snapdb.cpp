@@ -32,12 +32,7 @@
 #include "snapdb.hpp"
 
 
-
-
-
-
-
-
+FILE * file;
 
 
 char* getCmdOption(char ** begin, char ** end, const std::string & option)
@@ -123,6 +118,20 @@ rapidjson::Document parse_json(char * line) {
   return d;
   
 }
+
+
+char * line_buffer = NULL;
+extern
+rapidjson::Document load_json_at_position(unsigned long position) {
+  if (line_buffer == NULL) {
+    line_buffer = (char *)malloc(1024 * 1024 * 4);
+  }
+  fseek(file, position, SEEK_SET);
+  fgets(line_buffer, 1024 * 1024 * 4, file);
+  auto parsed_json = parse_json(line_buffer);
+  return parsed_json;
+}
+
 
 json_history_entry parse_data(char * line, bool preprocess) {
   json_history_entry result = {};
@@ -347,7 +356,7 @@ std::mutex result_processor_mutex;
 volatile bool has_more_lines = true;
 
 
-FILE * file;
+
 
 long get_next_line(char * line) {
   std::lock_guard<std::mutex> guard(line_read_mutex);
@@ -364,7 +373,6 @@ long get_next_line(char * line) {
 
 
 int counter;
-
 
 void process_result(json_history_entry data, unsigned long file_position) {
   if (data.vid == 0 || data.ts == 0) return;
@@ -458,7 +466,7 @@ void start_web_server(int port) {
   svr.get("/get_raw_user", [](const auto& req, auto& res) {
       std::cerr << "get_raw_user celled\n";
       
-      char line[1024 * 1024 * 4];
+      // char line[1024 * 1024 * 4];
 
       rapidjson::Document document;
       document.SetObject();
@@ -477,9 +485,6 @@ void start_web_server(int port) {
 	vid = strtoul(vid_it->second.c_str(), NULL, 0);
       }
       
-
-      
-
       if (vid == 0) {
 	res.set_content("{user find failed}", "text/plain");
 	return;
@@ -494,9 +499,10 @@ void start_web_server(int port) {
 
       std::cerr << "loading user:" << vid << " width " << history_it->second->history.size() << " events\n";
       for (auto i = history_it->second->history.begin(); i != history_it->second->history.end(); i++) {
-	fseek(file, i->second.file_position, SEEK_SET);
-	fgets(line, 1024 * 1024 * 4, file);
-	auto parsed_json = parse_json(line);
+	//fseek(file, i->second.file_position, SEEK_SET);
+	//fgets(line, 1024 * 1024 * 4, file);
+	//auto parsed_json = parse_json(line);
+	auto parsed_json = load_json_at_position(i->second.file_position);
 	rapidjson::Value event(rapidjson::kObjectType);
 	event.CopyFrom(parsed_json, allocator);
 	array.PushBack(event, allocator);	

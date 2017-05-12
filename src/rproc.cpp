@@ -12,7 +12,8 @@ extern std::string test_string;
 
 
 extern "C"
-char * f1() {
+char * query() {
+  auto test = load_json_at_position(0);
   std::unordered_map<int, int> vector_stats;
   std::stringstream result;
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
