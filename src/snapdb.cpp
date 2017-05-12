@@ -282,8 +282,12 @@ json_history_entry parse_data(char * line, bool preprocess) {
       } catch (...) {}
 
       try {
-	if (d["events"][i]["subids"]["ensighten"].HasMember("crumbs") && d["events"][i]["subids"]["ensighten"]["crumbs"].IsString()) {
-	  event.ensighten.crumbs = d["events"][i]["subids"]["ensighten"]["crumbs"].GetString();
+	if (d["events"][i]["subids"]["ensighten"].HasMember("crumbs") && d["events"][i]["subids"]["ensighten"]["crumbs"].IsArray()) {
+	  for (int j = 0; j < d["events"][i]["subids"]["ensighten"]["crumbs"].Size(); j++) {
+	    if (d["events"][i]["subids"]["ensighten"]["crumbs"][j].IsString()) {
+	      event.ensighten.crumbs.push_back(d["events"][i]["subids"]["ensighten"]["crumbs"][j].GetString());
+	    }
+	  }
 	}
       } catch (...) {}
       
