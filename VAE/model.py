@@ -67,6 +67,6 @@ class Decoder:
         
         #self.loss = tf.reduce_mean(tf.square(output - self.target)) + encoder.vae_loss * 0.01
         # encoder.vae_loss
-        self.learn = (self.optimizer.minimize(- self.loss + 0.1 * encoder.vae_loss),
+        self.learn = (self.optimizer.minimize(- self.loss + 0.01 * encoder.vae_loss),
                           self.loss, encoder.vae_loss)
         
