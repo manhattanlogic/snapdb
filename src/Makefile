@@ -14,7 +14,7 @@ LIBS = -L/usr/local/lib -lpthread -ldl
 
 OBJS = $(PROG).o
 
-all: $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so
+all: $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
@@ -35,6 +35,9 @@ compute_user_vectors.so: compute_user_vectors.cpp
 cluster_statistics.so: cluster_statistics.cpp
 	$(CXX) -Wall -fPIC -c cluster_statistics.cpp -o cluster_statistics.o
 	$(CXX) -shared -rdynamic -o cluster_statistics.so cluster_statistics.o
+compute_crumbs_user_vectors.so: compute_crumbs_user_vectors.cpp
+	$(CXX) -Wall -fPIC -c compute_crumbs_user_vectors.cpp -o compute_crumbs_user_vectors.o
+	$(CXX) -shared -rdynamic -o compute_crumbs_user_vectors.so compute_crumbs_user_vectors.o
 endif
 ifeq ($(UNAME_S),Darwin)
 $(PROG): $(OBJS)
@@ -49,6 +52,8 @@ compute_user_vectors.so: compute_user_vectors.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup compute_user_vectors.cpp -o $@
 cluster_statistics.so: cluster_statistics.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup cluster_statistics.cpp -o $@
+compute_crumbs_user_vectors.so: compute_crumbs_user_vectors.cpp
+	$(CXX) -dynamiclib -undefined dynamic_lookup compute_crumbs_user_vectors.cpp -o $@
 endif
 
 clean:
