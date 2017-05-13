@@ -256,11 +256,11 @@ if __name__ == "__main__":
         
 
         alpha = 1.0
-
+        '''
         kmeans = KMeans(n_clusters=8, random_state=0, max_iter=1000)
         kmeans.fit(_projection.astype(np.float64))
         self_y_pred = kmeans.predict(_projection.astype(np.float64))
-        
+        '''
 
         
         f1 = plt.figure(figsize=(10, 10))
