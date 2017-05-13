@@ -81,6 +81,8 @@ char * query() {
 	  if (crumbs.find(crumb) != crumbs.end()) {
 	    if (printed) out_file << " ";
 	    std::replace(crumb.begin(), crumb.end(), ' ', '_');
+	    std::replace(crumb.begin(), crumb.end(), '\t', '_');
+	    std::replace(crumb.begin(), crumb.end(), '\n', '_');
 	    out_file << crumb;
 	    printed = true;
 	  }
