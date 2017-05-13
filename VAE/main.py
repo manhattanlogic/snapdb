@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     print ("images start at", start)
         
-    for e in range(1, 1000000):
+    for e in range(0, 1000000):
         np.random.shuffle(shuffler)
         error_1 = []
         error_2 = []
@@ -57,14 +57,28 @@ if __name__ == "__main__":
         print (e, np.mean(error_1), np.mean(error_2))
         if e % 10 != 0:
             continue
-        _projection = sess.run(decoder.encoder.output, feed_dict={decoder.encoder.input: data[:, 2:],
-                                                                      decoder.encoder.keep_prob: 1.0})
-        
+
         f1 = plt.figure(figsize=(20, 20))
-        projection = _projection[non_converters,:]
+
+        middle = data.shape[0] // 2
+        
+        _projection = sess.run(decoder.encoder.output, feed_dict={decoder.encoder.input: data[:middle, 2:],
+                                                                      decoder.encoder.keep_prob: 1.0})
+        projection = _projection[non_converters[:middle],:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
-        projection = _projection[converters,:]
+        projection = _projection[converters[:middle],:]
         plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
+
+
+        _projection = sess.run(decoder.encoder.output, feed_dict={decoder.encoder.input: data[middle:, 2:],
+                                                                      decoder.encoder.keep_prob: 1.0})
+        projection = _projection[non_converters[middle:],:]
+        plt.scatter(projection[:,0],projection[:,1], s=1, marker="," ,color="black")
+        projection = _projection[converters[middle:],:]
+        plt.scatter(projection[:,0],projection[:,1], s=1, marker=",",  color="red")
+
+
+        
         plt.savefig('graph_'+("%06d" % (start + e))+'.png')
         plt.close(f1)
         
