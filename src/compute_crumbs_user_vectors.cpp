@@ -7,7 +7,8 @@
 #include <memory.h>
 #include <fstream>
 #include <iostream>
-
+#include <algorithm>
+#include <string>
 
 
 std::vector<std::string> split_string(std::string line) {
