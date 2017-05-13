@@ -8,6 +8,8 @@
 #include <unordered_map>
 #include <memory.h>
 #include <fstream>
+#include <algorithm>
+#include <string>
 
 extern std::string test_string;
 
