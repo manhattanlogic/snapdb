@@ -32,6 +32,14 @@ char * query() {
 	}
 	if (is_product) {
 	  for (int q = 0; q < e->ensighten.crumbs.size(); q++) {
+
+	    if ((q == 0) && (e->ensighten.crumbs[q] == "Eziba" ||
+			     e->ensighten.crumbs[q] == "black consoles" ||
+			     e->ensighten.crumbs[q] == "Full xfirm memory foam, gel")) {
+	      result << i->first << "\n";
+	    }
+
+	    
 	    if (q >= crumb_stats.size()) {
 	      std::unordered_map<std::string, long> map;
 	      crumb_stats.push_back(map);
