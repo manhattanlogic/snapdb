@@ -57,6 +57,10 @@ if __name__ == "__main__":
         print (e, np.mean(error_1), np.mean(error_2))
         if e % 10 != 0:
             continue
+
+        w = sess.run([decoder.encoder.weights, decoder.weights])
+        pickle.dump(w, open("weights.pkl", "wb"))
+        
         _projection = sess.run(decoder.encoder.output, feed_dict={decoder.encoder.input: data[:, 2:],
                                                                       decoder.encoder.keep_prob: 1.0})
         
@@ -68,5 +72,4 @@ if __name__ == "__main__":
         plt.savefig('graph_'+("%06d" % (start + e))+'.png')
         plt.close(f1)
         
-        w = sess.run([decoder.encoder.weights, decoder.weights])
-        pickle.dump(w, open("weights.pkl", "wb"))
+       
