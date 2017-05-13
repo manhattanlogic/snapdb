@@ -69,8 +69,9 @@ char * query() {
 
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
     bool is_converter = false;
+    bool printed = false;
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
-      bool printed = false;
+      
       if (j->second.events == NULL) continue;
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (!(e->ensighten.exists)) continue;
@@ -86,8 +87,8 @@ char * query() {
 	}
 	
       }
-      if (printed) out_file << "\n";
     }
+    if (printed) out_file << "\n";
   }
 
 
