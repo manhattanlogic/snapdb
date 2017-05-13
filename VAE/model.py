@@ -5,7 +5,7 @@ class Encoder:
     def __init__(self, input_size=100, output_size=2):
         self.keep_prob = tf.placeholder(tf.float32)
         self.activation_function = tf.tanh
-        self.shape = [input_size, 128, 32, output_size]
+        self.shape = [input_size, 64, 32, output_size]
         self.weights = []
         self.input = tf.placeholder(tf.float32, [None, input_size])
         for i in range(0, len(self.shape) - 1):
@@ -38,7 +38,7 @@ class Decoder:
     def __init__(self, input_size=2, output_size=100, encoder=None):
         self.encoder = encoder
         self.activation_function = tf.tanh
-        self.shape = [input_size, 8, 64, output_size]
+        self.shape = [input_size, 16, 32, output_size]
         self.weights = []
         self.target = tf.placeholder(tf.float32, [None, output_size])
         self.learning_rate = tf.placeholder(tf.float32)
