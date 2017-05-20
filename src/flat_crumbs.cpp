@@ -180,7 +180,7 @@ char * query() {
       if (limit == 0) break;
     }
     json_out += "]";
-    file << json_out << "\n";
+    file << coverage << "\t" << json_out << "\n";
   }
   
 
