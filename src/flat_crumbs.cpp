@@ -168,7 +168,7 @@ char * query() {
       test ++;
       inverter.insert(std::pair<long, std::string>(it2->second, it2->first));
     }
-    int limit = 10;
+    int limit = 20;
     long coverage = 0;
     std::string json_out = "[";
     
