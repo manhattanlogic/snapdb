@@ -14,7 +14,7 @@ LIBS = -L/usr/local/lib -lpthread -ldl
 
 OBJS = $(PROG).o
 
-all: $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so
+all: $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so flat_crumbs.so
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
