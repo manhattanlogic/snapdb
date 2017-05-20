@@ -26,6 +26,7 @@ struct ensighten_type {
   std::vector<ensighten_item> items;
   std::string camGroup;
   std::string camSource;
+  std::string searchTerm;
 };
 
 struct json_simgle_event_type {
