@@ -161,7 +161,7 @@ char * query() {
  
 
   for (auto it = global_crumb_stats.begin(); it != global_crumb_stats.end(); it++) {
-    file << it->first << "\t" << it->second.users << "\t" << it->second.converters << "\n";
+    file << it->first << "\t" << it->second.users << "\t" << it->second.converters << "\t";
     std::multimap<long, std::string> inverter;
     int test = 0;
     for (auto it2 = it->second.hash.begin(); it2 != it->second.hash.end(); it2++) {
