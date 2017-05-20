@@ -38,6 +38,9 @@ cluster_statistics.so: cluster_statistics.cpp
 compute_crumbs_user_vectors.so: compute_crumbs_user_vectors.cpp
 	$(CXX) -Wall -fPIC -c compute_crumbs_user_vectors.cpp -o compute_crumbs_user_vectors.o
 	$(CXX) -shared -rdynamic -o compute_crumbs_user_vectors.so compute_crumbs_user_vectors.o
+flat_crumbs.so: flat_crumbs.cpp
+	$(CXX) -Wall -fPIC -c flat_crumbs.cpp -o flat_crumbs.o
+	$(CXX) -shared -rdynamic -o flat_crumbs.so flat_crumbs.o
 endif
 ifeq ($(UNAME_S),Darwin)
 $(PROG): $(OBJS)
@@ -54,6 +57,8 @@ cluster_statistics.so: cluster_statistics.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup cluster_statistics.cpp -o $@
 compute_crumbs_user_vectors.so: compute_crumbs_user_vectors.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup compute_crumbs_user_vectors.cpp -o $@
+flat_crumbs.so: flat_crumbs.cpp
+	$(CXX) -dynamiclib -undefined dynamic_lookup flat_crumbs.cpp -o $@
 endif
 
 clean:
