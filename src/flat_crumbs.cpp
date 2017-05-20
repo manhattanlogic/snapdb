@@ -39,6 +39,8 @@ char * query() {
 	}
 	if (is_product) {
 	  std::string crumb_key = "";
+	  if (e->ensighten.crumbs.size() != 4) continue;
+	  if (e->ensighten.crumbs[0] == "O.biz" || e->ensighten.crumbs[0] == "Eziba") continue;
 	  for (int q = 0; q < e->ensighten.crumbs.size(); q++) {
 	    if (crumb_key != "") crumb_key += "|";
 	    crumb_key += e->ensighten.crumbs[q];
@@ -70,3 +72,9 @@ char * query() {
   buffer[result.str().size()] = 0;
   return buffer;
 }
+
+
+/*
+O.biz
+Eziba
+*/
