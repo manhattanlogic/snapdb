@@ -20,7 +20,7 @@ std::unordered_map <std::string, unsigned long> flat_crumb_stats;
 
 extern "C"
 char * query() {
-  std::ofstream file("sku_stats.csv");
+  std::ofstream file("flat_crumb_stats.csv");
   
   std::unordered_map<int, int> vector_stats;
   std::stringstream result;
