@@ -171,9 +171,10 @@ char * query() {
     int limit = 10;
     long coverage = 0;
     std::string json_out = "[";
+    
     for (auto it2 = inverter.rbegin(); it2 != inverter.rend(); it2++) {
-      if (json_out != "[") json_out += ",";
-      json_out += ",\"" + it2->second + "\",\"" + std::to_string(it2->first) + "\"";
+      if (coverage != 0) json_out += ",";
+      json_out += "\"" + it2->second + "\",\"" + std::to_string(it2->first) + "\"";
       coverage += it2->first;
       limit --;
       if (limit == 0) break;
