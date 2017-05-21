@@ -22,9 +22,29 @@ struct hash_struct {
   long users;
   long converters;
   std::unordered_map<std::string, int> hash;
+  double order_total;
 };
 
 std::unordered_map<std::string, hash_struct> global_crumb_stats;
+
+
+std::string replace_all(
+			const std::string & str ,   // where to work
+			const std::string & find ,  // substitute 'find'
+			const std::string & replace //      by 'replace'
+			) {
+  using namespace std;
+  string result;
+  size_t find_len = find.size();
+  size_t pos,from=0;
+  while ( string::npos != ( pos=str.find(find,from) ) ) {
+    result.append( str, from, pos-from );
+    result.append( replace );
+    from = pos + find_len;
+  }
+  result.append( str, from , string::npos );
+  return result;
+}
 
 
 extern "C"
@@ -40,8 +60,8 @@ char * query() {
     std::unordered_set<std::string> cart;
     bool cart_first = true;
     std::vector<std::string> hash_string;
-
     std::unordered_set<std::string> user_crumbs;
+    double order_total = 0.0;
     
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       bool is_product = false;
@@ -86,6 +106,7 @@ char * query() {
 	    } else if (ii->tag == "order") {
 	      event_type = "order";
 	      is_converter = true;
+	      order_total += ii->price * ii->quantity;
 	    } else if (ii->tag == "featured") {
 	      event_type = "featured";
 	    } else {
@@ -115,8 +136,9 @@ char * query() {
 	  if (e->ensighten.crumbs.size() != 4) continue;
 	  if (e->ensighten.crumbs[0] == "O.biz" || e->ensighten.crumbs[0] == "Eziba") continue;
 	  for (int q = 0; q < e->ensighten.crumbs.size(); q++) {
+	    std::string current_crumb = replace_all(e->ensighten.crumbs[q], "&amp;", "&");
 	    if (crumb_key != "") crumb_key += "|";
-	    crumb_key += e->ensighten.crumbs[q];
+	    crumb_key += current_crumb;
 	    user_crumbs.insert(crumb_key);
 	  }
 	  auto it = flat_crumb_stats.find(crumb_key);
@@ -138,7 +160,9 @@ char * query() {
 	ci = global_crumb_stats.find(*c);
       }
       ci->second.users ++;
+      
       if (is_converter) {
+	ci->second.order_total += order_total;
 	ci->second.converters++;
 	std::string true_hash_string;
 	for (auto h = hash_string.begin(); h != hash_string.end(); h++) {
@@ -180,7 +204,7 @@ char * query() {
       if (limit == 0) break;
     }
     json_out += "]";
-    file << coverage << "\t" << json_out << "\n";
+    file << coverage << "\t" << json_out << "\t" << it->second.order_total << "\n";
   }
   
 
