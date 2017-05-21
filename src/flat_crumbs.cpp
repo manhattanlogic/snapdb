@@ -106,7 +106,7 @@ char * query() {
 	    } else if (ii->tag == "order") {
 	      event_type = "order";
 	      is_converter = true;
-	      order_total += ii->price * ii->quantity;
+	      if (!(is_completed)) order_total += ii->price * ii->quantity;
 	    } else if (ii->tag == "featured") {
 	      event_type = "featured";
 	    } else {
