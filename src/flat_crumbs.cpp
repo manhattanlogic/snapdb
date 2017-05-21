@@ -90,38 +90,35 @@ char * query() {
 	if (e -> ensighten.searchTerm != "") {
 	  event_type = "search";
 	} else if (e->ensighten.items.size() > 0) {
-	  for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
-	    if (ii -> tag == "cart") {
-	      if (new_cart.size() != 0) {
-		if (cart_first) {
-		  cart = new_cart;
-		  event_type = "cart_first";
-		  cart_first = false;
-		}
-	      } else {
-		if (abs((int)new_cart.size() - (int)cart.size()) != 1) {
-		  std::cerr << "CART DIFF:" << new_cart.size() << " - " << cart.size() << "\n";
-		}
-		if (new_cart.size() > cart.size()) {
-		  event_type = "cart_add";
-		} else if (new_cart.size() < cart.size()) {
-		  event_type = "cart_remove";
-		} else {
-		  event_type = "cart_view";
-		}
-	      }
-	    } else if ((ii->tag == "productpage") || (e -> ensighten.pageType == "PRODUCT")) {
-	      event_type = "productpage";
-	    } else if (ii->tag == "order") {
-	      event_type = "order";
-	      is_converter = true;
-	      if (!(is_completed)) order_total += ii->price * ii->quantity;
-	    } else if (ii->tag == "featured") {
-	      event_type = "featured";
+	  auto ii = &e->ensighten.items[0];
+	  //for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
+	  if (ii -> tag == "cart") {
+	    if (cart_first) {
+	      cart = new_cart;
+	      event_type = "cart_first";
+	      cart_first = false;
 	    } else {
-	      event_type = "mistake";
+	      if (new_cart.size() > cart.size()) {
+		event_type = "cart_add";
+	      } else if (new_cart.size() < cart.size()) {
+		event_type = "cart_remove";
+	      } else {
+		event_type = "cart_view";
+	      }
 	    }
+	  } else if ((ii->tag == "productpage") || (e -> ensighten.pageType == "PRODUCT")) {
+	    event_type = "productpage";
+	  } else if (ii->tag == "order") {
+	    event_type = "order";
+	    is_converter = true;
+	    if (!(is_completed)) order_total += ii->price * ii->quantity;
+	  } else if (ii->tag == "featured") {
+	    event_type = "featured";
+	  } else {
+	    event_type = "mistake";
+	    std::cerr << "mistake:" << ii->tag << "\n";
 	  }
+	  //}
 	} else {
 	  event_type = "listing";
 	}
