@@ -187,11 +187,25 @@ char * query() {
   for (auto it = global_crumb_stats.begin(); it != global_crumb_stats.end(); it++) {
     file << it->first << "\t" << it->second.users << "\t" << it->second.converters << "\t";
     std::multimap<long, std::string> inverter;
+    std::map<std::string, long> spectrum;
     int test = 0;
     for (auto it2 = it->second.hash.begin(); it2 != it->second.hash.end(); it2++) {
       test ++;
       inverter.insert(std::pair<long, std::string>(it2->second, it2->first));
+      auto its = spectrum.find(it2->first);
+      if (its == spectrum.end()) {
+	spectrum[it2->first] = 1;
+      } else {
+	its->second++;
+      }
     }
+
+    std::string spectrum_out = "{";
+    for (auto its = spectrum.begin(); its != spectrum.end(); its++) {
+      if (spectrum_out != "{") spectrum_out += ",";
+      spectrum_out += "\"" + its->first + "\":" + std::to_string(its->second);
+    }
+    spectrum_out += "}";
     int limit = 20;
     long coverage = 0;
     std::string json_out = "[";
@@ -204,7 +218,7 @@ char * query() {
       if (limit == 0) break;
     }
     json_out += "]";
-    file << coverage << "\t" << json_out << "\t" << it->second.order_total << "\n";
+    file << coverage << "\t" << json_out << "\t" << it->second.order_total << "\t" << spectrum_out << "\n";
   }
   
 
