@@ -46,6 +46,15 @@ std::string replace_all(
   return result;
 }
 
+std::vector<std::string> split_string(std::string line, const char * sep = " ") {
+  std::vector <std::string> result;
+  char * pch = strtok ((char *)line.c_str(), sep);
+  while (pch != NULL) {
+    result.push_back(pch);
+    pch = strtok (NULL, sep);
+  }
+  return result;
+}
 
 extern "C"
 char * query() {
@@ -192,11 +201,16 @@ char * query() {
     for (auto it2 = it->second.hash.begin(); it2 != it->second.hash.end(); it2++) {
       test ++;
       inverter.insert(std::pair<long, std::string>(it2->second, it2->first));
-      auto its = spectrum.find(it2->first);
-      if (its == spectrum.end()) {
-	spectrum[it2->first] = 1;
-      } else {
-	its->second++;
+
+      auto seq_parts = split_string(it2->first, "|");
+
+      for (auto itp = seq_parts.begin(); itp != seq_parts.end(); itp++) {
+	auto its = spectrum.find(*itp);
+	if (its == spectrum.end()) {
+	  spectrum[*itp] = 1;
+	} else {
+	  its->second++;
+	}
       }
     }
 
