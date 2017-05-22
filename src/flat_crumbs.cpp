@@ -80,6 +80,7 @@ char * query() {
     }
   }
 
+  std::cerr << sku_crumbs.size() << " crumbs loaded\n";
 
   
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
@@ -103,7 +104,7 @@ char * query() {
 	if (!(e->ensighten.exists)) continue;
 
 	std::string event_type = "X";
-
+	std::string order_sku = "";
 	std::unordered_set <std::string> new_cart;
 	for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
 	  if (ii -> tag == "cart") {
@@ -134,6 +135,7 @@ char * query() {
 	  } else if (ii->tag == "order") {
 	    event_type = "order";
 	    is_converter = true;
+	    order_sku = ii->sku;
 	    if (!(is_completed)) order_total += ii->price * ii->quantity;
 	  } else if (ii->tag == "featured") {
 	    event_type = "featured";
@@ -162,16 +164,21 @@ char * query() {
 
 	if (is_converter) {
 	  std::string crumb_key = "";
-	  for (int q = 0; q < e->ensighten.crumbs.size(); q++) {
-	    std::string current_crumb = replace_all(e->ensighten.crumbs[q], "&amp;", "&");
-	    if (crumb_key != "") crumb_key += "|";
-	    auto ci = global_crumb_stats.find(crumb_key);
-	    if (ci == global_crumb_stats.end()) {
-	      hash_struct hs = {};
-	      global_crumb_stats[crumb_key] = hs;
-	      ci = global_crumb_stats.find(crumb_key);
+	  auto it = sku_crumbs.find(order_sku);
+	  if (it == sku_crumbs.end()) {
+	    std::cerr << "bad order sku:" << order_sku << "\n";
+	  } else {
+	    for (int q = 0; q < sku_crumbs[order_sku].size(); q++) {
+	      std::string current_crumb = replace_all(sku_crumbs[order_sku][q], "&amp;", "&");
+	      if (crumb_key != "") crumb_key += "|";
+	      auto ci = global_crumb_stats.find(crumb_key);
+	      if (ci == global_crumb_stats.end()) {
+		hash_struct hs = {};
+		global_crumb_stats[crumb_key] = hs;
+		ci = global_crumb_stats.find(crumb_key);
+	      }
+	      ci->second.exact_order_total += order_total;
 	    }
-	    ci->second.exact_order_total += order_total;
 	  }
 	}
 	
