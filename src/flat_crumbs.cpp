@@ -75,7 +75,9 @@ char * query() {
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (e->ensighten.items.size() > 0) {
 	  if ((e->ensighten.items[0].tag == "productpage") || (e -> ensighten.pageType == "PRODUCT")) {
-	    sku_crumbs[e->ensighten.items[0].sku] = e->ensighten.crumbs;
+	    if (e->ensighten.crumbs.size() == 4 && (!(e->ensighten.crumbs[0] == "O.biz" || e->ensighten.crumbs[0] == "Eziba"))) {
+	      sku_crumbs[e->ensighten.items[0].sku] = e->ensighten.crumbs;
+	    }
 	  }
 	  for (int l = 0; l < e->ensighten.items.size(); l++) {
 	    for (int k = 0; k < e->ensighten.items[l].subCatIds.size(); k++) {
@@ -119,6 +121,7 @@ char * query() {
     bool cart_first = true;
     std::vector<std::string> hash_string;
     std::unordered_set<std::string> user_crumbs;
+    std::unordered_set<std::string> skus_ubserved;
     double order_total = 0.0;
 
     
@@ -126,6 +129,7 @@ char * query() {
     
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       bool is_product = false;
+      bool is_cart = false;
       if (j->second.events == NULL) continue;
       
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
@@ -146,6 +150,7 @@ char * query() {
 	  auto ii = &e->ensighten.items[0];
 	  //for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
 	  if (ii -> tag == "cart") {
+	    is_cart = true;
 	    if (cart_first) {
 	      cart = new_cart;
 	      event_type = "cart_first";
@@ -182,12 +187,14 @@ char * query() {
 	
 
 
-
+	
 	
 	for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
 	  if ((e -> ensighten.pageType == "PRODUCT") || (ii -> tag == "productpage")) {
 	    is_product = true;
-	    break;
+	    skus_ubserved.insert(ii->sku);
+	  } else if (ii -> tag == "cart" || (ii -> tag == "order")) {
+	    skus_ubserved.insert(ii->sku);
 	  }
 	}
 
@@ -212,7 +219,8 @@ char * query() {
  	    }
 	  }
 	}
-	
+
+	/*
 	if (is_product) {
 	  std::string crumb_key = "";
 	  if (e->ensighten.crumbs.size() != 4) continue;
@@ -230,10 +238,21 @@ char * query() {
 	    it->second++;
 	  }
 	}
+	*/
       } // event
     } // time
     
-
+    for (auto u = skus_ubserved.begin(); u != skus_ubserved.end(); u++) {
+      auto it = sku_crumbs.find(*u);
+      if (it == sku_crumbs.end()) continue;
+      std::string crumb_key = "";
+      for (int q = 0; q < it->second.size(); q++) {
+	if (crumb_key != "") crumb_key += "|";
+	crumb_key += it->second[q];
+	user_crumbs.insert(crumb_key);
+      }
+    }
+    
     for (auto c = user_crumbs.begin(); c != user_crumbs.end(); c++) {
       auto ci = global_crumb_stats.find(*c);
       if (ci == global_crumb_stats.end()) {
