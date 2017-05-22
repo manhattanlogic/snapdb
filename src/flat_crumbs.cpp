@@ -21,7 +21,9 @@ std::unordered_map <std::string, unsigned long> flat_crumb_stats;
 struct hash_struct {
   long users;
   long converters;
+  long exact_converters;
   std::unordered_map<std::string, int> hash;
+  std::unordered_map<std::string, int> exact_hash;
   double order_total;
   double exact_order_total;
 };
@@ -122,6 +124,7 @@ char * query() {
     std::vector<std::string> hash_string;
     std::unordered_set<std::string> user_crumbs;
     std::unordered_set<std::string> skus_ubserved;
+    std::unordered_set<std::string> skus_converted;
     double order_total = 0.0;
 
     
@@ -192,13 +195,16 @@ char * query() {
 	    } else if (ii -> tag == "cart" || (ii -> tag == "order")) {
 	      skus_ubserved.insert(ii->sku);
 	    }
+	    if (ii -> tag == "order") {
+	      skus_converted.insert(ii->sku);
+	    }
 	  }
 
 	  if (order_sku != "") {
 	    std::string crumb_key = "";
 	    auto it = sku_crumbs.find(order_sku);
 	    if (it == sku_crumbs.end()) {
-	      std::cerr << "bad order sku:" << order_sku << " " << i->first  << "\n";
+	      std::cerr << "bad order sku:" << order_sku << " " << i->first << "\n";
 	    } else {
 	      for (int q = 0; q < sku_crumbs[order_sku].size(); q++) {
 		std::string current_crumb = replace_all(sku_crumbs[order_sku][q], "&amp;", "&");
@@ -211,6 +217,22 @@ char * query() {
 		  ci = global_crumb_stats.find(crumb_key);
 		}
 		ci->second.exact_order_total += order_total;
+		ci->second.exact_converters ++;
+
+		std::string true_hash_string;
+		for (auto h = hash_string.begin(); h != hash_string.end(); h++) {
+		  if (true_hash_string != "") true_hash_string += "|";
+		  true_hash_string += (*h);
+		}
+		auto ch = ci->second.exact_hash.find(true_hash_string);
+		if (ch == ci->second.exact_hash.end()) {
+		  ci->second.exact_hash[true_hash_string] = 1;
+		} else {
+		  ci->second.exact_hash[true_hash_string] ++;
+		}
+
+
+		
 	      }
 	    }
 	  }
@@ -230,7 +252,7 @@ char * query() {
 	user_crumbs.insert(crumb_key);
       }
     }
-    
+
     for (auto c = user_crumbs.begin(); c != user_crumbs.end(); c++) {
       auto ci = global_crumb_stats.find(*c);
       if (ci == global_crumb_stats.end()) {
@@ -257,9 +279,6 @@ char * query() {
 	}
       }
     }
-
-
-    
   } // json hostory
 
  
@@ -267,12 +286,11 @@ char * query() {
   for (auto it = global_crumb_stats.begin(); it != global_crumb_stats.end(); it++) {
     file << it->first << "\t" << it->second.users << "\t" << it->second.converters << "\t";
     std::multimap<long, std::string> inverter;
+    std::multimap<long, std::string> exact_inverter;
     std::map<std::string, long> spectrum;
-    int test = 0;
-    for (auto it2 = it->second.hash.begin(); it2 != it->second.hash.end(); it2++) {
-      test ++;
+    
+    for (auto it2 = it->second.exact_hash.begin(); it2 != it->second.exact_hash.end(); it2++) {
       inverter.insert(std::pair<long, std::string>(it2->second, it2->first));
-
       auto seq_parts = split_string(it2->first, "|");
 
       for (auto itp = seq_parts.begin(); itp != seq_parts.end(); itp++) {
@@ -304,7 +322,10 @@ char * query() {
     }
     json_out += "]";
     file << coverage << "\t" << json_out << "\t" << it->second.order_total << "\t" << spectrum_out << "\t"
-	 << it->second.exact_order_total << "\n";
+	 << it->second.exact_order_total << "\t" << it->second.exact_converters << "\n";
+
+    
+    
   }
   
 
