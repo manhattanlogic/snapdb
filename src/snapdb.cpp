@@ -300,8 +300,11 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	  }
 	}
       } catch (...) {}
+
       
       
+      
+	
 
       if (d["events"][i]["subids"]["ensighten"].HasMember("items") && d["events"][i]["subids"]["ensighten"]["items"].IsArray()) {
 	for (int j = 0; j < d["events"][i]["subids"]["ensighten"]["items"].Size(); j++) {
@@ -325,6 +328,21 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	    }
 	  } catch (...) {}
 
+
+	  
+	  try {
+	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("subCatIds") &&
+		d["events"][i]["subids"]["ensighten"]["items"][j]["subCatIds"].IsArray()) {
+	      for (int k = 0; k < d["events"][i]["subids"]["ensighten"]["items"][j]["subCatIds"].Size(); k++) {
+		if (d["events"][i]["subids"]["ensighten"]["items"][j]["subCatIds"][k].IsString()) {
+		  item.subCatIds.push_back(d["events"][i]["subids"]["ensighten"]["items"][j]["subCatIds"][k].GetString());
+		}
+	      }
+	    }
+	  } catch (...) {}
+	  
+
+	  
 	  
 	  
 	  try {

@@ -15,6 +15,7 @@ struct ensighten_item {
   std::string productName;
   float price;
   int quantity;
+  std::vector<std::string> subCatIds;
 };
 
 struct ensighten_type {
