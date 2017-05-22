@@ -58,10 +58,12 @@ std::vector<std::string> split_string(std::string line, const char * sep = " ") 
 }
 
 std::unordered_map<std::string, std::vector<std::string> > sku_crumbs;
+std::vector<std::unordered_map<std::string, long> > subCatIds;
 
 extern "C"
 char * query() {
   std::ofstream file("flat_crumb_stats.csv");
+  std::ofstream subfile("subcats.csv");
   
   std::unordered_map<int, int> vector_stats;
   std::stringstream result;
@@ -75,11 +77,37 @@ char * query() {
 	  if ((e->ensighten.items[0].tag == "productpage") || (e -> ensighten.pageType == "PRODUCT")) {
 	    sku_crumbs[e->ensighten.items[0].sku] = e->ensighten.crumbs;
 	  }
+	  for (int l = 0; l < e->ensighten.items.size(); l++) {
+	    for (int k = 0; k < e->ensighten.items[l].subCatIds.size(); k++) {
+	      int p = e->ensighten.items[l].subCatIds.size() - k - 1;
+	      std::cerr << k << " " << e->ensighten.items[l].subCatIds.size() << " " << p << "\n";
+	      if (k >= subCatIds.size()) {
+		std::unordered_map<std::string, long> element;
+		subCatIds.push_back(element);
+	      }
+	      std::cerr << "cp1\n";
+	      auto it = subCatIds[k].find(e->ensighten.items[l].subCatIds[p]);
+	      if (it == subCatIds[k].end()) {
+		subCatIds[k][e->ensighten.items[l].subCatIds[p]] = 1;
+	      } else {
+		it->second ++;
+	      }
+	    }
+	  }
 	}
       }
     }
   }
 
+  for (int i = 0; i < subCatIds.size(); i++) {
+    subfile << "--------- " << i << " ---------\n";
+    for (auto it = subCatIds[i].begin(); it != subCatIds[i].end(); it++) {
+      subfile << it->first << "\t" << it->second << "\n";
+    }
+  }
+  
+
+  
   std::cerr << sku_crumbs.size() << " crumbs loaded\n";
 
   
