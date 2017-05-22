@@ -23,6 +23,7 @@ struct hash_struct {
   long converters;
   std::unordered_map<std::string, int> hash;
   double order_total;
+  double exact_order_total;
 };
 
 std::unordered_map<std::string, hash_struct> global_crumb_stats;
@@ -56,12 +57,31 @@ std::vector<std::string> split_string(std::string line, const char * sep = " ") 
   return result;
 }
 
+std::unordered_map<std::string, std::vector<std::string> > sku_crumbs;
+
 extern "C"
 char * query() {
   std::ofstream file("flat_crumb_stats.csv");
   
   std::unordered_map<int, int> vector_stats;
   std::stringstream result;
+
+  /* build crambs dictionary & subcatId dictionary for product crumb reporting*/
+  for (auto i = json_history.begin(); i != json_history.end(); i++) {
+    for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
+      if (j->second.events == NULL) continue;
+      for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
+	if (e->ensighten.items.size() > 0) {
+	  if (e->ensighten.items[0].tag == "product") {
+	    sku_crumbs[e->ensighten.items[0].sku] = e->ensighten.crumbs;
+	  }
+	}
+      }
+    }
+  }
+
+
+  
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
     bool is_converter = false;
     bool is_completed = false;
@@ -71,6 +91,9 @@ char * query() {
     std::vector<std::string> hash_string;
     std::unordered_set<std::string> user_crumbs;
     double order_total = 0.0;
+
+    
+
     
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       bool is_product = false;
@@ -134,6 +157,21 @@ char * query() {
 	  if ((e -> ensighten.pageType == "PRODUCT") || (ii -> tag == "productpage")) {
 	    is_product = true;
 	    break;
+	  }
+	}
+
+	if (is_converter) {
+	  std::string crumb_key = "";
+	  for (int q = 0; q < e->ensighten.crumbs.size(); q++) {
+	    std::string current_crumb = replace_all(e->ensighten.crumbs[q], "&amp;", "&");
+	    if (crumb_key != "") crumb_key += "|";
+	    auto ci = global_crumb_stats.find(crumb_key);
+	    if (ci == global_crumb_stats.end()) {
+	      hash_struct hs = {};
+	      global_crumb_stats[crumb_key] = hs;
+	      ci = global_crumb_stats.find(crumb_key);
+	    }
+	    ci->second.exact_order_total += order_total;
 	  }
 	}
 	
@@ -229,7 +267,8 @@ char * query() {
       if (limit == 0) break;
     }
     json_out += "]";
-    file << coverage << "\t" << json_out << "\t" << it->second.order_total << "\t" << spectrum_out << "\n";
+    file << coverage << "\t" << json_out << "\t" << it->second.order_total << "\t" << spectrum_out << "\t"
+	 << it->second.exact_order_total << "\n";
   }
   
 
