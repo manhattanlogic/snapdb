@@ -182,63 +182,40 @@ char * query() {
 	  event_type = "listing";
 	}
 
-	if (!(is_completed)) hash_string.push_back(event_type);
-	if (is_converter) is_completed = true;
+	if (!(is_completed)) {
+	  hash_string.push_back(event_type);
 	
-
-
-	
-	
-	for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
-	  if ((e -> ensighten.pageType == "PRODUCT") || (ii -> tag == "productpage")) {
-	    is_product = true;
-	    skus_ubserved.insert(ii->sku);
-	  } else if (ii -> tag == "cart" || (ii -> tag == "order")) {
-	    skus_ubserved.insert(ii->sku);
+	  for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
+	    if ((e -> ensighten.pageType == "PRODUCT") || (ii -> tag == "productpage")) {
+	      is_product = true;
+	      skus_ubserved.insert(ii->sku);
+	    } else if (ii -> tag == "cart" || (ii -> tag == "order")) {
+	      skus_ubserved.insert(ii->sku);
+	    }
 	  }
-	}
 
-	if (order_sku != "") {
-	  std::string crumb_key = "";
-	  auto it = sku_crumbs.find(order_sku);
-	  if (it == sku_crumbs.end()) {
-	    std::cerr << "bad order sku:" << order_sku << " " << i->first  << "\n";
-	  } else {
-	    for (int q = 0; q < sku_crumbs[order_sku].size(); q++) {
-	      std::string current_crumb = replace_all(sku_crumbs[order_sku][q], "&amp;", "&");
-	      if (crumb_key != "") crumb_key += "|";
-	      crumb_key += current_crumb;
-	      auto ci = global_crumb_stats.find(crumb_key);
-	      if (ci == global_crumb_stats.end()) {
-		hash_struct hs = {};
-		global_crumb_stats[crumb_key] = hs;
-		ci = global_crumb_stats.find(crumb_key);
+	  if (order_sku != "") {
+	    std::string crumb_key = "";
+	    auto it = sku_crumbs.find(order_sku);
+	    if (it == sku_crumbs.end()) {
+	      std::cerr << "bad order sku:" << order_sku << " " << i->first  << "\n";
+	    } else {
+	      for (int q = 0; q < sku_crumbs[order_sku].size(); q++) {
+		std::string current_crumb = replace_all(sku_crumbs[order_sku][q], "&amp;", "&");
+		if (crumb_key != "") crumb_key += "|";
+		crumb_key += current_crumb;
+		auto ci = global_crumb_stats.find(crumb_key);
+		if (ci == global_crumb_stats.end()) {
+		  hash_struct hs = {};
+		  global_crumb_stats[crumb_key] = hs;
+		  ci = global_crumb_stats.find(crumb_key);
+		}
+		ci->second.exact_order_total += order_total;
 	      }
-	      ci->second.exact_order_total += order_total;
-	      
- 	    }
+	    }
 	  }
-	}
-
-	/*
-	if (is_product) {
-	  std::string crumb_key = "";
-	  if (e->ensighten.crumbs.size() != 4) continue;
-	  if (e->ensighten.crumbs[0] == "O.biz" || e->ensighten.crumbs[0] == "Eziba") continue;
-	  for (int q = 0; q < e->ensighten.crumbs.size(); q++) {
-	    std::string current_crumb = replace_all(e->ensighten.crumbs[q], "&amp;", "&");
-	    if (crumb_key != "") crumb_key += "|";
-	    crumb_key += current_crumb;
-	    user_crumbs.insert(crumb_key);
-	  }
-	  auto it = flat_crumb_stats.find(crumb_key);
-	  if (it == flat_crumb_stats.end()) {
-	    flat_crumb_stats[crumb_key] = 1;
-	  } else {
-	    it->second++;
-	  }
-	}
-	*/
+	} // is_completed
+	if (is_converter) is_completed = true;
       } // event
     } // time
     
