@@ -80,12 +80,12 @@ char * query() {
 	  for (int l = 0; l < e->ensighten.items.size(); l++) {
 	    for (int k = 0; k < e->ensighten.items[l].subCatIds.size(); k++) {
 	      int p = e->ensighten.items[l].subCatIds.size() - k - 1;
-	      std::cerr << k << " " << e->ensighten.items[l].subCatIds.size() << " " << p << "\n";
+	      
 	      if (k >= subCatIds.size()) {
 		std::unordered_map<std::string, long> element;
 		subCatIds.push_back(element);
 	      }
-	      std::cerr << "cp1\n";
+	      
 	      auto it = subCatIds[k].find(e->ensighten.items[l].subCatIds[p]);
 	      if (it == subCatIds[k].end()) {
 		subCatIds[k][e->ensighten.items[l].subCatIds[p]] = 1;
