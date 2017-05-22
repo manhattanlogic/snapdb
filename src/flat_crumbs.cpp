@@ -170,6 +170,11 @@ char * query() {
 	  } else if ((ii->tag == "productpage") || (e -> ensighten.pageType == "PRODUCT")) {
 	    event_type = "productpage";
 	  } else if (ii->tag == "order") {
+
+	    if (j == i->second->history.begin()) {
+	      std::cerr << "first order:" << i->first << "\n";
+	    }
+	    
 	    event_type = "order";
 	    is_converter = true;
 	    order_sku = ii->sku;
