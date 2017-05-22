@@ -163,7 +163,7 @@ char * query() {
 	  }
 	}
 
-	if (is_converter) {
+	if (order_sku != "") {
 	  std::string crumb_key = "";
 	  auto it = sku_crumbs.find(order_sku);
 	  if (it == sku_crumbs.end()) {
@@ -172,6 +172,7 @@ char * query() {
 	    for (int q = 0; q < sku_crumbs[order_sku].size(); q++) {
 	      std::string current_crumb = replace_all(sku_crumbs[order_sku][q], "&amp;", "&");
 	      if (crumb_key != "") crumb_key += "|";
+	      crumb_key += current_crumb;
 	      auto ci = global_crumb_stats.find(crumb_key);
 	      if (ci == global_crumb_stats.end()) {
 		hash_struct hs = {};
@@ -179,7 +180,8 @@ char * query() {
 		ci = global_crumb_stats.find(crumb_key);
 	      }
 	      ci->second.exact_order_total += order_total;
-	    }
+	      
+ 	    }
 	  }
 	}
 	
@@ -211,6 +213,7 @@ char * query() {
 	global_crumb_stats[*c] = hs;
 	ci = global_crumb_stats.find(*c);
       }
+      
       ci->second.users ++;
       
       if (is_converter) {
