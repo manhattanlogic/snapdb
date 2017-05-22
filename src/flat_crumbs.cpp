@@ -72,7 +72,7 @@ char * query() {
       if (j->second.events == NULL) continue;
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (e->ensighten.items.size() > 0) {
-	  if (e->ensighten.items[0].tag == "product") {
+	  if ((e->ensighten.items[0].tag == "productpage") || (e -> ensighten.pageType == "PRODUCT")) {
 	    sku_crumbs[e->ensighten.items[0].sku] = e->ensighten.crumbs;
 	  }
 	}
