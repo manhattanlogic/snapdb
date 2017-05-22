@@ -247,8 +247,9 @@ char * query() {
       if (it == sku_crumbs.end()) continue;
       std::string crumb_key = "";
       for (int q = 0; q < it->second.size(); q++) {
+	std::string current_crumb = replace_all(it->second[q], "&amp;", "&");
 	if (crumb_key != "") crumb_key += "|";
-	crumb_key += it->second[q];
+	crumb_key += current_crumb;
 	user_crumbs.insert(crumb_key);
       }
     }
