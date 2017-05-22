@@ -167,7 +167,7 @@ char * query() {
 	  std::string crumb_key = "";
 	  auto it = sku_crumbs.find(order_sku);
 	  if (it == sku_crumbs.end()) {
-	    std::cerr << "bad order sku:" << order_sku << " " << i->first << "\n";
+	    std::cerr << "bad order sku:" << order_sku << " " << i->first  << "\n";
 	  } else {
 	    for (int q = 0; q < sku_crumbs[order_sku].size(); q++) {
 	      std::string current_crumb = replace_all(sku_crumbs[order_sku][q], "&amp;", "&");
