@@ -145,28 +145,28 @@ char * query() {
 
   
 
-  //std::ofstream matrix_file("order_matrix.csv");
+  std::ofstream matrix_file("order_matrix.csv");
   bool first_line = true;
   for (auto i = sku_order_matrix.begin(); i != sku_order_matrix.end(); i++) {
     bool first_column = true;
     if (first_line) {
       for (auto j = i->second.begin(); j != i->second.end(); j++) {
-	result << "," << j->first;
+	matrix_file << "\t" << j->first;
       }
-      result << "\n";
+      matrix_file << "\n";
       first_line = false;
     }
     for (auto j = i->second.begin(); j != i->second.end(); j++) {
       if (first_column) {
-	result << i->first;
+	matrix_file << i->first;
 	first_column = false;
       }
-      result << "," << j->second;
+      matrix_file << "\t" << j->second;
     }
-    result << "\n";
+    matrix_file << "\n";
   }
   
-  //result << "ok\n";
+  result << "ok\n";
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());
   buffer[result.str().size()] = 0;
