@@ -114,7 +114,7 @@ char * query() {
       if (order_skus.size() > 0) break;
     } // history
 
-    std::cerr << i->first << "\n";
+    
 
     
     if (order_skus.size() > 0) {
@@ -143,7 +143,7 @@ char * query() {
     
   } // json history
 
-  std::cerr << "done 1\n";
+  
 
   //std::ofstream matrix_file("order_matrix.csv");
   bool first_line = true;
