@@ -89,12 +89,18 @@ char * query() {
   }
 
   std::cerr << "done 0\n";
+
+  struct matrix_entry {
+    long converters = 0;
+    double amount = 0.0;
+  };
   
-  std::map<std::string, std::map<std::string, long> > sku_order_matrix;
+  std::map<std::string, std::map<std::string, matrix_entry> > sku_order_matrix;
   
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
     std::string first_sku;
     std::vector <std::string> order_skus;
+    std::vector <double> order_dollars;
     bool is_completed = false;
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       if (j->second.events == NULL) continue;
@@ -107,6 +113,7 @@ char * query() {
 	  } else if (e->ensighten.items[0].tag == "order") {
 	    for (auto item = e->ensighten.items.begin(); item != e->ensighten.items.end(); item++) {
 	      order_skus.push_back(item->sku);
+	      order_dollars.push_back(item->price * item->quantity);
 	    }
 	  }
 	}
@@ -122,20 +129,24 @@ char * query() {
       if (source_crumbs.size() > 0) {
 	auto it = sku_order_matrix.find(source_crumbs[0]);
 	if (it == sku_order_matrix.end()) {
-	  std::map<std::string, long> element;
+	  std::map<std::string, matrix_entry> element;
 	  sku_order_matrix[source_crumbs[0]] = element;
 	  it = sku_order_matrix.find(source_crumbs[0]);
 	}
-	for (auto s = order_skus.begin(); s != order_skus.end(); s++) {
+	for (int si = 0; si < order_skus.size(); si++) {
+	  //for (auto s = order_skus.begin(); s != order_skus.end(); s++) {
+	  auto s = &order_skus[si];
 	  auto dest_crumbs = get_crumbs_for_sku(*s);
 	  if (dest_crumbs.size() > 0) {
 	    for (auto it3 = sku_order_matrix.begin(); it3 != sku_order_matrix.end(); it3++) {
 	      auto it2 = it3->second.find(dest_crumbs[0]);
 	      if (it2 == it3->second.end()) {
-		it3->second[dest_crumbs[0]] = 0;
+		matrix_entry me;
+		it3->second[dest_crumbs[0]] = me;
 	      }
 	    }
-	    sku_order_matrix[source_crumbs[0]][dest_crumbs[0]] ++;
+	    sku_order_matrix[source_crumbs[0]][dest_crumbs[0]].converters ++;
+	    sku_order_matrix[source_crumbs[0]][dest_crumbs[0]].amount += order_dollars[si];
 	  }
 	}
       }
@@ -146,24 +157,31 @@ char * query() {
   
 
   std::ofstream matrix_file("order_matrix.csv");
+  std::ofstream dollar_matrix_file("dollar_matrix.csv");
   bool first_line = true;
   for (auto i = sku_order_matrix.begin(); i != sku_order_matrix.end(); i++) {
     bool first_column = true;
     if (first_line) {
       for (auto j = i->second.begin(); j != i->second.end(); j++) {
 	matrix_file << "\t" << j->first;
+	dollar_matrix_file << "\t" << j->first;
       }
       matrix_file << "\n";
+      dollar_matrix_file << "\n";
       first_line = false;
     }
     for (auto j = i->second.begin(); j != i->second.end(); j++) {
       if (first_column) {
 	matrix_file << i->first;
+	dollar_matrix_file << i->first;
 	first_column = false;
       }
-      matrix_file << "\t" << j->second;
+      matrix_file << "\t" << j->second.converters;
+      dollar_matrix_file << "\t" << j->second.amount;
+      
     }
     matrix_file << "\n";
+    dollar_matrix_file << "\n";
   }
   
   result << "ok\n";
