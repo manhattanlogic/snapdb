@@ -30,7 +30,7 @@
 #include "cpp-httplib/httplib.h"
 
 #include "snapdb.hpp"
-
+#include "util.hpp"
 
 FILE * file;
 
@@ -50,24 +50,6 @@ bool cmdOptionExists(char** begin, char** end, const std::string& option)
     return std::find(begin, end, option) != end;
 }
 
-
-std::string replace_all(
-			const std::string & str ,   // where to work
-			const std::string & find ,  // substitute 'find'
-			const std::string & replace //      by 'replace'
-			) {
-  using namespace std;
-  string result;
-  size_t find_len = find.size();
-  size_t pos,from=0;
-  while ( string::npos != ( pos=str.find(find,from) ) ) {
-    result.append( str, from, pos-from );
-    result.append( replace );
-    from = pos + find_len;
-  }
-  result.append( str, from , string::npos );
-  return result;
-}
 
 int THREADS = 32;
 
@@ -421,17 +403,13 @@ void process_result(json_history_entry data, unsigned long file_position) {
   unsigned long vid = data.vid;
   unsigned long ts = data.ts;
 
-
-  auto id_it = ids.find(id);
-  if (id_it != ids.end()) {
-    // std::cerr << "id collision\n";
-  }
   ids.insert(id);
   
   counter += 1;
   if (counter % 10000 == 0) {
     std::cerr << "    " << counter <<  "\n" << "\033[1A";
   }
+
   
   auto it = json_history.find(vid);
   if (it == json_history.end()) {
@@ -439,6 +417,7 @@ void process_result(json_history_entry data, unsigned long file_position) {
     json_history[vid] = suh;
     it = json_history.find(vid);
   }
+  
   result_processor_mutex.unlock();
   
   it->second->row_mutex.lock();

@@ -11,45 +11,10 @@
 #include <algorithm>
 #include <string>
 #include <vector>
-
-std::string replace_all(
-			const std::string & str ,   // where to work
-			const std::string & find ,  // substitute 'find'
-			const std::string & replace //      by 'replace'
-			) {
-  using namespace std;
-  string result;
-  size_t find_len = find.size();
-  size_t pos,from=0;
-  while ( string::npos != ( pos=str.find(find,from) ) ) {
-    result.append( str, from, pos-from );
-    result.append( replace );
-    from = pos + find_len;
-  }
-  result.append( str, from , string::npos );
-  return result;
-}
-
-std::vector<std::string> split_string(std::string line, const char * sep = " ") {
-  std::vector <std::string> result;
-  char * pch = strtok ((char *)line.c_str(), sep);
-  while (pch != NULL) {
-    result.push_back(pch);
-    pch = strtok (NULL, sep);
-  }
-  return result;
-}
+#include <set>
+#include "util.hpp"
 
 
-struct hash_struct {
-  long users;
-  long converters;
-  long exact_converters;
-  std::unordered_map<std::string, int> hash;
-  std::unordered_map<std::string, int> exact_hash;
-  double order_total;
-  double exact_order_total;
-};
 
 std::unordered_map<std::string, std::vector<std::string> > sku_crumbs;
 
@@ -62,6 +27,22 @@ std::vector<std::string> get_crumbs_for_sku(std::string sku) {
     return it->second;
   }
 }
+
+struct hash_struct {
+  long users; // done
+  long converters; // done
+  long exact_converters; // done
+  long multicart_converters; // done
+  long exact_multicart_converters; // done
+  std::unordered_map<std::string, long> hash; // done
+  std::unordered_map<std::string, long> exact_hash; // done
+  std::unordered_map<std::string, long> multicart_hash; // done
+  std::unordered_map<std::string, long> exact_multicart_hash; // done
+  double order_total;
+  double exact_order_total;
+};
+
+std::unordered_map<std::string, hash_struct> global_crumb_stats;
 
 
 extern "C"
@@ -102,10 +83,76 @@ char * query() {
     std::vector <std::string> order_skus;
     std::vector <double> order_dollars;
     bool is_completed = false;
+    std::set<std::string> last_cart;
+    std::string last_cam_source;
+    bool cam_source_changed = false;
+
+    std::string tetris_string; 
+    bool is_converter = false;
+    int  cart_events  = 0;
+    
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       if (j->second.events == NULL) continue;
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
+	// classify event type
+	if (j == i->second->history.begin()) {
+	  last_cam_source = e->ensighten.camSource;
+	} else {
+	  if (last_cam_source != e->ensighten.camSource) {
+	    cam_source_changed = true;
+	    last_cam_source = e->ensighten.camSource;
+	  }
+	}
+	std::string event_type = "listing";
+	if ((e->ensighten.searchTerm != "") || (e->ensighten.pageType == "SEARCH")) {
+	  event_type = "search";
+	} else if (e->ensighten.pageType == "HOMEPAGE") {
+	  event_type = "homepage";
+	} else  if (e->ensighten.pageType == "TAXONOMY") {
+	  event_type = "taxonomy";
+	}
 	if (e->ensighten.items.size() > 0) {
+	  if ((e->ensighten.items[0].tag == "featured") || (e->ensighten.items[0].tag == "productpage") || (e -> ensighten.pageType == "PRODUCT")) {
+	    event_type = "productpage";
+	  } else if (e->ensighten.items[0].tag == "order") {
+	    event_type = "order";
+	    is_converter = true;
+	  } else if (e->ensighten.items[0].tag == "featured") {
+	    event_type = "featured";
+	  }
+	  if (e->ensighten.items[0].tag == "cart") {
+	    cart_events ++;
+	    std::set<std::string> new_cart;
+	    for (auto c = e->ensighten.items.begin(); c != e->ensighten.items.end(); c++) {
+	      new_cart.insert(c->sku);
+	    }
+	    if (last_cart.size() == 0) {
+	      event_type = "cart_first";
+	    } else if (last_cart.size() > new_cart.size()) {
+	      event_type = "cart_remove";
+	    } else if (last_cart.size() < new_cart.size()) {
+	      event_type = "cart_add";
+	    } else {
+	      event_type = "cart_view";
+	      auto it_last = last_cart.begin();
+	      for (auto it_new = new_cart.begin(); it_new != new_cart.end(); it_new++) {
+		if (*it_last != *it_new) {
+		  event_type = "cart_change";
+		  break;
+		}
+		it_last++;
+	      }
+	    }
+	    last_cart = new_cart;
+	  }
+	}
+	// at this point event is classified
+	if (tetris_string != "") tetris_string += "|";
+	if (cam_source_changed) tetris_string += "cam_source_changed|";
+	tetris_string += event_type;
+
+	/* start/end matrix update */
+	if (e->ensighten.items.size() > 0) {  
 	  if ((e->ensighten.items[0].tag == "featured") || (e->ensighten.items[0].tag == "productpage") || (e -> ensighten.pageType == "PRODUCT")) {
 	    if (first_sku == "") {
 	      first_sku = e->ensighten.items[0].sku;
@@ -118,46 +165,72 @@ char * query() {
 	  }
 	}
       }
-      if (order_skus.size() > 0) break;
+      cam_source_changed = false;
+      if (is_converter) break;
     } // history
 
-    
-
-    
+    /* stats update */
     if (order_skus.size() > 0) {
       auto source_crumbs = get_crumbs_for_sku(first_sku);
       if (source_crumbs.size() > 0) {
-	auto it = sku_order_matrix.find(source_crumbs[0]);
-	if (it == sku_order_matrix.end()) {
-	  std::map<std::string, matrix_entry> element;
-	  sku_order_matrix[source_crumbs[0]] = element;
-	  it = sku_order_matrix.find(source_crumbs[0]);
-	}
+	auto it = safe_find(sku_order_matrix, source_crumbs[0]);
+	/* matrix update */
+	std::unordered_set<std::string> order_categories;
 	for (int si = 0; si < order_skus.size(); si++) {
-	  //for (auto s = order_skus.begin(); s != order_skus.end(); s++) {
 	  auto s = &order_skus[si];
 	  auto dest_crumbs = get_crumbs_for_sku(*s);
 	  if (dest_crumbs.size() > 0) {
 	    for (auto it3 = sku_order_matrix.begin(); it3 != sku_order_matrix.end(); it3++) {
-	      auto it2 = it3->second.find(dest_crumbs[0]);
-	      if (it2 == it3->second.end()) {
-		matrix_entry me;
-		it3->second[dest_crumbs[0]] = me;
-	      }
+	      auto it2 = safe_find(it3->second, dest_crumbs[0]);
+	    }
+	    std::string category_index = "";
+	    for (auto crumb = dest_crumbs.begin(); crumb != dest_crumbs.end(); crumb++) {
+	      if (category_index == "") category_index += "|";
+	      category_index += *crumb;
+	      order_categories.insert(category_index);
 	    }
 	    sku_order_matrix[source_crumbs[0]][dest_crumbs[0]].converters ++;
 	    sku_order_matrix[source_crumbs[0]][dest_crumbs[0]].amount += order_dollars[si];
 	  }
 	}
+	/* main stats update */
+	std::string category_index = "";
+	for (auto crumb = source_crumbs.begin(); crumb != source_crumbs.end(); crumb++) {
+	  if (category_index == "") category_index += "|";
+	  category_index += *crumb;
+	  
+	  auto it = safe_find(global_crumb_stats, category_index);
+	  it->second.users ++;
+	  
+	  if (is_converter) {
+	    it->second.converters ++;
+	    safe_inc(it->second.hash, tetris_string);
+	    bool exact_converter = false;
+	    if (order_categories.find(category_index) != order_categories.end()) {
+	      it->second.exact_converters ++;
+	      safe_inc(it->second.exact_hash, tetris_string);
+	      exact_converter = true;
+	    }
+	    if (cart_events > 1) {
+	      it->second.multicart_converters++;
+	      safe_inc(it->second.multicart_hash, tetris_string);
+	      if (exact_converter) {
+		it->second.exact_multicart_converters++;
+		safe_inc(it->second.exact_multicart_hash, tetris_string);
+	      }
+	    }
+	  }
+	}
+	
       }
     }
-    
   } // json history
 
   
-
+  std::ofstream file("flat_crumb_stats.csv");
   std::ofstream matrix_file("order_matrix.csv");
   std::ofstream dollar_matrix_file("dollar_matrix.csv");
+  
   bool first_line = true;
   for (auto i = sku_order_matrix.begin(); i != sku_order_matrix.end(); i++) {
     bool first_column = true;
@@ -182,6 +255,43 @@ char * query() {
     }
     matrix_file << "\n";
     dollar_matrix_file << "\n";
+  }
+
+  for (auto it = global_crumb_stats.begin(); it != global_crumb_stats.end(); it++) {
+    file << it->first << "\t" << it->second.users << "\t" << it->second.converters << "\t";
+    std::multimap<long, std::string> inverter;
+    std::map<std::string, long> spectrum;
+
+    for (auto it2 = it->second.exact_multicart_hash.begin(); it2 != it->second.exact_multicart_hash.end(); it2++) {
+      inverter.insert(std::pair<long, std::string>(it2->second, it2->first));
+      auto seq_parts = split_string(it2->first, "|");
+      for (auto itp = seq_parts.begin(); itp != seq_parts.end(); itp++) {
+	safe_inc(spectrum, *itp);
+      }
+    }
+
+    std::string spectrum_out = "{";
+    for (auto its = spectrum.begin(); its != spectrum.end(); its++) {
+      if (spectrum_out != "{") spectrum_out += ",";
+      spectrum_out += "\"" + its->first + "\":" + std::to_string(its->second);
+    }
+    spectrum_out += "}";
+    int limit = 20;
+    long coverage = 0;
+    std::string json_out = "[";
+    
+    for (auto it2 = inverter.rbegin(); it2 != inverter.rend(); it2++) {
+      if (coverage != 0) json_out += ",";
+      json_out += "\"" + it2->second + "\",\"" + std::to_string(it2->first) + "\"";
+      coverage += it2->first;
+      limit --;
+      if (limit == 0) break;
+    }
+    json_out += "]";
+    file << coverage << "\t" << json_out << "\t" << it->second.order_total << "\t" << spectrum_out << "\t"
+	 << it->second.exact_order_total << "\t" << it->second.exact_converters << "\n";
+
+    
   }
   
   result << "ok\n";
