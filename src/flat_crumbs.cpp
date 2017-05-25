@@ -151,7 +151,8 @@ char * query() {
 	}
 
 	if ((event_type == "cart_first") || (event_type == "cart_remove") ||
-	    (event_type == "cart_add") || (event_type == "cart_view")) {
+	    (event_type == "cart_add") || (event_type == "cart_view") ||
+	    (event_type == "cart_change")) {
 	  event_type = "cart_view";
 	} else if ((event_type == "productpage") || (event_type == "featured")) {
 	  event_type = "productpage";
