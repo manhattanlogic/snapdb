@@ -90,6 +90,8 @@ char * query() {
     std::string tetris_string; 
     bool is_converter = false;
     int  cart_events  = 0;
+
+    std::string browser;
     
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       if (j->second.events == NULL) continue;
@@ -104,6 +106,7 @@ char * query() {
 	  }
 	}
 	std::string event_type = "listing";
+	browser = e->ensighten.browser;
 	if ((e->ensighten.searchTerm != "") || (e->ensighten.pageType == "SEARCH")) {
 	  event_type = "search";
 	} else if (e->ensighten.pageType == "HOMEPAGE") {
@@ -169,6 +172,8 @@ char * query() {
       if (is_converter) break;
     } // history
 
+    if (browser != "d") continue;
+    
     /* stats update */
     auto source_crumbs = get_crumbs_for_sku(first_sku);
     std::unordered_set<std::string> order_categories;
@@ -227,7 +232,6 @@ char * query() {
 	  }
 	}
       }
-	
     }
     
   } // json history
