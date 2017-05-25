@@ -170,12 +170,14 @@ char * query() {
     } // history
 
     /* stats update */
+    auto source_crumbs = get_crumbs_for_sku(first_sku);
+    std::unordered_set<std::string> order_categories;
+    
     if (order_skus.size() > 0) {
-      auto source_crumbs = get_crumbs_for_sku(first_sku);
       if (source_crumbs.size() > 0) {
 	auto it = safe_find(sku_order_matrix, source_crumbs[0]);
 	/* matrix update */
-	std::unordered_set<std::string> order_categories;
+	
 	for (int si = 0; si < order_skus.size(); si++) {
 	  auto s = &order_skus[si];
 	  auto dest_crumbs = get_crumbs_for_sku(*s);
@@ -193,37 +195,41 @@ char * query() {
 	    sku_order_matrix[source_crumbs[0]][dest_crumbs[0]].amount += order_dollars[si];
 	  }
 	}
-	/* main stats update */
-	std::string category_index = "";
-	for (auto crumb = source_crumbs.begin(); crumb != source_crumbs.end(); crumb++) {
-	  if (category_index != "") category_index += "|";
-	  category_index += *crumb;
+      }
+    }
+    
+    if (source_crumbs.size() > 0) {
+      /* main stats update */
+      std::string category_index = "";
+      for (auto crumb = source_crumbs.begin(); crumb != source_crumbs.end(); crumb++) {
+	if (category_index != "") category_index += "|";
+	category_index += *crumb;
 	  
-	  auto it = safe_find(global_crumb_stats, category_index);
-	  it->second.users ++;
+	auto it = safe_find(global_crumb_stats, category_index);
+	it->second.users ++;
 	  
-	  if (is_converter) {
-	    it->second.converters ++;
-	    safe_inc(it->second.hash, tetris_string);
-	    bool exact_converter = false;
-	    if (order_categories.find(category_index) != order_categories.end()) {
-	      it->second.exact_converters ++;
-	      safe_inc(it->second.exact_hash, tetris_string);
-	      exact_converter = true;
-	    }
-	    if (cart_events > 1) {
-	      it->second.multicart_converters++;
-	      safe_inc(it->second.multicart_hash, tetris_string);
-	      if (exact_converter) {
-		it->second.exact_multicart_converters++;
-		safe_inc(it->second.exact_multicart_hash, tetris_string);
-	      }
+	if (is_converter) {
+	  it->second.converters ++;
+	  safe_inc(it->second.hash, tetris_string);
+	  bool exact_converter = false;
+	  if (order_categories.find(category_index) != order_categories.end()) {
+	    it->second.exact_converters ++;
+	    safe_inc(it->second.exact_hash, tetris_string);
+	    exact_converter = true;
+	  }
+	  if (cart_events > 1) {
+	    it->second.multicart_converters++;
+	    safe_inc(it->second.multicart_hash, tetris_string);
+	    if (exact_converter) {
+	      it->second.exact_multicart_converters++;
+	      safe_inc(it->second.exact_multicart_hash, tetris_string);
 	    }
 	  }
 	}
-	
       }
+	
     }
+    
   } // json history
 
   
