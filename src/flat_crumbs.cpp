@@ -149,6 +149,17 @@ char * query() {
 	    last_cart = new_cart;
 	  }
 	}
+
+	if ((event_type == "cart_first") || (event_type == "cart_remove") ||
+	    (event_type == "cart_add") || (event_type == "cart_view")) {
+	  event_type = "cart_view";
+	} else if ((event_type == "productpage") || (event_type == "featured")) {
+	  event_type = "productpage";
+	} else if ((event_type == "listing") || (event_type == "taxonomy") || (event_type == "homepage") || (event_type == "search")) {
+	  event_type = "listing";
+	}
+
+	
 	// at this point event is classified
 	if (tetris_string != "") tetris_string += "|";
 	if (cam_source_changed) tetris_string += "cam_source_changed|";
