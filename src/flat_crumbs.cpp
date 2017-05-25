@@ -222,7 +222,9 @@ char * query() {
     if (source_crumbs.size() > 0) {
       /* main stats update */
       std::string category_index = "";
+      std::vector<std::string> catche_source_crumbs;
       for (auto crumb = source_crumbs.begin(); crumb != source_crumbs.end(); crumb++) {
+	catche_source_crumbs.push_back(*crumb);
 	if (category_index != "") category_index += "|";
 	category_index += *crumb;
 	  
@@ -248,6 +250,15 @@ char * query() {
 	  }
 	  for (int i = 0; i < order_skus.size(); i++) {
 	    it->second.order_total += order_dollars[i];
+	    auto cats = get_crumbs_for_sku(order_skus[i]);
+	    if (cats.size() != 4) break;
+	    bool match = true;
+	    for (int j = 0; j < catche_source_crumbs.size(); j++) {
+	      if (catche_source_crumbs[j] != cats[j]) match = false;
+	    }
+	    if (match) {
+	      it->second.exact_order_total += order_dollars[i];
+	    }
 	  }
 	}
       }
