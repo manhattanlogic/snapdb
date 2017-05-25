@@ -246,6 +246,9 @@ char * query() {
 	      safe_inc(it->second.exact_multicart_hash, tetris_string);
 	    }
 	  }
+	  for (int i = 0; i < order_skus.size(); i++) {
+	    it->second.order_total += order_dollars[i];
+	  }
 	}
       }
     }
