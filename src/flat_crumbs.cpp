@@ -185,7 +185,7 @@ char * query() {
 	    }
 	    std::string category_index = "";
 	    for (auto crumb = dest_crumbs.begin(); crumb != dest_crumbs.end(); crumb++) {
-	      if (category_index == "") category_index += "|";
+	      if (category_index != "") category_index += "|";
 	      category_index += *crumb;
 	      order_categories.insert(category_index);
 	    }
@@ -196,7 +196,7 @@ char * query() {
 	/* main stats update */
 	std::string category_index = "";
 	for (auto crumb = source_crumbs.begin(); crumb != source_crumbs.end(); crumb++) {
-	  if (category_index == "") category_index += "|";
+	  if (category_index != "") category_index += "|";
 	  category_index += *crumb;
 	  
 	  auto it = safe_find(global_crumb_stats, category_index);
