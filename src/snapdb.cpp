@@ -371,7 +371,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
 }
 
 
-
+std::mutex web_mutex;
 std::mutex line_read_mutex;
 std::mutex result_processor_mutex;
 volatile bool has_more_lines = true;
@@ -482,6 +482,7 @@ void start_web_server(int port) {
   Server svr;
 
   svr.get("/get_raw_user", [](const auto& req, auto& res) {
+      std::lock_guard<std::mutex> guard(web_mutex);
       std::cerr << "get_raw_user celled\n";
       
       // char line[1024 * 1024 * 4];
@@ -490,8 +491,6 @@ void start_web_server(int port) {
       document.SetObject();
       rapidjson::Document::AllocatorType& allocator = document.GetAllocator();
       rapidjson::Value array(rapidjson::kArrayType);
-
-
 
       unsigned long vid;
       
@@ -543,6 +542,7 @@ void start_web_server(int port) {
     });
 
   svr.get("/exec", [](const auto& req, auto& res) {
+      std::lock_guard<std::mutex> guard(web_mutex);
       auto mod_it = req.params.find("mod");
       auto func_it = req.params.find("func");
 
