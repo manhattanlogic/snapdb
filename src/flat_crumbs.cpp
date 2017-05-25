@@ -150,6 +150,7 @@ char * query() {
 	  }
 	}
 
+	/*
 	if ((event_type == "cart_first") || (event_type == "cart_remove") ||
 	    (event_type == "cart_add") || (event_type == "cart_view") ||
 	    (event_type == "cart_change")) {
@@ -159,7 +160,7 @@ char * query() {
 	} else if ((event_type == "listing") || (event_type == "taxonomy") || (event_type == "homepage") || (event_type == "search")) {
 	  event_type = "listing";
 	}
-
+	*/
 	
 	// at this point event is classified
 	if (tetris_string != "") tetris_string += "|";
@@ -234,7 +235,7 @@ char * query() {
 	    safe_inc(it->second.exact_hash, tetris_string);
 	    exact_converter = true;
 	  }
-	  if (cart_events > 1) {
+	  if ((true) || (cart_events > 1)) {
 	    it->second.multicart_converters++;
 	    safe_inc(it->second.multicart_hash, tetris_string);
 	    if (exact_converter) {
