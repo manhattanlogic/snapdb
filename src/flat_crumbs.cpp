@@ -99,6 +99,9 @@ char * query() {
 	// classify event type
 	if (j == i->second->history.begin()) {
 	  last_cam_source = e->ensighten.camSource;
+	  if (last_cam_source != "") {
+	    cam_source_changed = true;
+	  }
 	} else {
 	  if (last_cam_source != e->ensighten.camSource) {
 	    cam_source_changed = true;
