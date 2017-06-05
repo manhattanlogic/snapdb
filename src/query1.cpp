@@ -31,7 +31,7 @@ struct accumulator_struct {
 
 
 std::unordered_map<std::string, long> cam_name_stats;
-
+std::unordered_map<std::string, long> unique_cam_name_stats;
 extern "C"
 char * query() {
   history_filter.clear();
@@ -66,6 +66,7 @@ char * query() {
     
     std::unordered_set<std::string> camSources;
     std::unordered_set<std::string> camGroups;
+    std::unordered_set<std::string> cams;
     std::unordered_set<std::string> browsers;
 
     std::string last_cam_group = "";
@@ -118,6 +119,7 @@ char * query() {
 	    } else {
 	      it->second++;
 	    }
+	    cams.insert(full_cam_name);
 	    camSources.insert(event.ensighten.camSource);
 	    camGroups.insert(event.ensighten.camGroup);
 	    auto browser = event.ensighten.browser;
@@ -143,6 +145,15 @@ char * query() {
 
     long hist_len = i->second->history.size();
 
+    for (auto c = cams.begin(); c != cams.end(); c++) {
+      auto it = unique_cam_name_stats.find(*c);
+      if (it == unique_cam_name_stats.end()) {
+	unique_cam_name_stats[*c] = 1;
+      } else {
+	it->second++;
+      }
+    }
+    
      
     for (auto c = camSources.begin(); c != camSources.end(); c++) {
       if ((*c == "DglBrand") || (*c == "Digital Brand") || (*c == "RevJet Acq")) {
@@ -290,7 +301,14 @@ char * query() {
   }
 
   for (auto it = cam_name_stats.begin(); it != cam_name_stats.end(); it++) {
-    result << it->first << ":" << it->second << "\n";
+    result << it->first << ":" << it->second << "\t";
+    auto it2 = unique_cam_name_stats.find(it->first);
+    if (it2 == unique_cam_name_stats.end()) {
+      result << "-";
+    } else {
+      result << it2->second;
+    }
+    result << "\n";
   }
   
   
