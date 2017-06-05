@@ -80,7 +80,7 @@ char * query() {
 	for (int e = 0; e < j->second.events->size(); e++) {
 	  auto event = (*j->second.events)[e];
 	  if (event.ensighten.exists) {
-	    if (last_cam_source != "") {
+	    if (j != i->second->history.begin()) {
 	      if ((event.ensighten.camSource == "DglBrand") || (event.ensighten.camSource == "Digital Brand") ||
 		  (event.ensighten.camSource == "RevJet Acq")) {
 		if ((last_cam_source != "DglBrand") && (last_cam_source != "Digital Brand") &&
@@ -95,7 +95,7 @@ char * query() {
 	      }
 	    }
 	    
-	    if (last_cam_group != "") {
+	    if (j != i->second->history.begin()) {
 	      if ((event.ensighten.camGroup == "DglBrand") || (event.ensighten.camGroup == "Digital Brand") ||
 		  (event.ensighten.camGroup == "RevJet Acq")) {
 		if ((last_cam_group != "DglBrand") && (last_cam_group != "Digital Brand") &&
