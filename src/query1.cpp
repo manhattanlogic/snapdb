@@ -164,29 +164,37 @@ char * query() {
 
   for (auto c = camSourceStats.begin(); c != camSourceStats.end(); c++) {
     cam_source_stats << c->first << "\t" << c->second.users << "\t" << c->second.converters << "\t" << c->second.producters << "\t" << c->second.carters << "\t";
+    cam_source_stats << "\"";
     for (auto l = c->second.hist_len.rbegin(); l != c->second.hist_len.rend(); l++) {
       if (l != c->second.hist_len.rbegin()) cam_source_stats << ",";
       cam_source_stats << l->first << ":" << l->second;
     }
+    cam_source_stats << "\"";
     cam_source_stats << "\t";
+    cam_source_stats << "\"";
     for (auto l = c->second.conv_hist_len.rbegin(); l != c->second.conv_hist_len.rend(); l++) {
       if (l != c->second.conv_hist_len.rbegin()) cam_source_stats << ",";
       cam_source_stats << l->first << ":" << l->second;
     }
+    cam_source_stats << "\"";
     cam_source_stats << "\n";
   }
 
   for (auto c = camGroupStats.begin(); c != camGroupStats.end(); c++) {
     cam_group_stats << c->first << "\t" << c->second.users << "\t" << c->second.converters << "\t" << c->second.producters << "\t" << c->second.carters << "\t";
+    cam_group_stats << "\"";
     for (auto l = c->second.hist_len.rbegin(); l != c->second.hist_len.rend(); l++) {
       if (l != c->second.hist_len.rbegin()) cam_group_stats << ",";
       cam_group_stats << l->first << ":" << l->second;
     }
+    cam_group_stats << "\"";
     cam_group_stats << "\t";
+    cam_group_stats << "\"";
     for (auto l = c->second.conv_hist_len.rbegin(); l != c->second.conv_hist_len.rend(); l++) {
       if (l != c->second.conv_hist_len.rbegin()) cam_group_stats << ",";
       cam_group_stats << l->first << ":" << l->second;
     }
+    cam_group_stats << "\"";
     cam_group_stats << "\n";
   }
   
