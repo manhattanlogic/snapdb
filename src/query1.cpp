@@ -16,6 +16,7 @@ struct accumulator_struct {
   unsigned long producters = 0;
   unsigned long carters = 0;
   std::map<unsigned int, unsigned long> hist_len;
+  std::map<unsigned int, unsigned long> conv_hist_len;
 };
 
 
@@ -110,6 +111,14 @@ char * query() {
       } else {
 	it->second++;
       }
+      if (is_converter) {
+	auto it = camSourceStats[*c].conv_hist_len.find(hist_len);
+	if (it == camSourceStats[*c].conv_hist_len.end()) {
+	  camSourceStats[*c].conv_hist_len[hist_len] = 1;
+	} else {
+	  it->second++;
+	}
+      }
     }
 
 
@@ -139,6 +148,14 @@ char * query() {
       } else {
 	it->second++;
       }
+      if (is_converter) {
+	auto it = camGroupStats[*c].conv_hist_len.find(hist_len);
+	if (it == camGroupStats[*c].conv_hist_len.end()) {
+	  camGroupStats[*c].conv_hist_len[hist_len] = 1;
+	} else {
+	  it->second++;
+	}
+      }
     }
   }
 
@@ -151,12 +168,22 @@ char * query() {
       if (l != c->second.hist_len.rbegin()) cam_source_stats << ",";
       cam_source_stats << l->first << ":" << l->second;
     }
+    cam_source_stats << "\t";
+    for (auto l = c->second.conv_hist_len.rbegin(); l != c->second.conv_hist_len.rend(); l++) {
+      if (l != c->second.hist_len.rbegin()) cam_source_stats << ",";
+      cam_source_stats << l->first << ":" << l->second;
+    }
     cam_source_stats << "\n";
   }
 
   for (auto c = camGroupStats.begin(); c != camGroupStats.end(); c++) {
     cam_group_stats << c->first << "\t" << c->second.users << "\t" << c->second.converters << "\t" << c->second.producters << "\t" << c->second.carters << "\t";
     for (auto l = c->second.hist_len.rbegin(); l != c->second.hist_len.rend(); l++) {
+      if (l != c->second.hist_len.rbegin()) cam_group_stats << ",";
+      cam_group_stats << l->first << ":" << l->second;
+    }
+    cam_group_stats << "\t";
+    for (auto l = c->second.conv_hist_len.rbegin(); l != c->second.conv_hist_len.rend(); l++) {
       if (l != c->second.hist_len.rbegin()) cam_group_stats << ",";
       cam_group_stats << l->first << ":" << l->second;
     }
