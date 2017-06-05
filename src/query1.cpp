@@ -89,6 +89,7 @@ char * query() {
       if ((*c == "DglBrand") || (*c == "Digital Brand") || (*c == "RevJet Acq")) {
 	history_filter.insert(i->first);
       }
+      
       if (camSourceStats.find(*c) == camSourceStats.end()) {
 	accumulator_struct a;
 	camSourceStats[*c] = a;
@@ -153,7 +154,7 @@ char * query() {
     cam_source_stats << "\n";
   }
 
-  for (auto c = camSourceStats.begin(); c != camSourceStats.end(); c++) {
+  for (auto c = camGroupStats.begin(); c != camGroupStats.end(); c++) {
     cam_group_stats << c->first << "\t" << c->second.users << "\t" << c->second.converters << "\t" << c->second.producters << "\t" << c->second.carters << "\t";
     for (auto l = c->second.hist_len.rbegin(); l != c->second.hist_len.rend(); l++) {
       if (l != c->second.hist_len.rbegin()) cam_source_stats << ",";
