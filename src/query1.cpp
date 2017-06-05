@@ -162,6 +162,7 @@ char * query() {
       if (is_converter) {
 	if (source_to_revjet) {
 	  camSourceStats[*c].conv_source_to_revjet++;
+	  result << i->first << "\n";
 	}
 	if (source_from_revjet) {
 	  camSourceStats[*c].conv_source_from_revjet++;
