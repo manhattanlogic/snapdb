@@ -30,6 +30,8 @@ struct accumulator_struct {
 };
 
 
+std::unordered_map<std::string, long> cam_name_stats;
+
 extern "C"
 char * query() {
   history_filter.clear();
@@ -108,6 +110,14 @@ char * query() {
 	    }
 	    last_cam_group = event.ensighten.camGroup;
 	    last_cam_source = event.ensighten.camSource;
+
+	    std::string full_cam_name = event.ensighten.camGroup + ":" + event.ensighten.camSource;
+	    auto it = cam_name_stats.find(full_cam_name);
+	    if (it == cam_name_stats.end()) {
+	      cam_name_stats[full_cam_name] = 1;
+	    } else {
+	      it->second++;
+	    }
 	    camSources.insert(event.ensighten.camSource);
 	    camGroups.insert(event.ensighten.camGroup);
 	    auto browser = event.ensighten.browser;
@@ -162,7 +172,7 @@ char * query() {
       if (is_converter) {
 	if (source_to_revjet) {
 	  camSourceStats[*c].conv_source_to_revjet++;
-	  result << i->first << "\n";
+	  //result << i->first << "\n";
 	}
 	if (source_from_revjet) {
 	  camSourceStats[*c].conv_source_from_revjet++;
@@ -277,6 +287,10 @@ char * query() {
     }
     cam_group_stats << "\"";
     cam_group_stats << "\n";
+  }
+
+  for (auto it = cam_name_stats.begin(); it != cam_name_stats.end(); it++) {
+    result << it->first << ":" << it->second << "\n";
   }
   
   
