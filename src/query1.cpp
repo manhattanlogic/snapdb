@@ -15,6 +15,10 @@ struct accumulator_struct {
   unsigned long converters = 0;
   unsigned long producters = 0;
   unsigned long carters = 0;
+  unsigned long group_to_revjet = 0;
+  unsigned long group_from_revjet = 0;
+  unsigned long source_to_revjet = 0;
+  unsigned long source_from_revjet = 0;
   std::map<unsigned int, unsigned long> hist_len;
   std::map<unsigned int, unsigned long> conv_hist_len;
 };
@@ -47,11 +51,18 @@ char * query() {
     bool is_converter = false;
     bool is_carter = false;
     bool is_producter = false;
-     
+    bool group_to_revjet = false;
+    bool group_from_revjet = false;
+    bool source_to_revjet = false;
+    bool source_from_revjet = false;
+    
     std::unordered_set<std::string> camSources;
     std::unordered_set<std::string> camGroups;
     std::unordered_set<std::string> browsers;
-     
+
+    std::string last_cam_group = "";
+    std::string last_cam_source = "";
+    
     auto start =  i->second->history.begin()->second.ts;
     auto end =  i->second->history.rbegin()->second.ts;
     if (end - start < 100) continue;
@@ -60,6 +71,37 @@ char * query() {
 	for (int e = 0; e < j->second.events->size(); e++) {
 	  auto event = (*j->second.events)[e];
 	  if (event.ensighten.exists) {
+	    if (last_cam_source != "") {
+	      if ((event.ensighten.camSource == "DglBrand") || (event.ensighten.camSource == "Digital Brand") ||
+		  (event.ensighten.camSource == "RevJet Acq")) {
+		if ((last_cam_source != "DglBrand") && (last_cam_source != "Digital Brand") &&
+		    (last_cam_source != "RevJet Acq")) {
+		  source_to_revjet = true;
+		}
+	      } else {
+		if ((last_cam_source == "DglBrand") || (last_cam_source == "Digital Brand") ||
+		    (last_cam_source == "RevJet Acq")) {
+		  source_from_revjet = true;
+		}
+	      }
+	    }
+	    
+	    if (last_cam_group != "") {
+	      if ((event.ensighten.camGroup == "DglBrand") || (event.ensighten.camGroup == "Digital Brand") ||
+		  (event.ensighten.camGroup == "RevJet Acq")) {
+		if ((last_cam_group != "DglBrand") && (last_cam_group != "Digital Brand") &&
+		    (last_cam_group != "RevJet Acq")) {
+		  group_to_revjet = true;
+		}
+	      } else {
+		if ((last_cam_group == "DglBrand") || (last_cam_group == "Digital Brand") ||
+		    (last_cam_group == "RevJet Acq")) {
+		  group_from_revjet = true;
+		}
+	      }
+	    }
+	    last_cam_group = event.ensighten.camGroup;
+	    last_cam_source = event.ensighten.camSource;
 	    camSources.insert(event.ensighten.camSource);
 	    camGroups.insert(event.ensighten.camGroup);
 	    auto browser = event.ensighten.browser;
@@ -105,6 +147,12 @@ char * query() {
       if (is_producter) {
 	camSourceStats[*c].producters++;
       }
+      if (source_to_revjet) {
+	camSourceStats[*c].source_to_revjet++;
+      }
+      if (source_from_revjet) {
+	camSourceStats[*c].source_from_revjet++;
+      }
       auto it = camSourceStats[*c].hist_len.find(hist_len);
       if (it == camSourceStats[*c].hist_len.end()) {
 	camSourceStats[*c].hist_len[hist_len] = 1;
@@ -142,6 +190,12 @@ char * query() {
       if (is_producter) {
 	camGroupStats[*c].producters++;
       }
+      if (group_to_revjet) {
+	camGroupStats[*c].group_to_revjet++;
+      }
+      if (group_from_revjet) {
+	camGroupStats[*c].group_from_revjet++;
+      }
       auto it = camGroupStats[*c].hist_len.find(hist_len);
       if (it == camGroupStats[*c].hist_len.end()) {
 	camGroupStats[*c].hist_len[hist_len] = 1;
@@ -164,6 +218,7 @@ char * query() {
 
   for (auto c = camSourceStats.begin(); c != camSourceStats.end(); c++) {
     cam_source_stats << c->first << "\t" << c->second.users << "\t" << c->second.converters << "\t" << c->second.producters << "\t" << c->second.carters << "\t";
+    cam_source_stats << c->second.source_to_revjet << "\t" <<  c->second.source_from_revjet << "\t";
     cam_source_stats << "\"";
     for (auto l = c->second.hist_len.rbegin(); l != c->second.hist_len.rend(); l++) {
       if (l != c->second.hist_len.rbegin()) cam_source_stats << ",";
@@ -182,6 +237,7 @@ char * query() {
 
   for (auto c = camGroupStats.begin(); c != camGroupStats.end(); c++) {
     cam_group_stats << c->first << "\t" << c->second.users << "\t" << c->second.converters << "\t" << c->second.producters << "\t" << c->second.carters << "\t";
+    cam_group_stats << c->second.group_to_revjet << "\t" <<  c->second.group_from_revjet << "\t";
     cam_group_stats << "\"";
     for (auto l = c->second.hist_len.rbegin(); l != c->second.hist_len.rend(); l++) {
       if (l != c->second.hist_len.rbegin()) cam_group_stats << ",";
