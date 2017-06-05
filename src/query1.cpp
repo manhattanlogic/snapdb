@@ -19,6 +19,12 @@ struct accumulator_struct {
   unsigned long group_from_revjet = 0;
   unsigned long source_to_revjet = 0;
   unsigned long source_from_revjet = 0;
+
+  unsigned long conv_group_to_revjet = 0;
+  unsigned long conv_group_from_revjet = 0;
+  unsigned long conv_source_to_revjet = 0;
+  unsigned long conv_source_from_revjet = 0;
+  
   std::map<unsigned int, unsigned long> hist_len;
   std::map<unsigned int, unsigned long> conv_hist_len;
 };
@@ -153,6 +159,14 @@ char * query() {
       if (source_from_revjet) {
 	camSourceStats[*c].source_from_revjet++;
       }
+      if (is_converter) {
+	if (source_to_revjet) {
+	  camSourceStats[*c].conv_source_to_revjet++;
+	}
+	if (source_from_revjet) {
+	  camSourceStats[*c].conv_source_from_revjet++;
+	}
+      }
       auto it = camSourceStats[*c].hist_len.find(hist_len);
       if (it == camSourceStats[*c].hist_len.end()) {
 	camSourceStats[*c].hist_len[hist_len] = 1;
@@ -196,6 +210,14 @@ char * query() {
       if (group_from_revjet) {
 	camGroupStats[*c].group_from_revjet++;
       }
+      if (is_converter) {
+	if (group_to_revjet) {
+	  camGroupStats[*c].conv_group_to_revjet++;
+	}
+	if (group_from_revjet) {
+	  camGroupStats[*c].conv_group_from_revjet++;
+	}
+      }
       auto it = camGroupStats[*c].hist_len.find(hist_len);
       if (it == camGroupStats[*c].hist_len.end()) {
 	camGroupStats[*c].hist_len[hist_len] = 1;
@@ -219,6 +241,7 @@ char * query() {
   for (auto c = camSourceStats.begin(); c != camSourceStats.end(); c++) {
     cam_source_stats << c->first << "\t" << c->second.users << "\t" << c->second.converters << "\t" << c->second.producters << "\t" << c->second.carters << "\t";
     cam_source_stats << c->second.source_to_revjet << "\t" <<  c->second.source_from_revjet << "\t";
+    cam_source_stats << c->second.conv_source_to_revjet << "\t" <<  c->second.conv_source_from_revjet << "\t";
     cam_source_stats << "\"";
     for (auto l = c->second.hist_len.rbegin(); l != c->second.hist_len.rend(); l++) {
       if (l != c->second.hist_len.rbegin()) cam_source_stats << ",";
@@ -238,6 +261,7 @@ char * query() {
   for (auto c = camGroupStats.begin(); c != camGroupStats.end(); c++) {
     cam_group_stats << c->first << "\t" << c->second.users << "\t" << c->second.converters << "\t" << c->second.producters << "\t" << c->second.carters << "\t";
     cam_group_stats << c->second.group_to_revjet << "\t" <<  c->second.group_from_revjet << "\t";
+    cam_group_stats << c->second.conv_group_to_revjet << "\t" <<  c->second.conv_group_from_revjet << "\t";
     cam_group_stats << "\"";
     for (auto l = c->second.hist_len.rbegin(); l != c->second.hist_len.rend(); l++) {
       if (l != c->second.hist_len.rbegin()) cam_group_stats << ",";
