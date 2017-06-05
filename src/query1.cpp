@@ -170,7 +170,7 @@ char * query() {
     }
     cam_source_stats << "\t";
     for (auto l = c->second.conv_hist_len.rbegin(); l != c->second.conv_hist_len.rend(); l++) {
-      if (l != c->second.hist_len.rbegin()) cam_source_stats << ",";
+      if (l != c->second.conv_hist_len.rbegin()) cam_source_stats << ",";
       cam_source_stats << l->first << ":" << l->second;
     }
     cam_source_stats << "\n";
@@ -184,7 +184,7 @@ char * query() {
     }
     cam_group_stats << "\t";
     for (auto l = c->second.conv_hist_len.rbegin(); l != c->second.conv_hist_len.rend(); l++) {
-      if (l != c->second.hist_len.rbegin()) cam_group_stats << ",";
+      if (l != c->second.conv_hist_len.rbegin()) cam_group_stats << ",";
       cam_group_stats << l->first << ":" << l->second;
     }
     cam_group_stats << "\n";
