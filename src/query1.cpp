@@ -301,7 +301,7 @@ char * query() {
   }
 
   for (auto it = cam_name_stats.begin(); it != cam_name_stats.end(); it++) {
-    result << it->first << ":" << it->second << "\t";
+    result << it->first << ":" << it->second << ":";
     auto it2 = unique_cam_name_stats.find(it->first);
     if (it2 == unique_cam_name_stats.end()) {
       result << "-";
