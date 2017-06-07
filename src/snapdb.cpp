@@ -592,6 +592,7 @@ void start_web_server(int port) {
 
 
 int main (int argc, char**argv) {
+  bool inverted = false;
   std::string filename = "";
   if(cmdOptionExists(argv, argv+argc, "-data")) {
     filename = getCmdOption(argv, argv + argc, "-data");
@@ -605,15 +606,17 @@ int main (int argc, char**argv) {
     THREADS = std::stoul(getCmdOption(argv, argv + argc, "-threads"), NULL, 0);
   }
   
+  if(cmdOptionExists(argv, argv+argc, "-inverted")) {
+    inverted = true;
+  }
+  
   std::thread threads[THREADS];
   
   for (int i = 0; i < THREADS; i++) {
     threads[i] = std::thread(thread_runner, i, true);
   }
   for (int i = 0; i < THREADS; i++) {
-    // std::cerr << "join:" << i << "\n";
     threads[i].join();
-    //std::cerr << "\n";
   }
 
   std::cerr << "total users:" << json_history.size() << "\n";
@@ -627,6 +630,20 @@ int main (int argc, char**argv) {
     }
   }
 
+  
+  if (inverted) {
+    std::cerr << "inverting validity map\n";
+    std::unordered_set<unsigned long> invalid_users;
+    for (auto i = json_history.begin(); i != json_history.end(); i++) {
+      if (valid_users.find(i->first) == valid_users.end()) {
+	invalid_users.insert(i->first);
+      }
+    }
+    valid_users = invalid_users;
+  }
+
+
+  
   std::cerr << "valid users:" << valid_users.size() << "\n";
   json_history.clear();
   fclose(file);
@@ -646,6 +663,7 @@ int main (int argc, char**argv) {
   }
 
   valid_users.clear();
+  
   
   std::cerr << json_history.size() << " users loaded\n";
   start_web_server(8080);
