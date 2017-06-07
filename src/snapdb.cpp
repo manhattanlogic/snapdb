@@ -609,6 +609,8 @@ int main (int argc, char**argv) {
   if(cmdOptionExists(argv, argv+argc, "-inverted")) {
     inverted = true;
   }
+
+  std::cerr << "inverted status:" << inverted << "\n";
   
   std::thread threads[THREADS];
   
