@@ -44,7 +44,7 @@ char * query() {
 	} // ensighten
       } // enents
     } // history
-    if (is_converter) converters = true;
+    if (is_converter) converters++;
     users++;
     /*
     if (skus.size() < 3) continue;
