@@ -20,24 +20,12 @@ unsigned long max_user = 0;
 extern "C"
 char * query() {
   std::stringstream result;
-  long short_hist = 0;
-  for (auto i = json_history.begin(); i != json_history.end(); i++) {
-    std::vector <std::string> skus;
-    auto start =  i->second->history.begin()->second.ts;
-    auto end =  i->second->history.rbegin()->second.ts;
-    if (end - start < 100) {
-      short_hist ++;
-      continue;
-    }
-    total_length +=  std::min(i->second->history.size(), (unsigned long)SANITY_LENGTH);
-    total_users ++;
 
-    if (i->second->history.size() > max_history) {
-      max_history = i->second->history.size();
-      max_user = i->first;
-    }
-    
-    /*
+  unsigned long converters = 0;
+  unsigned long users = 0;
+  
+  for (auto i = json_history.begin(); i != json_history.end(); i++) {
+    bool is_converter = false;
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       if (j->second.events->size() != 1) continue;
       for (int e = 0; e < j->second.events->size(); e++) {
@@ -46,16 +34,18 @@ char * query() {
 	  bool is_product = event.ensighten.pageType == "PRODUCT";
 	  for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	    if ((is_product) || (event.ensighten.items[it].tag == "productpage")) {
-	      skus.push_back(event.ensighten.items[it].sku);
+	      //skus.push_back(event.ensighten.items[it].sku);
 	    } else if ( (it == 0) && (event.ensighten.items[it].tag  == "cart") ) {
-	      skus.push_back("cart");
+	      //skus.push_back("cart");
+	    } else if (event.ensighten.items[it].tag  == "order") {
+	      is_converter = true;
 	    }
 	  } // items
 	} // ensighten
       } // enents
     } // history
-
-    */
+    if (is_converter) converters = true;
+    users++;
     /*
     if (skus.size() < 3) continue;
     for (int j = 0; j < skus.size(); j++) {
@@ -66,8 +56,7 @@ char * query() {
     */
   } // user
 
-  result << max_user << ":" << max_history << "\n";
-  result << "length:" << total_length << ",users:" << total_users << "\n";
+  result << "users:" << users << ",converters:" << converters << "\n";
   
   // end of custom code
   char * buffer = (char *)malloc(result.str().size() + 1);
