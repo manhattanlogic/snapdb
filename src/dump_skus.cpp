@@ -11,6 +11,9 @@
 unsigned long total_length = 0;
 unsigned long total_users = 0;
 
+unsigned long min_history = 10000000;
+unsigned long max_history = 0;
+unsigned long max_user = 0;
 
 extern "C"
 char * query() {
@@ -27,6 +30,11 @@ char * query() {
     total_length +=  i->second->history.size();
     total_users ++;
 
+    if (i->second->history.size() > max_history) {
+      max_history = i->second->history.size();
+      max_user = i->first;
+    }
+    
     /*
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       if (j->second.events->size() != 1) continue;
@@ -56,7 +64,8 @@ char * query() {
     */
   } // user
 
-  std::cerr << "length:" << total_length << ",users:" << total_users << "\n";
+  result << max_user << ":" << max_history << "\n";
+  result << "length:" << total_length << ",users:" << total_users << "\n";
   
   // end of custom code
   char * buffer = (char *)malloc(result.str().size() + 1);
