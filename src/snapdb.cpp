@@ -465,12 +465,12 @@ unsigned long get_random_user() {
     int counter = 0;
     for (int c = 0; c < MAX_ITERATIONS; c++) {
       auto random_it = std::next(std::begin(json_history), rand_between(0, json_history.size()));
-      if (random_it->second->history.size() > 1) return random_it->first;
+      if ((true) || (random_it->second->history.size() > 1)) return random_it->first;
     }
   } else {
     for (int c = 0; c < MAX_ITERATIONS; c++) {
       auto filtered = std::next(std::begin(history_filter), rand_between(0, history_filter.size()));
-      if (json_history[*filtered]->history.size() > 1) return (*filtered);
+      if ((true) || (json_history[*filtered]->history.size() > 1)) return (*filtered);
     }
   }
   return 0;
