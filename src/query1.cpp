@@ -319,3 +319,9 @@ char * query() {
   buffer[result.str().size()] = 0;
   return buffer;
 }
+
+
+/*
+1. overstock data. rj data. by changing creative show possible influence on the funnel.
+2. 
+*/

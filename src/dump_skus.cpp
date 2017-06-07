@@ -8,6 +8,9 @@
 #include <iostream>
 
 
+unsigned long total_length = 0;
+unsigned long total_users = 0;
+
 
 extern "C"
 char * query() {
@@ -17,10 +20,14 @@ char * query() {
     std::vector <std::string> skus;
     auto start =  i->second->history.begin()->second.ts;
     auto end =  i->second->history.rbegin()->second.ts;
-    if (end - start < 1000) {
+    if (end - start < 100) {
       short_hist ++;
       continue;
     }
+    total_length +=  i->second->history.size();
+    total_users ++;
+
+    /*
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       if (j->second.events->size() != 1) continue;
       for (int e = 0; e < j->second.events->size(); e++) {
@@ -38,16 +45,18 @@ char * query() {
       } // enents
     } // history
 
-
+    */
+    /*
     if (skus.size() < 3) continue;
     for (int j = 0; j < skus.size(); j++) {
       if (j > 0) result << " ";
       result << skus[j];
     }
     result << "\n";
+    */
   } // user
 
-  std::cerr << "short_hist:" << short_hist << "\n";
+  std::cerr << "length:" << total_length << ",users:" << total_users << "\n";
   
   // end of custom code
   char * buffer = (char *)malloc(result.str().size() + 1);
