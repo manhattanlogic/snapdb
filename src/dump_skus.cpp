@@ -15,6 +15,8 @@ unsigned long min_history = 10000000;
 unsigned long max_history = 0;
 unsigned long max_user = 0;
 
+#define SANITY_LENGTH 100
+
 extern "C"
 char * query() {
   std::stringstream result;
@@ -27,7 +29,7 @@ char * query() {
       short_hist ++;
       continue;
     }
-    total_length +=  i->second->history.size();
+    total_length +=  std::min(i->second->history.size(), (unsigned long)SANITY_LENGTH);
     total_users ++;
 
     if (i->second->history.size() > max_history) {
