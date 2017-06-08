@@ -34,8 +34,18 @@ int main(int argc, char ** argv) {
     }
   }
   std::ofstream vid_map_file("vid_map.dat", std::ios::binary);
+  std::map<unsigned int, unsigned int> imp_distribution;
   for (auto it = vid_map.begin(); it != vid_map.end(); it++) {
     vid_map_file.write((char *)&(it->first), sizeof(unsigned long));
     vid_map_file.write((char *)&(it->second), sizeof(unsigned int));
+    auto it2 = imp_distribution.find(it->second);
+    if (it2 == imp_distribution.end()) {
+      imp_distribution[it->second] = 1;
+    } else {
+      it2->second++;
+    }
+  }
+  for (auto it = imp_distribution.begin(); it != imp_distribution.end(); it++) {
+    std::cout << it->first << "\t" << it->second << "\n";
   }
 }
