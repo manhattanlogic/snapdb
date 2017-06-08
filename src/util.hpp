@@ -1,5 +1,7 @@
 #include <unordered_map>
 #include <map>
+#include <string>
+#include <vector>
 
 std::string replace_all(
 			const std::string & str ,   // where to work

@@ -1,6 +1,6 @@
 # this is a test
 PROG = snapdb
-
+PROG2 = impressions_trainsform
 INCLUDES= -I/usr/local/include
 
 CXX = g++ -std=c++14
@@ -12,9 +12,13 @@ CFLAGS = -O3 $(INCLUDES)
 LIBS = -L/usr/local/lib -lpthread -ldl 
 
 
-OBJS = $(PROG).o
+OBJS = $(PROG).o 
+OBJS2 = $(PROG2).o
 
-all: $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so flat_crumbs.so
+all: $(PROG2) $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so flat_crumbs.so
+
+$(PROG2): $(OBJS2)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
