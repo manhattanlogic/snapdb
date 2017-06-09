@@ -2,6 +2,14 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <fstream>
+
+std::ifstream::pos_type get_filesize(const char* filename)
+{
+    std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
+    return in.tellg(); 
+}
+
 
 std::string replace_all(
 			const std::string & str ,   // where to work

@@ -15,7 +15,7 @@ LIBS = -L/usr/local/lib -lpthread -ldl
 OBJS = $(PROG).o 
 OBJS2 = $(PROG2).o
 
-all: $(PROG2) $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so flat_crumbs.so
+all: $(PROG2) $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so flat_crumbs.so impression_intersect.so
 
 $(PROG2): $(OBJS2)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
@@ -45,6 +45,9 @@ compute_crumbs_user_vectors.so: compute_crumbs_user_vectors.cpp
 flat_crumbs.so: flat_crumbs.cpp
 	$(CXX) -Wall -fPIC -c flat_crumbs.cpp -o flat_crumbs.o
 	$(CXX) -shared -rdynamic -o flat_crumbs.so flat_crumbs.o
+impression_intersect.so: impression_intersect.cpp
+	$(CXX) -Wall -fPIC -c impression_intersect.cpp -o impression_intersect.o
+	$(CXX) -shared -rdynamic -o impression_intersect.so impression_intersect.o
 endif
 ifeq ($(UNAME_S),Darwin)
 $(PROG): $(OBJS)
@@ -63,6 +66,8 @@ compute_crumbs_user_vectors.so: compute_crumbs_user_vectors.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup compute_crumbs_user_vectors.cpp -o $@
 flat_crumbs.so: flat_crumbs.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup flat_crumbs.cpp -o $@
+impression_intersect.so: impression_intersect.cpp
+	$(CXX) -dynamiclib -undefined dynamic_lookup impression_intersect.cpp -o $@
 endif
 
 clean:
