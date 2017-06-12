@@ -232,6 +232,20 @@ json_history_entry parse_data(char * line, bool preprocess) {
     */
 
     if (is_active_event) {
+
+      if (d["events"][i].HasMember("ip") && d["events"][i]["ip"].IsString()) {
+	event.ip = d["events"][i]["ip"].GetString();
+      }
+      if (d["events"][i].HasMember("ua") && d["events"][i]["ua"].IsObject()) {
+	if (d["events"][i]["ua"].HasMember("_browser") && (d["events"][i]["ua"]["_browser"].IsString())) {
+	  event.browser = d["events"][i]["ua"]["_browser"].GetString();
+	}
+	if (d["events"][i]["ua"].HasMember("_device_model") && (d["events"][i]["ua"]["_device_model"].IsString())) {
+	  event.device_model = d["events"][i]["ua"]["_device_model"].GetString();
+	}
+      }
+
+      
       event.ensighten.exists = true;
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("browser") && d["events"][i]["subids"]["ensighten"]["browser"].IsString()) {

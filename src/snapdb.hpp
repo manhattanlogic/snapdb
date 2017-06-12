@@ -28,12 +28,16 @@ struct ensighten_type {
   std::string camGroup;
   std::string camSource;
   std::string searchTerm;
+  
 };
 
 struct json_simgle_event_type {
   //std::string location;
   //std::string referrer;
   ensighten_type ensighten;
+  std::string ip;
+  std::string browser;
+  std::string device_model;
 };
 
 struct json_history_entry {
