@@ -34,6 +34,8 @@ char * query() {
   auto X = fread(data, file_size, 1, f);
   std::cerr << "X:" << X << "\n";
   std::cerr << "sizeof(uuid_count):" << sizeof(uuid_count) << "\n";
+  std::cerr << "sizeof(unsigned long):" << sizeof(unsigned long) << "\n";
+  std::cerr << "sizeof(unsigned int):" << sizeof(unsigned int) << "\n";
   fclose(f);
 
   unsigned long users = 0;
