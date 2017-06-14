@@ -41,7 +41,7 @@ char * query() {
   unsigned long converters_intersection = 0;
   
   std::unordered_map<unsigned long, unsigned int> impressions;
-  for (unsigned long i = 0; i < (file_size / 12); i++) {
+  for (unsigned long i = 0; i < (file_size / sizeof(uuid_count)); i++) {
     impressions[data[i].vid] = data[i].len;
   }
   
