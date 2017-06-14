@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <memory.h>
 #include <fstream>
+#include <iostream>
 
 // history_filter contains filter for the display application
 
@@ -76,6 +77,7 @@ char * query() {
     auto end =  i->second->history.rbegin()->second.ts;
     //if (end - start < 100) continue;
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
+      std::cerr << j->second.pixels << "\n";
       if (j->second.events != NULL) {
 	for (int e = 0; e < j->second.events->size(); e++) {
 	  auto event = (*j->second.events)[e];
