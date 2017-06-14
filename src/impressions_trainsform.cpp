@@ -13,13 +13,14 @@ std::vector<int> get_pixels(std::string json) {
   std::vector<int> result;
   rapidjson::Document d;
   d.Parse(replace_all(json, "'", "").c_str());
-  std::cerr << json << " ";
   if (d.HasParseError()) {
     std::cerr << "o";
+    return result;
   } else {
-    std::cerr << ".";
+    for (int i = 0; i < d.Size(); i++) {
+      result.push_back(d[i].GetInt());
+    }
   }
-  std::cerr << "\n";
   return result;
 }
 
