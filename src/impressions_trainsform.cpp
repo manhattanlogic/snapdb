@@ -25,6 +25,7 @@ std::vector<int> get_pixels(std::string json) {
 }
 
 int main(int argc, char ** argv) {
+  std::unordered_map<int, unsigned long> pixel_stats;
   char buffer[1024 * 1204];
   while (fgets(buffer, 1024*1024, stdin)) {
     auto parts = split_string(buffer, "\t");
@@ -33,10 +34,14 @@ int main(int argc, char ** argv) {
     }
 
     auto pixels = get_pixels(parts[1]);
-    for (int i = 0; i < pixels.size(); i++) {
-      std::cerr << pixels[i] << " ";
+    for (auto i = 0; i < pixels.size(); i++) {
+      auto it = pixel_stats.find(pixels[i]);
+      if (it == pixel_stats.end()) {
+	pixel_stats[pixels[i]] = 1;
+      } else {
+	it->second++;
+      }
     }
-    std::cerr << "\n";
     
     auto json = replace_all(parts[2], "\\'","'");
     json = replace_all(json, "\\\\","\\");
@@ -68,5 +73,9 @@ int main(int argc, char ** argv) {
   }
   for (auto it = imp_distribution.begin(); it != imp_distribution.end(); it++) {
     std::cout << it->first << "\t" << it->second << "\n";
+  }
+  std::cout << "------- PIXELS -----\n";
+  for (auto it = pixel_stats.begin(); it != pixel_stats.end(); it ++) {
+    std::cout << it->first << ":" << it->second << "\n";
   }
 }
