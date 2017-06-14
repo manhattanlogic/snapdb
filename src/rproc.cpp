@@ -28,7 +28,7 @@ char * query() {
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (!(e->ensighten.exists)) continue;
 	for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
-	  if ((e -> ensighten.camGroup == "PRODUCT")) {
+	  
 	    if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
 		  (e->ensighten.camSource == "RevJet Acq")) {
 	      is_revjet = true;
@@ -37,7 +37,7 @@ char * query() {
 		  (e->ensighten.camGroup == "RevJet Acq")) {
 	      is_revjet = true;
 	    }
-	  }
+	  
 	}
       }
     }
