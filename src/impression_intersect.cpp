@@ -17,7 +17,7 @@
 struct uuid_count {
   unsigned long vid;
   unsigned int len;
-};
+} __attribute__((packed));
 
 std::unordered_map<std::string, unsigned long> ua_stats;
 std::unordered_map<std::string, unsigned long> conv_ua_stats;
