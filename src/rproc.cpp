@@ -21,9 +21,9 @@ extern std::string test_string;
 std::vector<std::unordered_map<std::string, long> > crumb_stats;
 std::unordered_set<std::string> crumbs;
 
-unsigned long clickers = 0;
+unsigned long _clickers = 0;
 unsigned long clickers_converters = 0;
-
+unsigned long clickers_converters_alt = 0;
 extern "C"
 char * query() {
   history_filter.clear();
@@ -40,8 +40,8 @@ char * query() {
       d.Parse(pixel_string.c_str());
       if (d.HasParseError()) {
       } else {
-	for (int i = 0; i < d.Size(); i++) {
-	  if (d[i].GetInt() == 79) {
+	for (int q = 0; q < d.Size(); q++) {
+	  if (d[q].GetInt() == 79) {
 	    is_clicker = true;
 	  }
 	}
@@ -59,6 +59,7 @@ char * query() {
 	    (e->ensighten.camGroup == "RevJet Acq")) {
 	  is_revjet = true;
 	}
+	
 	for (int it = 0; it < e->ensighten.items.size(); it ++) {
 	  if (e->ensighten.items[it].tag == "order") is_converter = true;
 	}
@@ -67,16 +68,20 @@ char * query() {
     if (is_revjet) {
       history_filter.insert(i->first);
     }
-    if (is_clicker) clickers++;
+    if (is_clicker) _clickers++;
     if (is_clicker && is_converter) {
       clickers_converters ++;
+    }
+    if (is_revjet && is_converter) {
+      clickers_converters_alt++;
     }
   }
 
 
 
-  result << "clickers:" << clickers << "\n";
+  result << "clickers:" << _clickers << "\n";
   result << "clickers_converters:" << clickers_converters << "\n";
+  result << "clickers_converters_alt:" << clickers_converters_alt << "\n";
   result << "history_filter.size()=" << history_filter.size() << "\n";
   result << "ok\n";
   char * buffer = (char *)malloc(result.str().size() + 1);
