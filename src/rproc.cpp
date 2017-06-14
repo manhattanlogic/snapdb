@@ -59,6 +59,9 @@ char * query() {
 	    (e->ensighten.camGroup == "RevJet Acq")) {
 	  is_revjet = true;
 	}
+	for (int it = 0; it < e->ensighten.items.size(); it ++) {
+	  if (e->ensighten.items[it].tag == "order") is_converter = true;
+	}
       }
     }
     if (is_revjet) {
