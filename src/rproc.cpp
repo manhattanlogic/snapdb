@@ -46,7 +46,7 @@ char * query() {
 	  }
 	}
       }
-      std::cerr << j->second.pixels << "\n";
+      
       if (j->second.events == NULL) continue;
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (!(e->ensighten.exists)) continue;
@@ -70,7 +70,6 @@ char * query() {
     }
   }
 
-  
 
 
   result << "clickers:" << clickers << "\n";
