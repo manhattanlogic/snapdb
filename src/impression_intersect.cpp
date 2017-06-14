@@ -47,11 +47,10 @@ char * query() {
     bool is_converter = false;
     std::string ua = "";
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) { 
-      
       if (j->second.events == NULL) continue;
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (!(e->ensighten.exists)) continue;
-	ips.insert(e->ip);
+	// ips.insert(e->ip);
 	if (ua == "") {
 	  ua = e->device_model + ":" + e->browser;
 	}
