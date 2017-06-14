@@ -26,7 +26,7 @@ std::unordered_set<std::string> ips;
 extern "C"
 char * query() {
   std::stringstream result;
-  long file_size = get_filesize("vid_map.dat");
+  unsigned long file_size = get_filesize("vid_map.dat");
   uuid_count * data = (uuid_count *)malloc(file_size);
   FILE * f = fopen("vid_map.dat", "rb");
   fread(data, file_size, 1, f);
