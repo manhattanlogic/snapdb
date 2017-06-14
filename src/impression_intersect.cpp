@@ -22,6 +22,7 @@ struct uuid_count {
 std::unordered_map<std::string, unsigned long> ua_stats;
 std::unordered_map<std::string, unsigned long> conv_ua_stats;
 std::unordered_set<std::string> ips;
+
 extern "C"
 char * query() {
   std::stringstream result;
@@ -37,9 +38,10 @@ char * query() {
   unsigned long converters_intersection = 0;
   
   std::unordered_map<unsigned long, unsigned int> impressions;
-  for (int i = 0; i < (file_size / 12); i++) {
+  for (unsigned long i = 0; i < (file_size / 12); i++) {
     impressions[data[i].vid] = data[i].len;
   }
+  
   std::cerr << "loaded\n";
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
     bool is_converter = false;
