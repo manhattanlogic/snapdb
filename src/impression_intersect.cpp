@@ -33,6 +33,7 @@ char * query() {
   FILE * f = fopen("vid_map.dat", "rb");
   auto X = fread(data, file_size, 1, f);
   std::cerr << "X:" << X << "\n";
+  std::cerr << "sizeof(uuid_count):" << sizeof(uuid_count) << "\n";
   fclose(f);
 
   unsigned long users = 0;
