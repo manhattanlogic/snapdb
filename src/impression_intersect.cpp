@@ -27,9 +27,12 @@ extern "C"
 char * query() {
   std::stringstream result;
   unsigned long file_size = get_filesize("vid_map.dat");
+  std::cerr << "file_size:" << file_size << "\n";
   uuid_count * data = (uuid_count *)malloc(file_size);
+  std::cerr << "data:" << (unsigned long)data << "\n";
   FILE * f = fopen("vid_map.dat", "rb");
-  fread(data, file_size, 1, f);
+  auto X = fread(data, file_size, 1, f);
+  std::cerr << "X:" << X << "\n";
   fclose(f);
 
   unsigned long users = 0;
