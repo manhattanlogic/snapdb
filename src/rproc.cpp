@@ -23,22 +23,25 @@ char * query() {
   std::stringstream result;
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
     bool is_revjet = false;
+    bool is_converter = false;
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       if (j->second.events == NULL) continue;
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (!(e->ensighten.exists)) continue;
-	for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
+	//for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
 	  
-	    if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
-		  (e->ensighten.camSource == "RevJet Acq")) {
-	      is_revjet = true;
-	    }
-	    if ((e->ensighten.camGroup == "DglBrand") || (e->ensighten.camGroup == "Digital Brand") ||
-		  (e->ensighten.camGroup == "RevJet Acq")) {
-	      is_revjet = true;
-	    }
+	  if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
+	      (e->ensighten.camSource == "RevJet Acq")) {
+	    is_revjet = true;
+	  }
+	  if ((e->ensighten.camGroup == "DglBrand") || (e->ensighten.camGroup == "Digital Brand") ||
+	      (e->ensighten.camGroup == "RevJet Acq")) {
+	    is_revjet = true;
+	  }
+
 	  
-	}
+	  
+	  //}
       }
     }
     if (is_revjet) {
