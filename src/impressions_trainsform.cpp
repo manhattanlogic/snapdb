@@ -9,6 +9,17 @@
 
 std::unordered_map<unsigned long, unsigned int> vid_map;
 
+std::vector<int> get_pixels(std::string json) {
+  std::vector<int> result;
+  rapidjson::Document d;
+  d.Parse(json.c_str());
+  if (d.HasParseError()) {
+    std::cerr << "o";
+  } else {
+    std::cerr << ".";
+  }
+  return result;
+}
 
 int main(int argc, char ** argv) {
   char buffer[1024 * 1204];
@@ -17,6 +28,11 @@ int main(int argc, char ** argv) {
     if (parts.size() != 3) {
       continue;
     }
+
+    auto pixels = get_pixels(parts[1]);
+    
+
+    
     auto json = replace_all(parts[2], "\\'","'");
     json = replace_all(json, "\\\\","\\");
     rapidjson::Document d;
