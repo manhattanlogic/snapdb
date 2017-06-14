@@ -33,8 +33,10 @@ int main(int argc, char ** argv) {
     }
 
     auto pixels = get_pixels(parts[1]);
-    
-
+    for (int i = 0; i < pixels.size(); i++) {
+      std::cerr << pixels[i] << " ";
+    }
+    std::cerr << "\n";
     
     auto json = replace_all(parts[2], "\\'","'");
     json = replace_all(json, "\\\\","\\");
