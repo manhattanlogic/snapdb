@@ -28,7 +28,7 @@ char * query() {
   std::stringstream result;
   unsigned long file_size = get_filesize("vid_map.dat");
   std::cerr << "file_size:" << file_size << "\n";
-  uuid_count * data = (uuid_count *)malloc(file_size);
+  void * data = malloc(file_size);
   std::cerr << "data:" << (unsigned long)data << "\n";
   FILE * f = fopen("vid_map.dat", "rb");
   auto X = fread(data, file_size, 1, f);
@@ -44,8 +44,11 @@ char * query() {
   unsigned long converters_intersection = 0;
   
   std::unordered_map<unsigned long, unsigned int> impressions;
-  for (unsigned long i = 0; i < (file_size / sizeof(uuid_count)); i++) {
-    impressions[data[i].vid] = data[i].len;
+  for (unsigned long i = 0; i < (file_size / (sizeof(unsigned long) + sizeof(unsigned int))); i++) {
+    unsigned long idx = i * (sizeof(unsigned long) + sizeof(unsigned int));
+    unsigned long vid = *(unsigned long *)((char *)data + idx);
+    unsigned int len = *(unsigned int *)((char *)data + idx + sizeof(unsigned long));
+    impressions[vid] = len;
   }
   
   std::cerr << "loaded\n";
