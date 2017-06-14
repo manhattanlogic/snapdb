@@ -50,7 +50,7 @@ char * query() {
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
     bool is_converter = false;
     std::string ua = "";
-    /*
+    
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) { 
       if (j->second.events == NULL) continue;
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
@@ -66,7 +66,7 @@ char * query() {
 	}
       }
     }
-    */
+    
     if (ua != "") {
       auto it = ua_stats.find(ua);
       if (it == ua_stats.end()) {
