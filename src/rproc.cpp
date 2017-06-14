@@ -22,6 +22,7 @@ std::vector<std::unordered_map<std::string, long> > crumb_stats;
 std::unordered_set<std::string> crumbs;
 
 unsigned long clickers = 0;
+unsigned long clickers_converters = 0;
 
 extern "C"
 char * query() {
@@ -49,32 +50,31 @@ char * query() {
       if (j->second.events == NULL) continue;
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (!(e->ensighten.exists)) continue;
-	//for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
-	  
-	  if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
-	      (e->ensighten.camSource == "RevJet Acq")) {
-	    is_revjet = true;
-	  }
-	  if ((e->ensighten.camGroup == "DglBrand") || (e->ensighten.camGroup == "Digital Brand") ||
-	      (e->ensighten.camGroup == "RevJet Acq")) {
-	    is_revjet = true;
-	  }
 
-	  
-	  
-	  //}
+	if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
+	    (e->ensighten.camSource == "RevJet Acq")) {
+	  is_revjet = true;
+	}
+	if ((e->ensighten.camGroup == "DglBrand") || (e->ensighten.camGroup == "Digital Brand") ||
+	    (e->ensighten.camGroup == "RevJet Acq")) {
+	  is_revjet = true;
+	}
       }
     }
     if (is_revjet) {
       history_filter.insert(i->first);
     }
     if (is_clicker) clickers++;
+    if (is_clicker && is_converter) {
+      clickers_converters ++;
+    }
   }
 
   
 
 
   result << "clickers:" << clickers << "\n";
+  result << "clickers_converters:" << clickers_converters << "\n";
   result << "history_filter.size()=" << history_filter.size() << "\n";
   result << "ok\n";
   char * buffer = (char *)malloc(result.str().size() + 1);
