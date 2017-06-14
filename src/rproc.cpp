@@ -50,7 +50,7 @@ char * query() {
 
 
  
-
+  result << "history_filter.size()=" << history_filter.size() << "\n";
   result << "ok\n";
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());
