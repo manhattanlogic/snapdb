@@ -105,11 +105,13 @@ char * query() {
   for (auto it = ua_stats.begin(); it != ua_stats.end(); it++) {
     result << it->first << ":" << it->second << "\n";
   }
+  std::cerr << "CP1\n";
   result << "------------- CONV UA STATS ---------\n";
   for (auto it = conv_ua_stats.begin(); it != conv_ua_stats.end(); it++) {
     result << it->first << ":" << it->second << "\n";
   }
 
+  std::cerr << "finished. sending back result\n";
   
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());
