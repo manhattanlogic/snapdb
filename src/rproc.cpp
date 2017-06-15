@@ -21,9 +21,12 @@ extern std::string test_string;
 std::vector<std::unordered_map<std::string, long> > crumb_stats;
 std::unordered_set<std::string> crumbs;
 
+unsigned long _meaningful = 0;
 unsigned long _clickers = 0;
 unsigned long clickers_converters = 0;
 unsigned long clickers_converters_alt = 0;
+unsigned long clickers_meaningful = 0;
+unsigned long clickers_meaningful_alt = 0;
 extern "C"
 char * query() {
   history_filter.clear();
@@ -34,6 +37,7 @@ char * query() {
     bool is_revjet = false;
     bool is_converter = false;
     bool is_clicker = false;
+    bool is_meaningful = false;
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       auto pixel_string = replace_all(j->second.pixels, "'", "");
       rapidjson::Document d;
@@ -59,9 +63,16 @@ char * query() {
 	    (e->ensighten.camGroup == "RevJet Acq")) {
 	  is_revjet = true;
 	}
+
+	if (e->ensighten.pageType == "PRODUCT") {
+	  is_meaningful = true;
+	}
 	
 	for (int it = 0; it < e->ensighten.items.size(); it ++) {
 	  if (e->ensighten.items[it].tag == "order") is_converter = true;
+	  if (e->ensighten.items[it].tag == "productpage") is_meaningful = true;
+	  if (e->ensighten.items[it].tag == "featured") is_meaningful = true;
+	  
 	}
       }
     }
@@ -69,19 +80,36 @@ char * query() {
       history_filter.insert(i->first);
     }
     if (is_clicker) _clickers++;
+    if (is_meaningful) _meaningful++;
+    
     if (is_clicker && is_converter) {
       clickers_converters ++;
     }
     if (is_revjet && is_converter) {
       clickers_converters_alt++;
     }
+
+
+    if (is_clicker && is_meaningful) {
+      clickers_meaningful ++;
+    }
+    if (is_revjet && is_meaningful) {
+      clickers_meaningful_alt++;
+    }
+
+    
   }
 
 
 
   result << "clickers:" << _clickers << "\n";
+  result << "meaningful:" << _meaningful << "\n";
   result << "clickers_converters:" << clickers_converters << "\n";
   result << "clickers_converters_alt:" << clickers_converters_alt << "\n";
+
+  result << "clickers_meaningful:" << clickers_converters << "\n";
+  result << "clickers_meaningful_alt:" << clickers_converters_alt << "\n";
+  
   result << "history_filter.size()=" << history_filter.size() << "\n";
   result << "ok\n";
   char * buffer = (char *)malloc(result.str().size() + 1);
