@@ -21,10 +21,6 @@
 
 extern std::string test_string;
 
-std::vector<std::unordered_map<std::string, long> > crumb_stats;
-std::unordered_set<std::string> crumbs;
-
-
 
 extern "C"
 char * query() {
