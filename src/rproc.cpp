@@ -107,8 +107,8 @@ char * query() {
   result << "clickers_converters:" << clickers_converters << "\n";
   result << "clickers_converters_alt:" << clickers_converters_alt << "\n";
 
-  result << "clickers_meaningful:" << clickers_converters << "\n";
-  result << "clickers_meaningful_alt:" << clickers_converters_alt << "\n";
+  result << "clickers_meaningful:" << clickers_meaningful << "\n";
+  result << "clickers_meaningful_alt:" << clickers_meaningful_alt << "\n";
   
   result << "history_filter.size()=" << history_filter.size() << "\n";
   result << "ok\n";
