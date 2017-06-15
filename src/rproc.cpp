@@ -11,11 +11,12 @@
 #include <algorithm>
 #include <string>
 #include "util.hpp"
+/*
 #include "rapidjson/include/rapidjson/document.h"
 #include "rapidjson/include/rapidjson/prettywriter.h"
 #include "rapidjson/include/rapidjson/writer.h"
 #include "rapidjson/include/rapidjson/stringbuffer.h"
-
+*/
 extern std::string test_string;
 
 std::vector<std::unordered_map<std::string, long> > crumb_stats;
@@ -27,6 +28,7 @@ unsigned long clickers_converters = 0;
 unsigned long clickers_converters_alt = 0;
 unsigned long clickers_meaningful = 0;
 unsigned long clickers_meaningful_alt = 0;
+
 extern "C"
 char * query() {
   history_filter.clear();
