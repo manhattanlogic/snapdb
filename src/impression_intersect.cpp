@@ -53,6 +53,7 @@ char * query() {
   };
 
   std::map<std::string, stats_struct> stats;
+  stats["all"] = {};
   
   std::unordered_map<unsigned long, unsigned int> impressions;
   for (unsigned long i = 0; i < (file_size / (sizeof(unsigned long) + sizeof(unsigned int))); i++) {
@@ -90,6 +91,7 @@ char * query() {
 	
 	if (stats.find(browser) == stats.end()) stats[browser] = {};
 	stats[browser].ips.insert(e->ip);
+	stats["all"].ips.insert(e->ip);
 	
 	if (ua == "") {
 	  ua = e->device_model + ":" + e->browser;
@@ -122,21 +124,26 @@ char * query() {
 	}
       }
     }
-    
-    stats[browser].users ++;
-    if (impressions.find(i->first) != impressions.end()) {
-      stats[browser].users_intersection ++;
-    }
-    if (is_converter) {
-      stats[browser].converters ++;
+
+    std::vector<std::string> tmp = {"all", browser};
+
+    for (auto b = tmp.begin(); b != tmp.end(); b++) {
+      std::string browser = *b;
+      stats[browser].users ++;
       if (impressions.find(i->first) != impressions.end()) {
-	stats[browser].converters_intersection ++;
+	stats[browser].users_intersection ++;
       }
-    }
-    if (is_meaningful) {
-      stats[browser].meaningful_users++;
-      if (impressions.find(i->first) != impressions.end()) {
-	stats[browser].meaningful_users_intersection++;
+      if (is_converter) {
+	stats[browser].converters ++;
+	if (impressions.find(i->first) != impressions.end()) {
+	  stats[browser].converters_intersection ++;
+	}
+      }
+      if (is_meaningful) {
+	stats[browser].meaningful_users++;
+	if (impressions.find(i->first) != impressions.end()) {
+	  stats[browser].meaningful_users_intersection++;
+	}
       }
     }
   }
