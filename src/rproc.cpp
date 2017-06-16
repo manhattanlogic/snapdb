@@ -25,6 +25,9 @@ extern std::string test_string;
 extern "C"
 char * query() {
   struct stats_struct {
+    unsigned long converters = 0;
+    unsigned long converters_rj = 0;
+    unsigned long converters_rj_alt = 0;
     unsigned long _meaningful = 0;
     unsigned long _clickers = 0;
     unsigned long clickers_converters = 0;
@@ -35,7 +38,7 @@ char * query() {
   };
 
   std::map<std::string, stats_struct> stats;
-  
+  stats["all"] = {};
   history_filter.clear();
   
   std::stringstream result;
@@ -82,38 +85,45 @@ char * query() {
 	for (int it = 0; it < e->ensighten.items.size(); it ++) {
 	  if (e->ensighten.items[it].tag == "order") is_converter = true;
 	  if (e->ensighten.items[it].tag == "productpage") is_meaningful = true;
-	  if (e->ensighten.items[it].tag == "featured") is_meaningful = true;
-	  
+	  if (e->ensighten.items[it].tag == "featured") is_meaningful = true; 
 	}
       }
     }
 
-    if (stats.find(browser) == stats.end()) {
-      stats[browser] = {};
-    }
+
+    std::vector<std::string> tmp = {"all", browser}; 
+
+    for (auto b = tmp.begin(); b != tmp.end(); b++) {
+      std::string browser = *b;
+      if (stats.find(browser) == stats.end()) {
+	stats[browser] = {};
+      }
+      if (is_revjet) {
+	stats[browser].alt_clickers.insert(i->first);
+      }
+      if (is_clicker) stats[browser]._clickers++;
+      if (is_meaningful) stats[browser]._meaningful++;
     
-    if (is_revjet) {
-      history_filter.insert(i->first);
-      stats[browser].alt_clickers.insert(i->first);
-    }
-    if (is_clicker) stats[browser]._clickers++;
-    if (is_meaningful) stats[browser]._meaningful++;
+      if (is_clicker && is_converter) {
+	stats[browser].clickers_converters ++;
+	history_filter.insert(i->first);
+      }
+      if (is_revjet && is_converter) {
+	stats[browser].clickers_converters_alt++;
+	history_filter.insert(i->first);
+      }
+
+      if (is_converter) {
+	stats[browser].converters ++;
+      }
     
-    if (is_clicker && is_converter) {
-      stats[browser].clickers_converters ++;
+      if (is_clicker && is_meaningful) {
+	stats[browser].clickers_meaningful ++;
+      }
+      if (is_revjet && is_meaningful) {
+	stats[browser].clickers_meaningful_alt++;
+      }
     }
-    if (is_revjet && is_converter) {
-      stats[browser].clickers_converters_alt++;
-    }
-
-
-    if (is_clicker && is_meaningful) {
-      stats[browser].clickers_meaningful ++;
-    }
-    if (is_revjet && is_meaningful) {
-      stats[browser].clickers_meaningful_alt++;
-    }
-
     
   }
 
@@ -167,6 +177,7 @@ rproc.so output:
 
 ----------- browser:
 clickers:0
+clickers_alt:0
 meaningful:0
 clickers_converters:0
 clickers_converters_alt:0
@@ -174,6 +185,7 @@ clickers_meaningful:0
 clickers_meaningful_alt:0
 ----------- browser:d
 clickers:6524
+clickers_alt:10320
 meaningful:2681712
 clickers_converters:195
 clickers_converters_alt:239
@@ -181,6 +193,7 @@ clickers_meaningful:4045
 clickers_meaningful_alt:5892
 ----------- browser:m
 clickers:820
+clickers_alt:1701
 meaningful:1308233
 clickers_converters:22
 clickers_converters_alt:16
@@ -188,6 +201,7 @@ clickers_meaningful:545
 clickers_meaningful_alt:1125
 ----------- browser:t
 clickers:56161
+clickers_alt:51038
 meaningful:461973
 clickers_converters:398
 clickers_converters_alt:174

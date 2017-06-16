@@ -45,6 +45,7 @@ char * query() {
     unsigned long users = 0;
     unsigned long meaningful_users = 0;
     unsigned long converters = 0;
+    unsigned long alt_converters = 0;
     unsigned long users_intersection = 0;
     unsigned long meaningful_users_intersection = 0;
     unsigned long converters_intersection = 0;
@@ -65,6 +66,7 @@ char * query() {
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
     bool is_converter = false;
     bool is_meaningful = false;
+    bool is_revjet = false;
     std::string browser = "";
 
     std::string ua = "";
@@ -74,6 +76,17 @@ char * query() {
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (!(e->ensighten.exists)) continue;
 	browser = e->ensighten.browser;
+
+	if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
+	    (e->ensighten.camSource == "RevJet Acq")) {
+	  is_revjet = true;
+	}
+	if ((e->ensighten.camGroup == "DglBrand") || (e->ensighten.camGroup == "Digital Brand") ||
+	    (e->ensighten.camGroup == "RevJet Acq")) {
+	  is_revjet = true;
+	}
+
+
 	
 	if (stats.find(browser) == stats.end()) stats[browser] = {};
 	stats[browser].ips.insert(e->ip);
