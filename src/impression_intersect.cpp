@@ -165,3 +165,41 @@ char * query() {
   buffer[result.str().size()] = 0;
   return buffer;
 }
+
+
+/*
+
+-----------------  -----------------
+users:632
+meaningful_users:0
+converters:0
+ips:12
+users_intersection:0
+meaningful_users_intersection:0
+converters_intersection:0
+----------------- d -----------------
+users:3495095
+meaningful_users:2681712
+converters:179504
+ips:2831045
+users_intersection:104467
+meaningful_users_intersection:83333
+converters_intersection:5077
+----------------- m -----------------
+users:1830465
+meaningful_users:1308233
+converters:47078
+ips:1537321
+users_intersection:14379
+meaningful_users_intersection:11531
+converters_intersection:571
+----------------- t -----------------
+users:633413
+meaningful_users:461973
+converters:19595
+ips:644818
+users_intersection:54211
+meaningful_users_intersection:16740
+converters_intersection:479
+
+*/

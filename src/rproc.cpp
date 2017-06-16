@@ -31,6 +31,7 @@ char * query() {
     unsigned long clickers_converters_alt = 0;
     unsigned long clickers_meaningful = 0;
     unsigned long clickers_meaningful_alt = 0;
+    std::unordered_set<unsigned long> alt_clickers;
   };
 
   std::map<std::string, stats_struct> stats;
@@ -93,6 +94,7 @@ char * query() {
     
     if (is_revjet) {
       history_filter.insert(i->first);
+      stats[browser].alt_clickers.insert(i->first);
     }
     if (is_clicker) stats[browser]._clickers++;
     if (is_meaningful) stats[browser]._meaningful++;
@@ -119,6 +121,7 @@ char * query() {
   for (auto b = stats.begin(); b != stats.end(); b++) {
     result << "----------- browser:" << b->first << "\n";
     result << "clickers:" << b->second._clickers << "\n";
+    result << "clickers_alt:" << b->second.alt_clickers.size() << "\n";
     result << "meaningful:" << b->second._meaningful << "\n";
     result << "clickers_converters:" << b->second.clickers_converters << "\n";
     result << "clickers_converters_alt:" << b->second.clickers_converters_alt << "\n";
