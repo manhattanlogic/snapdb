@@ -24,12 +24,16 @@ extern std::string test_string;
 
 extern "C"
 char * query() {
-  unsigned long _meaningful = 0;
-  unsigned long _clickers = 0;
-  unsigned long clickers_converters = 0;
-  unsigned long clickers_converters_alt = 0;
-  unsigned long clickers_meaningful = 0;
-  unsigned long clickers_meaningful_alt = 0;
+  struct stats_struct {
+    unsigned long _meaningful = 0;
+    unsigned long _clickers = 0;
+    unsigned long clickers_converters = 0;
+    unsigned long clickers_converters_alt = 0;
+    unsigned long clickers_meaningful = 0;
+    unsigned long clickers_meaningful_alt = 0;
+  };
+
+  std::map<std::string, stats_struct> stats;
   
   history_filter.clear();
   
@@ -40,6 +44,8 @@ char * query() {
     bool is_converter = false;
     bool is_clicker = false;
     bool is_meaningful = false;
+    std::string browser = "";
+    
     for (auto j = i->second->history.begin(); j != i->second->history.end(); j++) {
       auto pixel_string = replace_all(j->second.pixels, "'", "");
       rapidjson::Document d;
@@ -57,6 +63,8 @@ char * query() {
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (!(e->ensighten.exists)) continue;
 
+	browser = e->ensighten.browser;
+	
 	if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
 	    (e->ensighten.camSource == "RevJet Acq")) {
 	  is_revjet = true;
@@ -78,41 +86,49 @@ char * query() {
 	}
       }
     }
+
+    if (stats.find(browser) == stats.end()) {
+      stats[browser] = {};
+    }
+    
     if (is_revjet) {
       history_filter.insert(i->first);
     }
-    if (is_clicker) _clickers++;
-    if (is_meaningful) _meaningful++;
+    if (is_clicker) stats[browser]._clickers++;
+    if (is_meaningful) stats[browser]._meaningful++;
     
     if (is_clicker && is_converter) {
-      clickers_converters ++;
+      stats[browser].clickers_converters ++;
     }
     if (is_revjet && is_converter) {
-      clickers_converters_alt++;
+      stats[browser].clickers_converters_alt++;
     }
 
 
     if (is_clicker && is_meaningful) {
-      clickers_meaningful ++;
+      stats[browser].clickers_meaningful ++;
     }
     if (is_revjet && is_meaningful) {
-      clickers_meaningful_alt++;
+      stats[browser].clickers_meaningful_alt++;
     }
 
     
   }
 
 
+  for (auto b = stats.begin(); b != stats.end(); b++) {
+    result << "----------- browser:" << b->first << "\n";
+    result << "clickers:" << b->second._clickers << "\n";
+    result << "meaningful:" << b->second._meaningful << "\n";
+    result << "clickers_converters:" << b->second.clickers_converters << "\n";
+    result << "clickers_converters_alt:" << b->second.clickers_converters_alt << "\n";
+    result << "clickers_meaningful:" << b->second.clickers_meaningful << "\n";
+    result << "clickers_meaningful_alt:" << b->second.clickers_meaningful_alt << "\n";
+    
+  }
 
-  result << "clickers:" << _clickers << "\n";
-  result << "meaningful:" << _meaningful << "\n";
-  result << "clickers_converters:" << clickers_converters << "\n";
-  result << "clickers_converters_alt:" << clickers_converters_alt << "\n";
-
-  result << "clickers_meaningful:" << clickers_meaningful << "\n";
-  result << "clickers_meaningful_alt:" << clickers_meaningful_alt << "\n";
-  
   result << "history_filter.size()=" << history_filter.size() << "\n";
+  
   result << "ok\n";
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());
