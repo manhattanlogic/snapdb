@@ -26,7 +26,7 @@ char * query() {
 
   std::unordered_map<std::string, unsigned long> ua_stats;
   std::unordered_map<std::string, unsigned long> conv_ua_stats;
-  std::unordered_set<std::string> ips;
+  
   
   std::stringstream result;
   unsigned long file_size = get_filesize("vid_map.dat");
@@ -41,13 +41,17 @@ char * query() {
   std::cerr << "sizeof(unsigned int):" << sizeof(unsigned int) << "\n";
   fclose(f);
 
-  unsigned long users = 0;
-  unsigned long meaningful_users = 0;
-  unsigned long converters = 0;
-  unsigned long users_intersection = 0;
-  unsigned long meaningful_users_intersection = 0;
-  unsigned long converters_intersection = 0;
-  
+  struct stats_struct {
+    unsigned long users = 0;
+    unsigned long meaningful_users = 0;
+    unsigned long converters = 0;
+    unsigned long users_intersection = 0;
+    unsigned long meaningful_users_intersection = 0;
+    unsigned long converters_intersection = 0;
+    std::unordered_set<std::string> ips;
+  };
+
+  std::map<std::string, stats_struct> stats;
   
   std::unordered_map<unsigned long, unsigned int> impressions;
   for (unsigned long i = 0; i < (file_size / (sizeof(unsigned long) + sizeof(unsigned int))); i++) {
@@ -61,7 +65,7 @@ char * query() {
   for (auto i = json_history.begin(); i != json_history.end(); i++) {
     bool is_converter = false;
     bool is_meaningful = false;
-
+    std::string browser = "";
 
     std::string ua = "";
     
@@ -69,7 +73,11 @@ char * query() {
       if (j->second.events == NULL) continue;
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (!(e->ensighten.exists)) continue;
-	ips.insert(e->ip);
+	browser = e->ensighten.browser;
+	
+	if (stats.find(browser) == stats.end()) stats[browser] = {};
+	stats[browser].ips.insert(e->ip);
+	
 	if (ua == "") {
 	  ua = e->device_model + ":" + e->browser;
 	}
@@ -82,6 +90,8 @@ char * query() {
 	}
       }
     }
+
+    
     
     if (ua != "") {
       auto it = ua_stats.find(ua);
@@ -99,20 +109,21 @@ char * query() {
 	}
       }
     }
-    users ++;
+    
+    stats[browser].users ++;
     if (impressions.find(i->first) != impressions.end()) {
-      users_intersection ++;
+      stats[browser].users_intersection ++;
     }
     if (is_converter) {
-      converters ++;
+      stats[browser].converters ++;
       if (impressions.find(i->first) != impressions.end()) {
-	converters_intersection ++;
+	stats[browser].converters_intersection ++;
       }
     }
     if (is_meaningful) {
-      meaningful_users++;
+      stats[browser].meaningful_users++;
       if (impressions.find(i->first) != impressions.end()) {
-	meaningful_users_intersection++;
+	stats[browser].meaningful_users_intersection++;
       }
     }
   }
@@ -121,14 +132,18 @@ char * query() {
 
   
   free(data);
-  result << "users:" << users << "\n";
-  result << "meaningful_users:" << meaningful_users << "\n";
-  result << "converters:" << converters << "\n";
-  result << "ips:" << ips.size() << "\n";
-  result << "users_intersection:" << users_intersection << "\n";
-  result << "meaningful_users_intersection:" << meaningful_users_intersection << "\n";
-  result << "converters_intersection:" << converters_intersection << "\n";
+
   
+  for (auto b = stats.begin(); b != stats.end(); b++) {
+    result << "----------------- " << b->first << " -----------------\n";
+    result << "users:" << b->second.users << "\n";
+    result << "meaningful_users:" << b->second.meaningful_users << "\n";
+    result << "converters:" << b->second.converters << "\n";
+    result << "ips:" << b->second.ips.size() << "\n";
+    result << "users_intersection:" << b->second.users_intersection << "\n";
+    result << "meaningful_users_intersection:" << b->second.meaningful_users_intersection << "\n";
+    result << "converters_intersection:" << b->second.converters_intersection << "\n";
+  }
 
 
   /*

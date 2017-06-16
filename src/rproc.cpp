@@ -156,3 +156,39 @@ event.type = [4, "click"], in pixel # 79
  user has camsource but not the click
 
  */
+
+
+/*
+
+rproc.so output:
+
+----------- browser:
+clickers:0
+meaningful:0
+clickers_converters:0
+clickers_converters_alt:0
+clickers_meaningful:0
+clickers_meaningful_alt:0
+----------- browser:d
+clickers:6524
+meaningful:2681712
+clickers_converters:195
+clickers_converters_alt:239
+clickers_meaningful:4045
+clickers_meaningful_alt:5892
+----------- browser:m
+clickers:820
+meaningful:1308233
+clickers_converters:22
+clickers_converters_alt:16
+clickers_meaningful:545
+clickers_meaningful_alt:1125
+----------- browser:t
+clickers:56161
+meaningful:461973
+clickers_converters:398
+clickers_converters_alt:174
+clickers_meaningful:14735
+clickers_meaningful_alt:10136
+history_filter.size()=63059
+*/
