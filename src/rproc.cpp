@@ -24,6 +24,31 @@ extern std::string test_string;
 
 extern "C"
 char * query() {
+
+  unsigned long file_size = get_filesize("vid_map.dat");
+  std::cerr << "file_size:" << file_size << "\n";
+  void * data = malloc(file_size);
+  std::cerr << "data:" << (unsigned long)data << "\n";
+  FILE * f = fopen("vid_map.dat", "rb");
+  auto X = fread(data, file_size, 1, f);
+  std::cerr << "X:" << X << "\n";
+  
+  std::cerr << "sizeof(unsigned long):" << sizeof(unsigned long) << "\n";
+  std::cerr << "sizeof(unsigned int):" << sizeof(unsigned int) << "\n";
+  fclose(f);
+
+  std::unordered_map<unsigned long, unsigned int> impressions;
+  for (unsigned long i = 0; i < (file_size / (sizeof(unsigned long) + sizeof(unsigned int))); i++) {
+    unsigned long idx = i * (sizeof(unsigned long) + sizeof(unsigned int));
+    unsigned long vid = *(unsigned long *)((char *)data + idx);
+    unsigned int len = *(unsigned int *)((char *)data + idx + sizeof(unsigned long));
+    impressions[vid] = len;
+  }
+  
+  std::cerr << "impressions loaded\n";
+
+
+  
   struct stats_struct {
     unsigned long converters = 0;
     unsigned long converters_rj = 0;
@@ -173,7 +198,7 @@ event.type = [4, "click"], in pixel # 79
 
 /*
 
-rproc.so output:
+LONG HISTORY STATS
 
 ----------- browser:
 clickers:0
@@ -183,6 +208,14 @@ clickers_converters:0
 clickers_converters_alt:0
 clickers_meaningful:0
 clickers_meaningful_alt:0
+----------- browser:all
+clickers:63505
+clickers_alt:63059
+meaningful:4451918
+clickers_converters:615
+clickers_converters_alt:429
+clickers_meaningful:19325
+clickers_meaningful_alt:17153
 ----------- browser:d
 clickers:6524
 clickers_alt:10320
@@ -207,5 +240,52 @@ clickers_converters:398
 clickers_converters_alt:174
 clickers_meaningful:14735
 clickers_meaningful_alt:10136
-history_filter.size()=63059
+history_filter.size()=770
+
+
+SHORT HISTORY STATS
+
+----------- browser:
+clickers:11
+clickers_alt:0
+meaningful:0
+clickers_converters:0
+clickers_converters_alt:0
+clickers_meaningful:0
+clickers_meaningful_alt:0
+----------- browser:all
+clickers:65950
+clickers_alt:120806
+meaningful:22395023
+clickers_converters:6
+clickers_converters_alt:37
+clickers_meaningful:2175
+clickers_meaningful_alt:14655
+----------- browser:d
+clickers:5491
+clickers_alt:31693
+meaningful:7313297
+clickers_converters:0
+clickers_converters_alt:13
+clickers_meaningful:359
+clickers_meaningful_alt:5177
+----------- browser:m
+clickers:702
+clickers_alt:10948
+meaningful:9428582
+clickers_converters:0
+clickers_converters_alt:14
+clickers_meaningful:63
+clickers_meaningful_alt:4559
+----------- browser:t
+clickers:59746
+clickers_alt:78165
+meaningful:5653144
+clickers_converters:6
+clickers_converters_alt:10
+clickers_meaningful:1753
+clickers_meaningful_alt:4919
+history_filter.size()=42
+
+
 */

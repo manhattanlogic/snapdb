@@ -189,6 +189,8 @@ char * query() {
 
 /*
 
+LONG HISTORY STATS
+
 -----------------  -----------------
 users:632
 meaningful_users:0
@@ -197,29 +199,83 @@ ips:12
 users_intersection:0
 meaningful_users_intersection:0
 converters_intersection:0
+----------------- all -----------------
+users:5959605
+meaningful_users:4451918
+converters:246177
+ips:4717674
+users_intersection:230168
+meaningful_users_intersection:154076
+converters_intersection:8487
 ----------------- d -----------------
 users:3495095
 meaningful_users:2681712
 converters:179504
 ips:2831045
-users_intersection:104467
-meaningful_users_intersection:83333
-converters_intersection:5077
+users_intersection:146018
+meaningful_users_intersection:116594
+converters_intersection:7080
 ----------------- m -----------------
 users:1830465
 meaningful_users:1308233
 converters:47078
 ips:1537321
-users_intersection:14379
-meaningful_users_intersection:11531
-converters_intersection:571
+users_intersection:20778
+meaningful_users_intersection:16676
+converters_intersection:787
 ----------------- t -----------------
 users:633413
 meaningful_users:461973
 converters:19595
 ips:644818
-users_intersection:54211
-meaningful_users_intersection:16740
-converters_intersection:479
+users_intersection:63372
+meaningful_users_intersection:20806
+converters_intersection:620
+
+
+SHORT HISTORY USERS
+
+-----------------  -----------------
+users:775497
+meaningful_users:0
+converters:0
+ips:3
+users_intersection:53
+meaningful_users_intersection:0
+converters_intersection:0
+----------------- all -----------------
+users:53621785
+meaningful_users:22395023
+converters:215648
+ips:7090841
+users_intersection:130937
+meaningful_users_intersection:38284
+converters_intersection:3
+----------------- d -----------------
+users:16854826
+meaningful_users:7313297
+converters:81938
+ips:2327695
+users_intersection:61947
+meaningful_users_intersection:33209
+converters_intersection:1
+----------------- m -----------------
+users:21375387
+meaningful_users:9428582
+converters:88351
+ips:3854375
+users_intersection:8300
+meaningful_users_intersection:2515
+converters_intersection:1
+----------------- t -----------------
+users:14616075
+meaningful_users:5653144
+converters:45359
+ips:1418302
+users_intersection:60637
+meaningful_users_intersection:2560
+converters_intersection:1
+
+
 
 */
