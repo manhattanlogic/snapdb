@@ -52,14 +52,22 @@ char * query() {
   struct stats_struct {
     unsigned long converters = 0;
     unsigned long converters_rj = 0;
+    unsigned long converters_rj_vid = 0;
     unsigned long converters_rj_alt = 0;
+    unsigned long converters_rj_alt_vid = 0;
     unsigned long _meaningful = 0;
     unsigned long _clickers = 0;
+    unsigned long _clickers_vid = 0;
     unsigned long clickers_converters = 0;
+    unsigned long clickers_converters_vid = 0;
     unsigned long clickers_converters_alt = 0;
+    unsigned long clickers_converters_alt_vid = 0;
     unsigned long clickers_meaningful = 0;
+    unsigned long clickers_meaningful_vid = 0;
     unsigned long clickers_meaningful_alt = 0;
+    unsigned long clickers_meaningful_alt_vid = 0;
     std::unordered_set<unsigned long> alt_clickers;
+    std::unordered_set<unsigned long> alt_clickers_vid;
   };
 
   std::map<std::string, stats_struct> stats;
@@ -149,19 +157,55 @@ char * query() {
 	stats[browser].clickers_meaningful_alt++;
       }
     }
+
+    // VID updates
+    if (impressions.find(i->first) != impressions.end()) {
+      for (auto b = tmp.begin(); b != tmp.end(); b++) {
+	if (is_revjet) {
+	  stats[browser].alt_clickers_vid.insert(i->first);
+	}
+	if (is_clicker) stats[browser]._clickers_vid++;
+	
+    
+	if (is_clicker && is_converter) {
+	  stats[browser].clickers_converters_vid++;
+	}
+	if (is_revjet && is_converter) {
+	  stats[browser].clickers_converters_alt_vid++;
+	}
+    
+	if (is_clicker && is_meaningful) {
+	  stats[browser].clickers_meaningful_vid ++;
+	}
+	if (is_revjet && is_meaningful) {
+	  stats[browser].clickers_meaningful_alt_vid++;
+	}
+      }
+    }
+
     
   }
 
 
+
+
+  
+
   for (auto b = stats.begin(); b != stats.end(); b++) {
     result << "----------- browser:" << b->first << "\n";
     result << "clickers:" << b->second._clickers << "\n";
+    result << "clickers_vid:" << b->second._clickers_vid << "\n";
     result << "clickers_alt:" << b->second.alt_clickers.size() << "\n";
+    result << "clickers_alt_vid:" << b->second.alt_clickers_vid.size() << "\n";
     result << "meaningful:" << b->second._meaningful << "\n";
     result << "clickers_converters:" << b->second.clickers_converters << "\n";
+    result << "clickers_converters_vid:" << b->second.clickers_converters_vid << "\n";
     result << "clickers_converters_alt:" << b->second.clickers_converters_alt << "\n";
+    result << "clickers_converters_alt_vid:" << b->second.clickers_converters_alt_vid << "\n";
     result << "clickers_meaningful:" << b->second.clickers_meaningful << "\n";
+    result << "clickers_meaningful_vid:" << b->second.clickers_meaningful_vid << "\n";
     result << "clickers_meaningful_alt:" << b->second.clickers_meaningful_alt << "\n";
+    result << "clickers_meaningful_alt_vid:" << b->second.clickers_meaningful_alt_vid << "\n";
     
   }
 
