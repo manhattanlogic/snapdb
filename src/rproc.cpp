@@ -161,6 +161,7 @@ char * query() {
     // VID updates
     if (impressions.find(i->first) != impressions.end()) {
       for (auto b = tmp.begin(); b != tmp.end(); b++) {
+	std::string browser = *b;
 	if (is_revjet) {
 	  stats[browser].alt_clickers_vid.insert(i->first);
 	}
@@ -330,6 +331,88 @@ clickers_converters_alt:10
 clickers_meaningful:1753
 clickers_meaningful_alt:4919
 history_filter.size()=42
+
+
+
+
+
+
+=================
+LONG
+
+ubuntu@ip-172-31-28-242:~/snapdb/src$ time curl "http://localhost:8080/exec?mod=./rproc2.so&func=query"
+----------- browser:
+clickers:0
+clickers_vid:0
+clickers_alt:0
+clickers_alt_vid:0
+meaningful:0
+clickers_converters:0
+clickers_converters_vid:0
+clickers_converters_alt:0
+clickers_converters_alt_vid:0
+clickers_meaningful:0
+clickers_meaningful_vid:0
+clickers_meaningful_alt:0
+clickers_meaningful_alt_vid:0
+----------- browser:all
+clickers:63505
+clickers_vid:0
+clickers_alt:63059
+clickers_alt_vid:0
+meaningful:4451918
+clickers_converters:615
+clickers_converters_vid:0
+clickers_converters_alt:429
+clickers_converters_alt_vid:0
+clickers_meaningful:19325
+clickers_meaningful_vid:0
+clickers_meaningful_alt:17153
+clickers_meaningful_alt_vid:0
+----------- browser:d
+clickers:6524
+clickers_vid:10074
+clickers_alt:10320
+clickers_alt_vid:5377
+meaningful:2681712
+clickers_converters:195
+clickers_converters_vid:228
+clickers_converters_alt:239
+clickers_converters_alt_vid:226
+clickers_meaningful:4045
+clickers_meaningful_vid:5514
+clickers_meaningful_alt:5892
+clickers_meaningful_alt_vid:5774
+----------- browser:m
+clickers:820
+clickers_vid:1074
+clickers_alt:1701
+clickers_alt_vid:653
+meaningful:1308233
+clickers_converters:22
+clickers_converters_vid:14
+clickers_converters_alt:16
+clickers_converters_alt_vid:14
+clickers_meaningful:545
+clickers_meaningful_vid:648
+clickers_meaningful_alt:1125
+clickers_meaningful_alt_vid:808
+----------- browser:t
+clickers:56161
+clickers_vid:101946
+clickers_alt:51038
+clickers_alt_vid:48907
+meaningful:461973
+clickers_converters:398
+clickers_converters_vid:372
+clickers_converters_alt:174
+clickers_converters_alt_vid:260
+clickers_meaningful:14735
+clickers_meaningful_vid:21048
+clickers_meaningful_alt:10136
+clickers_meaningful_alt_vid:17674
+history_filter.size()=770
+
 
 
 */
