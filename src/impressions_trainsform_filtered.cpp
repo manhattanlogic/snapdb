@@ -139,7 +139,7 @@ int __main(int argc, char ** argv) {
 }
 
 
-int main(int argc, char ** argv) {
+int ___main(int argc, char ** argv) {
   char buffer[1024 * 1204];
   
   std::unordered_set<std::string> devices;
@@ -229,4 +229,16 @@ int main(int argc, char ** argv) {
       }
     }
   }
+  return (0);
+}
+
+
+int main(int argc, char** argv) {
+  std::ifstream imp_data("mpressions_compact.csv");
+  std::string line;
+  while (std::getline(imp_data, line)) {
+    auto parts = split_string(line, "\t");
+    std::cerr << parts[0] << "\n";
+  }
+  return (0);
 }
