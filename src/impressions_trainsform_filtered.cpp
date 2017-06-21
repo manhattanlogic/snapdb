@@ -29,7 +29,7 @@ struct impression_data {
   std::string og;
 };
 
-int main(int argc, char ** argv) {
+int _main(int argc, char ** argv) {
   struct vid_record {
     unsigned long vid;
     unsigned long users;
@@ -65,7 +65,7 @@ int main(int argc, char ** argv) {
 }
 
 
-int _main(int argc, char ** argv) {
+int __main(int argc, char ** argv) {
   auto l = get_filesize("long_vids.dat");
   if (l <= 0) {
     std::cerr << "no vid file provided\n";
@@ -134,5 +134,38 @@ int _main(int argc, char ** argv) {
     vid_map_file.write((char *)&(it->first), sizeof(unsigned long));
     vid_map_file.write((char *)&(it->second[0]), sizeof(unsigned long));
     vid_map_file.write((char *)&(it->second[1]), sizeof(unsigned long));
+  }
+}
+
+
+int main(int argc, char ** argv) {
+  char buffer[1024 * 1204];
+  while (fgets(buffer, 1024*1024, stdin)) {
+    auto parts = split_string(buffer, "\t");
+    if (parts.size() != 3) {
+      continue;
+    }
+    auto json = replace_all(parts[2], "\\'","'");
+    json = replace_all(json, "\\\\","\\");
+    rapidjson::Document d;
+    d.Parse(json.c_str());
+    if (d.HasParseError()) {
+      std::cerr << "o";
+    } else {
+      auto vid = d["vid"].GetUint64();
+      if (d.HasMember("events") && d["events"].IsArray()) {
+	std::string e = "";
+	for (int i = 0; i < d["events"].Size(); i++) {
+	  if (d["events"][i].HasMember("ua") && d["events"][i]["ua"].IsObject()) {
+	    e += " + ";
+	  } else {
+	    e += " - ";
+	  }
+	}
+	std::cerr << vid << "\t" << e << "\n";
+      } else {
+	std::cerr << vid  << "\t" << "----------------------------\n";
+      }
+    }
   }
 }
