@@ -250,7 +250,8 @@ int main(int argc, char** argv) {
     if (parts.size() < 6) continue;
     auto tags = split_string(parts[5], ",");
     if (tags.size() != 4) {
-      std::cerr << "tags.size():" << tags.size() << "\n";
+      
+      std::cerr << tags << "\n";
       continue;
     }
     std::string record_id = parts[2] + "\t" + parts[3] + "\t" + parts[4] + "\t" + tags[2] + "\t" + tags[3];
