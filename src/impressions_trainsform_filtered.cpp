@@ -154,23 +154,37 @@ int main(int argc, char ** argv) {
     } else {
       auto vid = d["vid"].GetUint64();
       if (d.HasMember("events") && d["events"].IsArray()) {
-	std::string e = "";
+	std::string full_string;
 	for (int i = 0; i < d["events"].Size(); i++) {
+	  std::string e = "";
 	  std::string os = "x";
 	  std::string device = "x";
 	  std::string channel = "x";
+	  std::vector<std::string> tags;
 	  if (d["events"][i].HasMember("ua") && d["events"][i]["ua"].IsObject()) {
 	    os = d["events"][i]["ua"]["_os"].GetString();
 	    device = d["events"][i]["ua"]["_device_type"].GetString();
 	    if (d["events"][i].HasMember("subids") && d["events"][i]["subids"].IsObject()) {
 	      channel = d["events"][i]["subids"]["_device_channel_type"].GetString();
 	    }
-	    e += "[" + os + " " + device + " : " + channel + "]\t";
+	    e = "[" + os + " " + device + " : " + channel + "]";
 	  } else {
-	    e += " - ";
+	    e = " - ";
 	  }
+
+	  std::string g = "";
+	  if (d["events"][i].HasMember("plc") && d["events"][i]["plc"].IsArray()) {
+	    for (int j = 0; j < d["events"][i]["plc"].Size(); j++) {
+	      std::string tag = d["events"][i]["plc"][j][1].GetString();
+	      tags.push_back(tag);
+	      g += "," + tag;
+	    }
+	  } else {
+	    g = "-";
+	  }
+	  full_string += e + g + " \t ";
 	}
-	std::cerr << vid << "\t" << e << "\n";
+	std::cerr << vid << "\t" << full_string << "\n";
       } else {
 	std::cerr << vid  << "\t" << "----------------------------\n";
       }
