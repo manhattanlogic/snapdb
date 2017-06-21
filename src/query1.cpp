@@ -65,7 +65,7 @@ char * query() {
     }
     if (data[i].crossusers > 0) {
       imp_stats["all"].crossusers++;
-      result << data[i].vid << "\n";
+      // result << data[i].vid << "\n";
     }
     imp_stats["all"].imps_users += data[i].users;
     imp_stats["all"].imps_crossusers += data[i].crossusers;
