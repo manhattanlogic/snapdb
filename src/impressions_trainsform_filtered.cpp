@@ -46,6 +46,8 @@ int main(int argc, char ** argv) {
     vidmap[i] = datum;
   }
 
+  std::cerr << vidmap.size() << " vids loaded\n";
+  return(0);
   
   std::unordered_map<int, unsigned long> pixel_stats;
   char buffer[1024 * 1204];
