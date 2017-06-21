@@ -97,6 +97,10 @@ char * query() {
   struct stats_struct {
     std::unordered_set<unsigned long> users;
     unsigned long impressions;
+    std::unordered_set<unsigned long> overstock_users;
+    unsigned long overstock_impressions;
+    std::unordered_set<unsigned long> converter_users;
+    unsigned long converter_impressions;
   };
   std::string line;
 
@@ -119,10 +123,31 @@ char * query() {
     }
     it->second.impressions ++;
     it->second.users.insert(std::stoul(parts[0]));
+    auto it2 = json_history.find(std::stoul(parts[0]));
+    if (it2 != json_history.end()) {
+      it->second.overstock_impressions ++;
+      it->second.overstock_users.insert(std::stoul(parts[0]));
+      bool is_converter = false;
+      for (auto j = it2->second->history.begin(); j != it2->second->history.end(); j++) {
+	if (j->second.events == NULL) continue;
+	for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
+	  if (!(e->ensighten.exists)) continue;
+	  for (int itt = 0; itt < e->ensighten.items.size(); itt ++) {
+	    if (e->ensighten.items[itt].tag == "order") is_converter = true;
+	  }
+	}
+      }
+      if (is_converter) {
+	it->second.converter_impressions++;
+	it->second.converter_users.insert(std::stoul(parts[0]));
+      }
+    }
   }
 
   for (auto i = stats.begin(); i != stats.end(); i++) {
-    result << i->first << "\t" << i->second.users.size() << "\t" << i->second.impressions << "\n";
+    result << i->first << "\t" << i->second.users.size() << "\t" << i->second.impressions << "\t";
+    result << i->second.overstock_users.size() << "\t" << i->second.overstock_impressions << "\t";
+    result << i->second.converter_users.size() << "\t" << i->second.converter_impressions << "\n";
   }
 
   char * buffer = (char *)malloc(result.str().size() + 1);
