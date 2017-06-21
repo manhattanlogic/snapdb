@@ -52,7 +52,8 @@ int main(int argc, char ** argv) {
   std::unordered_map<int, unsigned long> pixel_stats;
   char buffer[1024 * 1204];
 
-  long count = 0;
+  long hit = 0;
+  long miss = 0;
   
   while (fgets(buffer, 1024*1024, stdin)) {
     auto parts = split_string(buffer, "\t");
@@ -86,8 +87,13 @@ int main(int argc, char ** argv) {
       }
       if (vidmap.find(vid) != vidmap.end()) {
 	std::cout << buffer;
-	count ++;
+	hit ++;
+      } else {
+	miss ++;
       }
+    }
+    if ((hit + miss) % 10000 == 0) {
+      std::cerr << hit << "\t" << miss << "\n";
     }
   }
 }
