@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <fstream>
+#include <unordered_set>
 
 std::unordered_map<unsigned long, std::vector<unsigned long> > vid_map;
 
@@ -140,6 +141,9 @@ int __main(int argc, char ** argv) {
 
 int main(int argc, char ** argv) {
   char buffer[1024 * 1204];
+
+  std::unordered_set<std::string> devices;
+  
   while (fgets(buffer, 1024*1024, stdin)) {
     auto parts = split_string(buffer, "\t");
     if (parts.size() != 3) {
@@ -164,6 +168,7 @@ int main(int argc, char ** argv) {
 	  if (d["events"][i].HasMember("ua") && d["events"][i]["ua"].IsObject()) {
 	    os = d["events"][i]["ua"]["_os"].GetString();
 	    device = d["events"][i]["ua"]["_device_type"].GetString();
+	    devices.insert(device);
 	    if (d["events"][i].HasMember("subids") && d["events"][i]["subids"].IsObject()) {
 	      channel = d["events"][i]["subids"]["_device_channel_type"].GetString();
 	    }
@@ -189,6 +194,10 @@ int main(int argc, char ** argv) {
       } else {
 	std::cerr << vid  << "\t" << "----------------------------\n";
       }
+      for (auto d = devices.begin(); d != devices.end(); d++) {
+	std::cerr << *d << " ";
+      }
+      std::cerr << "\n";
     }
   }
 }
