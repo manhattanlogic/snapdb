@@ -87,6 +87,13 @@ char * query_2() {
   return buffer;
 }
 
+std::string ts_to_time(unsigned long tt) {
+  struct tm * ptm = localtime((const time_t *)&tt);
+  char buf[30];
+  strftime (buf, 30, "%a, %d %b %YYYY %HH:%MM:%SS",  ptm);
+  return buf;
+}
+
 
 extern "C"
 char * query() {
@@ -105,6 +112,8 @@ char * query() {
     unsigned long clicker_impressions;
     std::unordered_set<unsigned long> clicker_converter_users;
     unsigned long clicker_converter_impressions;
+    unsigned long min_time;
+    unsigned long max_time;
   };
   std::string line;
 
@@ -127,6 +136,17 @@ char * query() {
     }
     it->second.impressions ++;
     it->second.users.insert(std::stoul(parts[0]));
+
+    if (it->second.min_time == 0) {
+      it->second.min_time = std::stoul(parts[2]);
+      it->second.max_time = std::stoul(parts[2]);
+    } else {
+      it->second.min_time = std::min(it->second.min_time, std::stoul(parts[2]));
+      it->second.max_time = std::max(it->second.min_time, std::stoul(parts[2])); 
+    }
+
+    
+    
     auto it2 = json_history.find(std::stoul(parts[0]));
     if (it2 != json_history.end()) {
       it->second.overstock_impressions ++;
@@ -146,9 +166,6 @@ char * query() {
 	      (e->ensighten.camGroup == "RevJet Acq")) {
 	    is_clicker = true;
 	  }
-
-
-	  
 	  for (int itt = 0; itt < e->ensighten.items.size(); itt ++) {
 	    if (e->ensighten.items[itt].tag == "order") is_converter = true;
 	  }
@@ -174,7 +191,8 @@ char * query() {
     result << i->second.overstock_users.size() << "\t" << i->second.overstock_impressions << "\t";
     result << i->second.converter_users.size() << "\t" << i->second.converter_impressions << "\t";
     result << i->second.clicker_users.size() << "\t" << i->second.clicker_impressions << "\t";
-    result << i->second.clicker_converter_users.size() << "\t" << i->second.clicker_converter_impressions << "\n";
+    result << i->second.clicker_converter_users.size() << "\t" << i->second.clicker_converter_impressions << "\t";
+    result << ts_to_time(i->second.min_time) << "\t" << ts_to_time(i->second.max_time) << "\n";
   }
 
   char * buffer = (char *)malloc(result.str().size() + 1);
