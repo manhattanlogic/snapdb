@@ -260,6 +260,8 @@ int main(int argc, char** argv) {
     it->second.users.insert(std::stoul(parts[0]));
   }
 
+  std::cerr << "------------------------\n";
+  
   for (auto i = stats.begin(); i != stats.end(); i++) {
     std::cout << i->first << "\t" << i->second.users.size() << "\t" << i->second.impressions << "\n";
   }
