@@ -7,7 +7,7 @@
 #include <iostream>
 #include <fstream>
 
-std::unordered_map<unsigned long, unsigned int> vid_map;
+std::unordered_map<unsigned long, std::vector<unsigned long> > vid_map;
 
 std::vector<int> get_pixels(std::string json) {
   std::vector<int> result;
@@ -81,19 +81,22 @@ int main(int argc, char ** argv) {
       auto vid = d["vid"].GetUint64();
       auto it = vid_map.find(vid);
       if (it == vid_map.end()) {
-	vid_map[vid] = 1;
-      } else {
-	it->second++;
+	std::vector<unsigned long> datum = {0,0};
+	vid_map[vid] = datum;
+	it = vid_map.find(vid);
       }
+
+      it->second[0]++;
       if (vidmap.find(vid) != vidmap.end()) {
-	std::cout << buffer;
-	hit ++;
-      } else {
-	miss ++;
+	it->second[1]++;
       }
-    }
-    if ((hit + miss) % 10000 == 0) {
-      std::cerr << hit << "\t" << miss << "\n";
+      std::ofstream vid_map_file("vid_map_dual.dat", std::ios::binary);
+      
+      for (auto it = vid_map.begin(); it != vid_map.end(); it++) {
+	vid_map_file.write((char *)&(it->first), sizeof(unsigned long));
+	vid_map_file.write((char *)&(it->second[0]), sizeof(unsigned long));
+	vid_map_file.write((char *)&(it->second[1]), sizeof(unsigned long));
+      }
     }
   }
 }
