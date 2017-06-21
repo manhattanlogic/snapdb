@@ -235,12 +235,10 @@ int ___main(int argc, char ** argv) {
 
 int main(int argc, char** argv) {
   std::ifstream imp_data("impressions_compact.csv");
-
   struct stats_struct {
     std::unordered_set<unsigned long> users;
     unsigned long impressions;
   };
-  
   std::string line;
 
   std::unordered_map<std::string, stats_struct> stats;

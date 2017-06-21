@@ -31,7 +31,7 @@ char * query_1() {
 
 
 extern "C"
-char * query() {
+char * query_2() {
   std::stringstream result;
   struct vid_record {
     unsigned long vid;
@@ -81,6 +81,50 @@ char * query() {
   
   // end of custom code
   result << "ok\n";
+  char * buffer = (char *)malloc(result.str().size() + 1);
+  memcpy(buffer, result.str().c_str(), result.str().size());
+  buffer[result.str().size()] = 0;
+  return buffer;
+}
+
+
+extern "C"
+char * query() {
+  std::stringstream result;
+
+
+  std::ifstream imp_data("impressions_compact.csv");
+  struct stats_struct {
+    std::unordered_set<unsigned long> users;
+    unsigned long impressions;
+  };
+  std::string line;
+
+  std::unordered_map<std::string, stats_struct> stats;
+  
+  while (std::getline(imp_data, line)) {
+    auto parts = split_string(line, "\t");
+    if (parts.size() < 6) continue;
+    auto tags = split_string(parts[5], ",");
+    if (tags.size() != 4) {
+      std::cerr << parts[5] << "\n";
+      continue;
+    }
+    std::string record_id = parts[2] + "\t" + parts[3] + "\t" + parts[4] + "\t" + tags[2] + "\t" + tags[3];
+    auto it = stats.find(record_id);
+    if (it == stats.end()) {
+      stats_struct ss = {};
+      stats[record_id] = ss;
+      it = stats.find(record_id);
+    }
+    it->second.impressions ++;
+    it->second.users.insert(std::stoul(parts[0]));
+  }
+
+  for (auto i = stats.begin(); i != stats.end(); i++) {
+    result << i->first << "\t" << i->second.users.size() << "\t" << i->second.impressions << "\n";
+  }
+
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());
   buffer[result.str().size()] = 0;
