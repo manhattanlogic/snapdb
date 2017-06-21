@@ -156,10 +156,15 @@ int main(int argc, char ** argv) {
       if (d.HasMember("events") && d["events"].IsArray()) {
 	std::string e = "";
 	for (int i = 0; i < d["events"].Size(); i++) {
+	  std::string os = "x";
+	  std::string device = "x";
+	  std::string channel = "x";
 	  if (d["events"][i].HasMember("ua") && d["events"][i]["ua"].IsObject()) {
-	    std::string os = d["events"][i]["ua"]["_os"].GetString();
-	    std::string device = d["events"][i]["ua"]["_device_type"].GetString();
-	    std::string channel = d["events"][i]["subids"]["_device_channel_type"].GetString();
+	    os = d["events"][i]["ua"]["_os"].GetString();
+	    device = d["events"][i]["ua"]["_device_type"].GetString();
+	    if (d["events"][i].HasMember("subids") && d["events"][i]["subids"].IsObject()) {
+	      channel = d["events"][i]["subids"]["_device_channel_type"].GetString();
+	    }
 	    e += "[" + os + " " + device + " : " + channel + "]\t";
 	  } else {
 	    e += " - ";
