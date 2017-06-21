@@ -340,7 +340,7 @@ history_filter.size()=42
 =================
 LONG
 
-ubuntu@ip-172-31-28-242:~/snapdb/src$ time curl "http://localhost:8080/exec?mod=./rproc2.so&func=query"
+
 ----------- browser:
 clickers:0
 clickers_vid:0
@@ -357,62 +357,122 @@ clickers_meaningful_alt:0
 clickers_meaningful_alt_vid:0
 ----------- browser:all
 clickers:63505
-clickers_vid:0
+clickers_vid:56547
 clickers_alt:63059
-clickers_alt_vid:0
+clickers_alt_vid:54937
 meaningful:4451918
 clickers_converters:615
-clickers_converters_vid:0
+clickers_converters_vid:307
 clickers_converters_alt:429
-clickers_converters_alt_vid:0
+clickers_converters_alt_vid:250
 clickers_meaningful:19325
-clickers_meaningful_vid:0
+clickers_meaningful_vid:13605
 clickers_meaningful_alt:17153
-clickers_meaningful_alt_vid:0
+clickers_meaningful_alt_vid:12128
 ----------- browser:d
 clickers:6524
-clickers_vid:10074
+clickers_vid:5037
 clickers_alt:10320
 clickers_alt_vid:5377
 meaningful:2681712
 clickers_converters:195
-clickers_converters_vid:228
+clickers_converters_vid:114
 clickers_converters_alt:239
-clickers_converters_alt_vid:226
+clickers_converters_alt_vid:113
 clickers_meaningful:4045
-clickers_meaningful_vid:5514
+clickers_meaningful_vid:2757
 clickers_meaningful_alt:5892
-clickers_meaningful_alt_vid:5774
+clickers_meaningful_alt_vid:2887
 ----------- browser:m
 clickers:820
-clickers_vid:1074
+clickers_vid:537
 clickers_alt:1701
 clickers_alt_vid:653
 meaningful:1308233
 clickers_converters:22
-clickers_converters_vid:14
+clickers_converters_vid:7
 clickers_converters_alt:16
-clickers_converters_alt_vid:14
+clickers_converters_alt_vid:7
 clickers_meaningful:545
-clickers_meaningful_vid:648
+clickers_meaningful_vid:324
 clickers_meaningful_alt:1125
-clickers_meaningful_alt_vid:808
+clickers_meaningful_alt_vid:404
 ----------- browser:t
 clickers:56161
-clickers_vid:101946
+clickers_vid:50973
 clickers_alt:51038
 clickers_alt_vid:48907
 meaningful:461973
 clickers_converters:398
-clickers_converters_vid:372
+clickers_converters_vid:186
 clickers_converters_alt:174
-clickers_converters_alt_vid:260
+clickers_converters_alt_vid:130
 clickers_meaningful:14735
-clickers_meaningful_vid:21048
+clickers_meaningful_vid:10524
 clickers_meaningful_alt:10136
-clickers_meaningful_alt_vid:17674
+clickers_meaningful_alt_vid:8837
 history_filter.size()=770
 
+
+SHORT
+
+----------- browser:all
+clickers:65950
+clickers_vid:63463
+clickers_alt:120806
+clickers_alt_vid:63265
+meaningful:22395023
+clickers_converters:6
+clickers_converters_vid:1
+clickers_converters_alt:37
+clickers_converters_alt_vid:0
+clickers_meaningful:2175
+clickers_meaningful_vid:1213
+clickers_meaningful_alt:14655
+clickers_meaningful_alt_vid:495
+----------- browser:d
+clickers:5491
+clickers_vid:5196
+clickers_alt:31693
+clickers_alt_vid:5967
+meaningful:7313297
+clickers_converters:0
+clickers_converters_vid:0
+clickers_converters_alt:13
+clickers_converters_alt_vid:0
+clickers_meaningful:359
+clickers_meaningful_vid:184
+clickers_meaningful_alt:5177
+clickers_meaningful_alt_vid:104
+----------- browser:m
+clickers:702
+clickers_vid:577
+clickers_alt:10948
+clickers_alt_vid:601
+meaningful:9428582
+clickers_converters:0
+clickers_converters_vid:0
+clickers_converters_alt:14
+clickers_converters_alt_vid:0
+clickers_meaningful:63
+clickers_meaningful_vid:14
+clickers_meaningful_alt:4559
+clickers_meaningful_alt_vid:14
+----------- browser:t
+clickers:59746
+clickers_vid:57682
+clickers_alt:78165
+clickers_alt_vid:56697
+meaningful:5653144
+clickers_converters:6
+clickers_converters_vid:1
+clickers_converters_alt:10
+clickers_converters_alt_vid:0
+clickers_meaningful:1753
+clickers_meaningful_vid:1015
+clickers_meaningful_alt:4919
+clickers_meaningful_alt_vid:377
+history_filter.size()=42
 
 
 */
