@@ -141,8 +141,17 @@ int __main(int argc, char ** argv) {
 
 int main(int argc, char ** argv) {
   char buffer[1024 * 1204];
-
+  
   std::unordered_set<std::string> devices;
+
+  struct line_struct {
+    unsigned long vid;
+    unsigned long ts;
+    std::string os;
+    std::string device;
+    std::string channel;
+    std::vector<std::string> tags;
+  };
   
   while (fgets(buffer, 1024*1024, stdin)) {
     auto parts = split_string(buffer, "\t");
@@ -156,6 +165,8 @@ int main(int argc, char ** argv) {
     if (d.HasParseError()) {
       std::cerr << "o";
     } else {
+      line_struct line = {};
+      
       auto vid = d["vid"].GetUint64();
       if (d.HasMember("events") && d["events"].IsArray()) {
 	std::string full_string;
@@ -165,7 +176,13 @@ int main(int argc, char ** argv) {
 	  std::string device = "x";
 	  std::string channel = "x";
 	  std::vector<std::string> tags;
+	  unsigned long ts;
 	  if (d["events"][i].HasMember("ua") && d["events"][i]["ua"].IsObject()) {
+	    struct tm tm = {};
+	    auto str_ts = d["events"][i]["ts"].GetString();
+	    strptime(str_ts, "%Y-%m-%dT%H:%M:%S", &tm);
+	    ts = mktime(&tm);
+
 	    os = d["events"][i]["ua"]["_os"].GetString();
 	    device = d["events"][i]["ua"]["_device_type"].GetString();
 	    devices.insert(device);
@@ -189,15 +206,27 @@ int main(int argc, char ** argv) {
 	    g = "-";
 	  }
 	  full_string += e + g + " \t ";
+	
+	  if (i == 0) {
+	    line.vid = vid;
+	    line.os = os;
+	    line.device = device;
+	    line.channel = channel;
+	  } else if (i == 1) {
+	    line.tags = tags;
+	    line.ts = ts;
+	  }
 	}
-	std::cerr << vid << "\t" << full_string << "\n";
+	std::cout << line.vid << "\t" << line.ts << "\t" << line.os << "\t" << line.device << "\t" << line.channel << "\t";
+	for (int j = 0; j < line.tags.size(); j++) {
+	  if (j > 0) std::cout << ",";
+	  std::cout << line.tags[j];
+	}
+	std::cout << "\n";
+	// std::cerr << vid << "\t" << full_string << "\n";
       } else {
-	std::cerr << vid  << "\t" << "----------------------------\n";
+	// std::cerr << vid  << "\t" << "----------------------------\n";
       }
-      for (auto d = devices.begin(); d != devices.end(); d++) {
-	std::cerr << *d << " ";
-      }
-      std::cerr << "\n";
     }
   }
 }
