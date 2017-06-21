@@ -47,10 +47,13 @@ int main(int argc, char ** argv) {
   }
 
   std::cerr << vidmap.size() << " vids loaded\n";
-  return(0);
+  
   
   std::unordered_map<int, unsigned long> pixel_stats;
   char buffer[1024 * 1204];
+
+  long count = 0;
+  
   while (fgets(buffer, 1024*1024, stdin)) {
     auto parts = split_string(buffer, "\t");
     if (parts.size() != 3) {
@@ -81,25 +84,13 @@ int main(int argc, char ** argv) {
       } else {
 	it->second++;
       }
+      if (vidmap.find(vid) != vidmap.end()) {
+	std::cout << buffer << "\n";
+	count ++;
+	if (count > 10) {
+	  return (0);
+	}
+      }
     }
-  }
-  std::ofstream vid_map_file("vid_map.dat", std::ios::binary);
-  std::map<unsigned int, unsigned int> imp_distribution;
-  for (auto it = vid_map.begin(); it != vid_map.end(); it++) {
-    vid_map_file.write((char *)&(it->first), sizeof(unsigned long));
-    vid_map_file.write((char *)&(it->second), sizeof(unsigned int));
-    auto it2 = imp_distribution.find(it->second);
-    if (it2 == imp_distribution.end()) {
-      imp_distribution[it->second] = 1;
-    } else {
-      it2->second++;
-    }
-  }
-  for (auto it = imp_distribution.begin(); it != imp_distribution.end(); it++) {
-    std::cout << it->first << "\t" << it->second << "\n";
-  }
-  std::cout << "------- PIXELS -----\n";
-  for (auto it = pixel_stats.begin(); it != pixel_stats.end(); it ++) {
-    std::cout << it->first << ":" << it->second << "\n";
   }
 }
