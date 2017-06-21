@@ -1,6 +1,7 @@
 # this is a test
 PROG = snapdb
 PROG2 = impressions_trainsform
+PROG2 = impressions_trainsform_filtered
 INCLUDES= -I/usr/local/include
 
 CXX = g++ -std=c++14
@@ -14,10 +15,14 @@ LIBS = -L/usr/local/lib -lpthread -ldl
 
 OBJS = $(PROG).o 
 OBJS2 = $(PROG2).o
+OBJS3 = $(PROG3).o
 
-all: $(PROG2) $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so flat_crumbs.so impression_intersect.so
+all: $(PROG3) $(PROG2) $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so flat_crumbs.so impression_intersect.so
 
 $(PROG2): $(OBJS2)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+
+$(PROG3): $(OBJS3)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
 
 UNAME_S := $(shell uname -s)
