@@ -85,11 +85,8 @@ int main(int argc, char ** argv) {
 	it->second++;
       }
       if (vidmap.find(vid) != vidmap.end()) {
-	std::cout << buffer << "\n";
+	std::cout << buffer;
 	count ++;
-	if (count > 10) {
-	  return (0);
-	}
       }
     }
   }
