@@ -101,6 +101,10 @@ char * query() {
     unsigned long overstock_impressions;
     std::unordered_set<unsigned long> converter_users;
     unsigned long converter_impressions;
+    std::unordered_set<unsigned long> clicker_users;
+    unsigned long clicker_impressions;
+    std::unordered_set<unsigned long> clicker_converter_users;
+    unsigned long clicker_converter_impressions;
   };
   std::string line;
 
@@ -128,10 +132,23 @@ char * query() {
       it->second.overstock_impressions ++;
       it->second.overstock_users.insert(std::stoul(parts[0]));
       bool is_converter = false;
+      bool is_clicker = false;
       for (auto j = it2->second->history.begin(); j != it2->second->history.end(); j++) {
 	if (j->second.events == NULL) continue;
 	for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	  if (!(e->ensighten.exists)) continue;
+
+	  if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
+	      (e->ensighten.camSource == "RevJet Acq")) {
+	    is_clicker = true;
+	  }
+	  if ((e->ensighten.camGroup == "DglBrand") || (e->ensighten.camGroup == "Digital Brand") ||
+	      (e->ensighten.camGroup == "RevJet Acq")) {
+	    is_clicker = true;
+	  }
+
+
+	  
 	  for (int itt = 0; itt < e->ensighten.items.size(); itt ++) {
 	    if (e->ensighten.items[itt].tag == "order") is_converter = true;
 	  }
@@ -141,6 +158,14 @@ char * query() {
 	it->second.converter_impressions++;
 	it->second.converter_users.insert(std::stoul(parts[0]));
       }
+      if (is_clicker) {
+	it->second.clicker_impressions++;
+	it->second.clicker_users.insert(std::stoul(parts[0]));
+      }
+      if (is_converter && is_clicker) {
+	it->second.clicker_converter_impressions++;
+	it->second.clicker_converter_users.insert(std::stoul(parts[0]));
+      }
     }
   }
 
@@ -148,6 +173,8 @@ char * query() {
     result << i->first << "\t" << i->second.users.size() << "\t" << i->second.impressions << "\t";
     result << i->second.overstock_users.size() << "\t" << i->second.overstock_impressions << "\t";
     result << i->second.converter_users.size() << "\t" << i->second.converter_impressions << "\n";
+    result << i->second.clicker_users.size() << "\t" << i->second.clicker_impressions << "\n";
+    result << i->second.clicker_converter_users.size() << "\t" << i->second.clicker_converter_impressions << "\n";
   }
 
   char * buffer = (char *)malloc(result.str().size() + 1);
