@@ -177,7 +177,8 @@ int main(int argc, char ** argv) {
 	    for (int j = 0; j < d["events"][i]["plc"].Size(); j++) {
 	      std::string tag = d["events"][i]["plc"][j][1].GetString();
 	      tags.push_back(tag);
-	      g += "," + tag;
+	      if (j > 0) g+= ",";
+	      g += tag;
 	    }
 	  } else {
 	    g = "-";
