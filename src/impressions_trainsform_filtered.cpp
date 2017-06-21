@@ -90,13 +90,13 @@ int main(int argc, char ** argv) {
       if (vidmap.find(vid) != vidmap.end()) {
 	it->second[1]++;
       }
-      std::ofstream vid_map_file("vid_map_dual.dat", std::ios::binary);
-      
-      for (auto it = vid_map.begin(); it != vid_map.end(); it++) {
-	vid_map_file.write((char *)&(it->first), sizeof(unsigned long));
-	vid_map_file.write((char *)&(it->second[0]), sizeof(unsigned long));
-	vid_map_file.write((char *)&(it->second[1]), sizeof(unsigned long));
-      }
+   
     }
+  }
+  std::ofstream vid_map_file("vid_map_dual.dat", std::ios::binary);
+  for (auto it = vid_map.begin(); it != vid_map.end(); it++) {
+    vid_map_file.write((char *)&(it->first), sizeof(unsigned long));
+    vid_map_file.write((char *)&(it->second[0]), sizeof(unsigned long));
+    vid_map_file.write((char *)&(it->second[1]), sizeof(unsigned long));
   }
 }
