@@ -172,8 +172,8 @@ char * query() {
   for (auto i = stats.begin(); i != stats.end(); i++) {
     result << i->first << "\t" << i->second.users.size() << "\t" << i->second.impressions << "\t";
     result << i->second.overstock_users.size() << "\t" << i->second.overstock_impressions << "\t";
-    result << i->second.converter_users.size() << "\t" << i->second.converter_impressions << "\n";
-    result << i->second.clicker_users.size() << "\t" << i->second.clicker_impressions << "\n";
+    result << i->second.converter_users.size() << "\t" << i->second.converter_impressions << "\t";
+    result << i->second.clicker_users.size() << "\t" << i->second.clicker_impressions << "\t";
     result << i->second.clicker_converter_users.size() << "\t" << i->second.clicker_converter_impressions << "\n";
   }
 
