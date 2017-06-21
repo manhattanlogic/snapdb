@@ -234,7 +234,7 @@ int ___main(int argc, char ** argv) {
 
 
 int main(int argc, char** argv) {
-  std::ifstream imp_data("mpressions_compact.csv");
+  std::ifstream imp_data("impressions_compact.csv");
   std::string line;
   while (std::getline(imp_data, line)) {
     auto parts = split_string(line, "\t");
