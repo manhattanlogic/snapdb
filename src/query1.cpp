@@ -45,10 +45,29 @@ char * query() {
   FILE * f = fopen("vid_map_dual.dat","rb");
   auto j = fread(data, l / sizeof(vid_record), sizeof(vid_record), f);
   fclose(f);
-  result << j << " loaded\n";
 
 
+  unsigned long users = 0;
+  unsigned long crossusers = 0;
+  unsigned long imps_users = 0;
+  unsigned long imps_crossusers = 0;
+  
+  for (long i = 0; i < l / sizeof(vid_record); i++) {
+    //std::cerr << data[i].vid << " " << data[i].users << " " << data[i].crossusers << "\n";
+    if (data[i].users > 0) {
+      users++;
+    }
+    if (data[i].crossusers > 0) {
+      crossusers++;
+    }
+    imps_users += data[i].users;
+    imps_crossusers += data[i].crossusers;
+  }
+  result << "users: " << users << "\ncrossusers: " << crossusers << "\n";
+  result << "imps_users: " << imps_users << "\nimps_crossusers: " << imps_crossusers << "\n";
 
+
+  
   
   // end of custom code
   result << "ok\n";
