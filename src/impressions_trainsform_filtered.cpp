@@ -43,7 +43,7 @@ int main(int argc, char ** argv) {
   std::unordered_map<unsigned long, std::map<unsigned long, impression_data> > vidmap;
   for (int i = 0; i < l / sizeof(long); i++) {
     std::map<unsigned long, impression_data> datum;
-    vidmap[i] = datum;
+    vidmap[vids[i]] = datum;
   }
 
   std::cerr << vidmap.size() << " vids loaded\n";
