@@ -167,7 +167,7 @@ int main(int argc, char ** argv) {
 	    if (d["events"][i].HasMember("subids") && d["events"][i]["subids"].IsObject()) {
 	      channel = d["events"][i]["subids"]["_device_channel_type"].GetString();
 	    }
-	    e = "[" + os + " " + device + " : " + channel + "]";
+	    e = "[" + os + " " + device + " : " + channel + "] ";
 	  } else {
 	    e = " - ";
 	  }
