@@ -46,27 +46,36 @@ char * query() {
   auto j = fread(data, l / sizeof(vid_record), sizeof(vid_record), f);
   fclose(f);
 
+  struct info_struct {
+    unsigned long users = 0;
+    unsigned long crossusers = 0;
+    unsigned long imps_users = 0;
+    unsigned long imps_crossusers = 0;
+  };
 
-  unsigned long users = 0;
-  unsigned long crossusers = 0;
-  unsigned long imps_users = 0;
-  unsigned long imps_crossusers = 0;
+  std::unordered_map<std::string, info_struct> imp_stats;
   
   for (long i = 0; i < l / sizeof(vid_record); i++) {
-    //std::cerr << data[i].vid << " " << data[i].users << " " << data[i].crossusers << "\n";
+
+    auto it = json_history.find(data[i].vid);
+    if (it == json_history.end()) continue;
+    
     if (data[i].users > 0) {
-      users++;
+      imp_stats["all"].users++;
     }
     if (data[i].crossusers > 0) {
-      crossusers++;
+      imp_stats["all"].crossusers++;
     }
-    imps_users += data[i].users;
-    imps_crossusers += data[i].crossusers;
+    imp_stats["all"].imps_users += data[i].users;
+    imp_stats["all"].imps_crossusers += data[i].crossusers;
   }
-  result << "users: " << users << "\ncrossusers: " << crossusers << "\n";
-  result << "imps_users: " << imps_users << "\nimps_crossusers: " << imps_crossusers << "\n";
 
+  for (auto it = imp_stats.begin(); it != imp_stats.end(); it++) {
+    result << "-----     " << it->first << "     -----\n";
+    result << "users: " << it->second.users << "\ncrossusers: " << it->second.crossusers << "\n";
+    result << "imps_users: " << it->second.imps_users << "\nimps_crossusers: " << it->second.imps_crossusers << "\n";
 
+  }
   
   
   // end of custom code
