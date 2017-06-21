@@ -30,6 +30,42 @@ struct impression_data {
 };
 
 int main(int argc, char ** argv) {
+  struct vid_record {
+    unsigned long vid;
+    unsigned long users;
+    unsigned long crossusers;
+  };
+  std::cerr << "sizeof(vid_record):" << sizeof(vid_record) << "\n";
+  auto l = get_filesize("vid_map_dual.dat");
+  vid_record * data = (vid_record *)malloc(l);
+  FILE * f = fopen("vid_map_dual.dat","rb");
+  auto j = fread(data, l / sizeof(vid_record), sizeof(vid_record), f);
+  fclose(f);
+  std::cerr << j << " loaded\n";
+
+  unsigned long users = 0;
+  unsigned long crossusers = 0;
+  
+  unsigned long imps_users = 0;
+  unsigned long imps_crossusers = 0;
+  
+  for (long i = 0; i < l / sizeof(vid_record); i++) {
+    //std::cerr << data[i].vid << " " << data[i].users << " " << data[i].crossusers << "\n";
+    if (data[i].users > 0) {
+      users++;
+    }
+    if (data[i].crossusers > 0) {
+      crossusers++;
+    }
+    imps_users += data[i].users;
+    imps_crossusers += data[i].crossusers;
+  }
+  std::cerr << "users: " << users << "\ncrossusers: " << crossusers << "\n";
+  std::cerr << "imps_users: " << imps_users << "\nimps_crossusers: " << imps_crossusers << "\n";
+}
+
+
+int _main(int argc, char ** argv) {
   auto l = get_filesize("long_vids.dat");
   if (l <= 0) {
     std::cerr << "no vid file provided\n";
