@@ -247,8 +247,9 @@ int main(int argc, char** argv) {
   
   while (std::getline(imp_data, line)) {
     auto parts = split_string(line, "\t");
-    if (parts.size() < 3) continue;
-    auto tags = split_string(parts[5], ",");    
+    if (parts.size() < 6) continue;
+    auto tags = split_string(parts[5], ",");
+    if (
     std::string record_id = parts[2] + "\t" + parts[3] + "\t" + parts[4] + "\t" + tags[2] + "\t" + tags[3];
     auto it = stats.find(record_id);
     if (it == stats.end()) {
