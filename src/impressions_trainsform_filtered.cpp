@@ -157,7 +157,9 @@ int main(int argc, char ** argv) {
 	std::string e = "";
 	for (int i = 0; i < d["events"].Size(); i++) {
 	  if (d["events"][i].HasMember("ua") && d["events"][i]["ua"].IsObject()) {
-	    e += d["events"][i]["ua"]["_os"].GetString();
+	    std::string os = d["events"][i]["ua"]["_os"].GetString();
+	    std::string device = d["events"][i]["ua"]["_device_type"].GetString();
+	    e += "[" + os + " " + device + "]\t";
 	  } else {
 	    e += " - ";
 	  }
