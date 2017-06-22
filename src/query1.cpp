@@ -87,10 +87,12 @@ char * query_2() {
   return buffer;
 }
 
-std::string ts_to_time(unsigned long tt) {
+std::string ts_to_time(unsigned long _tt) {
+  unsigned long tt = tt;
+  if (tt > 2000000000) tt /= 1000;
   struct tm * ptm = localtime((const time_t *)&tt);
   char buf[30];
-  strftime (buf, 30, "%a, %d %b %YYYY %HH:%MM:%SS",  ptm);
+  strftime (buf, 30, "%d %b %Y",  ptm);
   return buf;
 }
 
@@ -99,7 +101,9 @@ extern "C"
 char * query() {
   std::stringstream result;
 
-
+  std::cerr << "time test:" << ts_to_time(1492049877) << "\n";
+  std::cerr << "time test:" << ts_to_time(0) << "\n";
+  
   std::ifstream imp_data("impressions_compact.csv");
   struct stats_struct {
     std::unordered_set<unsigned long> users;
