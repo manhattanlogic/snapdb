@@ -88,7 +88,7 @@ char * query_2() {
 }
 
 std::string ts_to_time(unsigned long _tt) {
-  unsigned long tt = tt;
+  unsigned long tt = _tt;
   if (tt > 2000000000) tt /= 1000;
   struct tm * ptm = localtime((const time_t *)&tt);
   char buf[30];
