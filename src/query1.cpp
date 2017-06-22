@@ -142,11 +142,11 @@ char * query() {
     it->second.users.insert(std::stoul(parts[0]));
 
     if (it->second.min_time == 0) {
-      it->second.min_time = std::stoul(parts[2]);
-      it->second.max_time = std::stoul(parts[2]);
+      it->second.min_time = std::stoul(parts[1]);
+      it->second.max_time = std::stoul(parts[1]);
     } else {
-      it->second.min_time = std::min(it->second.min_time, std::stoul(parts[2]));
-      it->second.max_time = std::max(it->second.min_time, std::stoul(parts[2])); 
+      it->second.min_time = std::min(it->second.min_time, std::stoul(parts[1]));
+      it->second.max_time = std::max(it->second.min_time, std::stoul(parts[1])); 
     }
 
     
