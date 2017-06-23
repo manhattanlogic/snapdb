@@ -214,8 +214,16 @@ char * query() {
     result << i->second.clicker_users.size() << "\t" << i->second.clicker_impressions << "\t";
     result << i->second.clicker_converter_users.size() << "\t" << i->second.clicker_converter_impressions << "\t";
     result << ts_to_time(i->second.min_time) << "\t" << ts_to_time(i->second.max_time);
+    float total = 0;
     for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
-      result << "\t" << i->second.order_category_value[*it];
+      total += i->second.order_category_value[*it];
+    }
+    for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+      if (total > 0) {
+	result << "\t" << i->second.order_category_value[*it] / total;
+      } else {
+	result << "\t0";
+      }
     }
     result << "\n";
   }
