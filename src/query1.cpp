@@ -100,6 +100,21 @@ std::string ts_to_time(unsigned long _tt) {
 extern "C"
 char * query() {
   std::stringstream result;
+  std::string line;
+
+  std::unordered_set<std::string> top_categories;
+  
+  std::ifstream sku_crumbs_file("sku_crumbs.csv");
+  while (std::getline(sku_crumbs_file, line)) {
+    auto parts = split_string(line, "\t");
+    top_categories.insert(parts[1]);
+  }
+
+  for (auto i = top_categories.begin(); i != top_categories.end(); i++) {
+    result << *i << "\n";
+  }
+  
+  /*
 
   std::cerr << "time test:" << ts_to_time(1492049877) << "\n";
   std::cerr << "time test:" << ts_to_time(0) << "\n";
@@ -119,8 +134,7 @@ char * query() {
     unsigned long min_time;
     unsigned long max_time;
   };
-  std::string line;
-
+  
   std::unordered_map<std::string, stats_struct> stats;
   
   while (std::getline(imp_data, line)) {
@@ -176,6 +190,8 @@ char * query() {
     result << ts_to_time(i->second.min_time) << "\t" << ts_to_time(i->second.max_time) << "\n";
   }
 
+  */
+  
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());
   buffer[result.str().size()] = 0;
