@@ -107,7 +107,11 @@ char * query() {
   std::ifstream sku_crumbs_file("sku_crumbs.csv");
   while (std::getline(sku_crumbs_file, line)) {
     auto parts = split_string(line, "\t");
-    top_categories.insert(parts[1]);
+    if (parts[1] == "Home & Garden") {
+      top_categories.insert("> " + parts[2]);
+    } else {
+      top_categories.insert(parts[1]);
+    }
   }
 
   for (auto i = top_categories.begin(); i != top_categories.end(); i++) {
