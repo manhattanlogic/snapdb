@@ -60,3 +60,52 @@ struct single_json_history {
 extern std::unordered_map<unsigned long, single_json_history *> json_history;
 extern std::unordered_set<unsigned long> history_filter;
 extern rapidjson::Document load_json_at_position(unsigned long position);
+
+
+struct user_info_struct {
+  bool is_valid = false;
+  bool is_converter = false;
+  bool is_clicker = false;
+  std::unordered_set<std::string> order_skus;
+  std::unordered_set<std::string> cart_skus;
+  std::unordered_set<std::string> product_skus;
+  float order_value = 0.0;
+};
+
+user_info_struct get_user_info(unsigned long vid) {
+  user_info_struct result;
+  auto it = json_history.find(vid);
+  if (it == json_history.end()) return result;
+  result.is_valid = true;
+  for (auto j = it->second->history.begin(); j != it->second->history.end(); j++) {
+    if (j->second.events == NULL) continue;
+    for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
+      if (!(e->ensighten.exists)) continue;
+
+      if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
+	  (e->ensighten.camSource == "RevJet Acq")) {
+	result.is_clicker = true;
+      }
+      if ((e->ensighten.camGroup == "DglBrand") || (e->ensighten.camGroup == "Digital Brand") ||
+	  (e->ensighten.camGroup == "RevJet Acq")) {
+	result.is_clicker = true;
+      }
+      bool productpage = (e->ensighten.pageType == "PRODUCT");
+      
+      for (int itt = 0; itt < e->ensighten.items.size(); itt ++) {
+	if (e->ensighten.items[itt].tag == "order") {
+	  result.is_converter = true;
+	  result.order_skus.insert(e->ensighten.items[itt].sku);
+	  result.order_value += e->ensighten.items[itt].price * e->ensighten.items[itt].quantity;
+	}
+	if (productpage || e->ensighten.items[itt].tag == "productpage") {
+	  result.product_skus.insert(e->ensighten.items[itt].sku);
+	}
+	if (e->ensighten.items[itt].tag == "cart") {
+	  result.cart_skus.insert(e->ensighten.items[itt].sku);
+	}
+      }
+    }
+  }
+  return (result);
+}

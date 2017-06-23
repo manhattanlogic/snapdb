@@ -4,6 +4,7 @@
 #include <vector>
 #include <fstream>
 
+
 std::ifstream::pos_type get_filesize(const char* filename)
 {
     std::ifstream in(filename, std::ifstream::ate | std::ifstream::binary);
@@ -78,3 +79,5 @@ auto safe_find(std::map<T, V> &map, T key) {
   }
   return it;
 }
+
+
