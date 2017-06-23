@@ -205,6 +205,7 @@ char * query() {
   for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
     result << "\t" << *it;
   }
+  result << "\tTOTAL";
   result << "\n";
     
   for (auto i = stats.begin(); i != stats.end(); i++) {
@@ -219,12 +220,9 @@ char * query() {
       total += i->second.order_category_value[*it];
     }
     for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
-      if (total > 0) {
-	result << "\t" << i->second.order_category_value[*it] / total;
-      } else {
-	result << "\t0";
-      }
+      result << "\t" << i->second.order_category_value[*it];
     }
+    result << "\t" << total;
     result << "\n";
   }
 
