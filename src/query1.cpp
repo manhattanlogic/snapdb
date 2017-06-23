@@ -150,6 +150,7 @@ char * query() {
     }
 
     auto user_info = get_user_info(std::stoul(parts[0]));
+    
     if (user_info.is_valid) {
       if (user_info.order_skus.size() > 0) {
 	it->second.converter_impressions++;
@@ -164,46 +165,6 @@ char * query() {
 	it->second.clicker_converter_users.insert(std::stoul(parts[0]));
       }
     }
-    
-    /*
-    auto it2 = json_history.find();
-    if (it2 != json_history.end()) {
-      it->second.overstock_impressions ++;
-      it->second.overstock_users.insert(std::stoul(parts[0]));
-      bool is_converter = false;
-      bool is_clicker = false;
-      for (auto j = it2->second->history.begin(); j != it2->second->history.end(); j++) {
-	if (j->second.events == NULL) continue;
-	for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
-	  if (!(e->ensighten.exists)) continue;
-
-	  if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
-	      (e->ensighten.camSource == "RevJet Acq")) {
-	    is_clicker = true;
-	  }
-	  if ((e->ensighten.camGroup == "DglBrand") || (e->ensighten.camGroup == "Digital Brand") ||
-	      (e->ensighten.camGroup == "RevJet Acq")) {
-	    is_clicker = true;
-	  }
-	  for (int itt = 0; itt < e->ensighten.items.size(); itt ++) {
-	    if (e->ensighten.items[itt].tag == "order") is_converter = true;
-	  }
-	}
-      }
-      if (is_converter) {
-	it->second.converter_impressions++;
-	it->second.converter_users.insert(std::stoul(parts[0]));
-      }
-      if (is_clicker) {
-	it->second.clicker_impressions++;
-	it->second.clicker_users.insert(std::stoul(parts[0]));
-      }
-      if (is_converter && is_clicker) {
-	it->second.clicker_converter_impressions++;
-	it->second.clicker_converter_users.insert(std::stoul(parts[0]));
-      }
-    }
-    */
   }
 
   for (auto i = stats.begin(); i != stats.end(); i++) {

@@ -69,6 +69,26 @@ char * query() {
     }
   }
 
+  std::ofstream sku_crumbs_file("sku_crumbs.csv");
+  
+  for (auto i = sku_crumbs.begin(); i != sku_crumbs.end(); i++) {
+    sku_crumbs_file << i->first;
+    for (int j = 0; j < i->second.size(); j++) {
+      sku_crumbs_file << "\t" << i->second[j];
+    }
+    sku_crumbs_file << "\n";
+  }
+
+  result << "ok\n";
+
+  char * buffer = (char *)malloc(result.str().size() + 1);
+  memcpy(buffer, result.str().c_str(), result.str().size());
+  buffer[result.str().size()] = 0;
+  return buffer;
+  
+  /*
+
+  
   std::cerr << "done 0\n";
 
   struct matrix_entry {
@@ -153,24 +173,13 @@ char * query() {
 	  }
 	}
 
-	/*
-	if ((event_type == "cart_first") || (event_type == "cart_remove") ||
-	    (event_type == "cart_add") || (event_type == "cart_view") ||
-	    (event_type == "cart_change")) {
-	  event_type = "cart_view";
-	} else if ((event_type == "productpage") || (event_type == "featured")) {
-	  event_type = "productpage";
-	} else if ((event_type == "listing") || (event_type == "taxonomy") || (event_type == "homepage") || (event_type == "search")) {
-	  event_type = "listing";
-	}
-	*/
 	
 	// at this point event is classified
 	if (tetris_string != "") tetris_string += "|";
 	if (cam_source_changed) tetris_string += "cam_source_changed|";
 	tetris_string += event_type;
 
-	/* start/end matrix update */
+	
 	if (e->ensighten.items.size() > 0) {  
 	  if ((e->ensighten.items[0].tag == "featured") || (e->ensighten.items[0].tag == "productpage") || (e -> ensighten.pageType == "PRODUCT")) {
 	    if (first_sku == "") {
@@ -190,14 +199,14 @@ char * query() {
 
     if (browser != "d") continue;
     
-    /* stats update */
+    
     auto source_crumbs = get_crumbs_for_sku(first_sku);
     std::unordered_set<std::string> order_categories;
     
     if (order_skus.size() > 0) {
       if (source_crumbs.size() > 0) {
 	auto it = safe_find(sku_order_matrix, source_crumbs[0]);
-	/* matrix update */
+
 	
 	for (int si = 0; si < order_skus.size(); si++) {
 	  auto s = &order_skus[si];
@@ -220,7 +229,7 @@ char * query() {
     }
     
     if (source_crumbs.size() > 0) {
-      /* main stats update */
+     
       std::string category_index = "";
       std::vector<std::string> catche_source_crumbs;
       for (auto crumb = source_crumbs.begin(); crumb != source_crumbs.end(); crumb++) {
@@ -339,4 +348,5 @@ char * query() {
   memcpy(buffer, result.str().c_str(), result.str().size());
   buffer[result.str().size()] = 0;
   return buffer;
+  */
 }
