@@ -4,6 +4,7 @@
 #include "snapdb.hpp"
 #include <sstream>
 #include <unordered_set>
+#include <set>
 #include <memory.h>
 #include <fstream>
 #include <iostream>
@@ -102,23 +103,21 @@ char * query() {
   std::stringstream result;
   std::string line;
 
-  std::unordered_set<std::string> top_categories;
+  std::set<std::string> top_categories;
+  std::unordered_map<std::string, std::string> sku_category;
   
   std::ifstream sku_crumbs_file("sku_crumbs.csv");
   while (std::getline(sku_crumbs_file, line)) {
     auto parts = split_string(line, "\t");
-    if (parts[1] == "Home & Garden") {
-      top_categories.insert("> " + parts[2]);
-    } else {
-      top_categories.insert(parts[1]);
+    std::string val = parts[1];
+    if (val== "Home & Garden") {
+      val = "# " + parts[2];
     }
+    top_categories.insert(val);
+    sku_category[parts[0]] = val;
   }
-
-  for (auto i = top_categories.begin(); i != top_categories.end(); i++) {
-    result << *i << "\n";
-  }
+  top_categories.insert("UNKNOWN");
   
-  /*
 
   std::cerr << "time test:" << ts_to_time(1492049877) << "\n";
   std::cerr << "time test:" << ts_to_time(0) << "\n";
@@ -137,6 +136,7 @@ char * query() {
     unsigned long clicker_converter_impressions;
     unsigned long min_time;
     unsigned long max_time;
+    std::map<std::string, float> order_category_value;
   };
   
   std::unordered_map<std::string, stats_struct> stats;
@@ -153,6 +153,9 @@ char * query() {
     auto it = stats.find(record_id);
     if (it == stats.end()) {
       stats_struct ss = {};
+      for (auto it_2 = top_categories.begin(); it_2 != top_categories.end(); it_2++) {
+	ss.order_category_value[*it_2] = 0;
+      }
       stats[record_id] = ss;
       it = stats.find(record_id);
     }
@@ -173,6 +176,12 @@ char * query() {
       if (user_info.order_skus.size() > 0) {
 	it->second.converter_impressions++;
 	it->second.converter_users.insert(std::stoul(parts[0]));
+	for (auto it_s = user_info.order_skus.begin(); it_s != user_info.order_skus.end(); it_s++) {
+	  auto it_3 = sku_category.find(it_s->first);
+	  std::string category = "UNKNOWN";
+	  if (it_3 != sku_category.end()) category = it_3->second;
+	  it->second.order_category_value[category] += it_s->second;
+	}
       }
       if (user_info.is_clicker) {
 	it->second.clicker_impressions++;
@@ -185,16 +194,32 @@ char * query() {
     }
   }
 
+
+  result << "os\tdevice\tchannel\tgroup\tcreative\t";
+  result << "users\timpressions\t";
+  result << "os users\tos impressions\t";
+  result << "converters\tconv impressions\t";
+  result << "clickers\tclick impressions\t";
+  result << "clickthrough users\tclickthrough impressions\t";
+  result << "first\tlast";
+  for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+    result << "\t" << *it;
+  }
+  result << "\n";
+    
   for (auto i = stats.begin(); i != stats.end(); i++) {
     result << i->first << "\t" << i->second.users.size() << "\t" << i->second.impressions << "\t";
     result << i->second.overstock_users.size() << "\t" << i->second.overstock_impressions << "\t";
     result << i->second.converter_users.size() << "\t" << i->second.converter_impressions << "\t";
     result << i->second.clicker_users.size() << "\t" << i->second.clicker_impressions << "\t";
     result << i->second.clicker_converter_users.size() << "\t" << i->second.clicker_converter_impressions << "\t";
-    result << ts_to_time(i->second.min_time) << "\t" << ts_to_time(i->second.max_time) << "\n";
+    result << ts_to_time(i->second.min_time) << "\t" << ts_to_time(i->second.max_time);
+    for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+      result << "\t" << i->second.order_category_value[*it];
+    }
+    result << "\n";
   }
 
-  */
   
   char * buffer = (char *)malloc(result.str().size() + 1);
   memcpy(buffer, result.str().c_str(), result.str().size());

@@ -66,9 +66,10 @@ struct user_info_struct {
   bool is_valid = false;
   bool is_converter = false;
   bool is_clicker = false;
-  std::unordered_set<std::string> order_skus;
+  std::unordered_map<std::string, float> order_skus;
   std::unordered_set<std::string> cart_skus;
   std::unordered_set<std::string> product_skus;
+
   float order_value = 0.0;
 };
 
@@ -94,9 +95,16 @@ user_info_struct get_user_info(unsigned long vid) {
       
       for (int itt = 0; itt < e->ensighten.items.size(); itt ++) {
 	if (e->ensighten.items[itt].tag == "order") {
+	  float value = e->ensighten.items[itt].price * e->ensighten.items[itt].quantity;
 	  result.is_converter = true;
-	  result.order_skus.insert(e->ensighten.items[itt].sku);
-	  result.order_value += e->ensighten.items[itt].price * e->ensighten.items[itt].quantity;
+	  auto it = result.order_skus.find(e->ensighten.items[itt].sku);
+	  if (it == result.order_skus.end()) {
+	    result.order_skus[e->ensighten.items[itt].sku] = value;
+	  } else {
+	    it->second += value;
+	  }
+				   
+	  result.order_value += value;
 	}
 	if (productpage || e->ensighten.items[itt].tag == "productpage") {
 	  result.product_skus.insert(e->ensighten.items[itt].sku);
