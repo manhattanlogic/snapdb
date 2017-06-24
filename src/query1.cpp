@@ -97,6 +97,27 @@ std::string ts_to_time(unsigned long _tt) {
   return buf;
 }
 
+std::string device_to_device_type(std::string os, std::string device) {
+  if (device == "AppleDesktop" || device == "WindowsDesktop") {
+    return "desktop";
+  }
+  if ((device == "Unknown" && os == "Mac OS") || (device == "Unknown" && os == "Windows") || (device == "Unknown" && os == "Linux")) {
+    return "desktop";
+  }
+  if (device == "AndroidPhone" || device == "BlackBerry" || device == "iPhone" || device == "UnknownMobile" || device == "Windows Phone") {
+    return "mobile";
+  }
+  if (device == "Unknown" && os == "iPhone OS") {
+    return "mobile";
+  }
+  if (device == "AndroidTablet" || device == "iPad" || device == "iPod" || device == "Kindle Fire") {
+    return "tablet";
+  }
+  if (device == "Unknown" && os == "CrOS") {
+    return "tablet";
+  }
+  return "other";
+}
 
 extern "C"
 char * query() {
@@ -149,7 +170,7 @@ char * query() {
       std::cerr << parts[5] << "\n";
       continue;
     }
-    std::string record_id = parts[2] + "\t" + parts[3] + "\t" + parts[4] + "\t" + tags[2] + "\t" + tags[3];
+    std::string record_id = parts[2] + "\t" + parts[3] + "\t" + device_to_device_type(parts[2], parts[3]) + "\t" + parts[4] + "\t" + tags[2] + "\t" + tags[3];
     auto it = stats.find(record_id);
     if (it == stats.end()) {
       stats_struct ss = {};
@@ -159,8 +180,11 @@ char * query() {
       stats[record_id] = ss;
       it = stats.find(record_id);
     }
+
+    unsigned long vid = std::stoul(parts[0]);
+    
     it->second.impressions ++;
-    it->second.users.insert(std::stoul(parts[0]));
+    it->second.users.insert(vid);
 
     if (it->second.min_time == 0) {
       it->second.min_time = std::stoul(parts[1]);
@@ -171,11 +195,15 @@ char * query() {
     }
 
     auto user_info = get_user_info(std::stoul(parts[0]));
+
+    
     
     if (user_info.is_valid) {
+      it->second.overstock_users.insert(vid);
+      it->second.overstock_impressions++;
       if (user_info.order_skus.size() > 0) {
 	it->second.converter_impressions++;
-	it->second.converter_users.insert(std::stoul(parts[0]));
+	it->second.converter_users.insert(vid);
 	for (auto it_s = user_info.order_skus.begin(); it_s != user_info.order_skus.end(); it_s++) {
 	  auto it_3 = sku_category.find(it_s->first);
 	  std::string category = "UNKNOWN";
@@ -185,17 +213,16 @@ char * query() {
       }
       if (user_info.is_clicker) {
 	it->second.clicker_impressions++;
-	it->second.clicker_users.insert(std::stoul(parts[0]));
+	it->second.clicker_users.insert(vid);
       }
       if (user_info.order_skus.size() && user_info.is_clicker) {
 	it->second.clicker_converter_impressions++;
-	it->second.clicker_converter_users.insert(std::stoul(parts[0]));
+	it->second.clicker_converter_users.insert(vid);
       }
     }
   }
 
-
-  result << "os\tdevice\tchannel\tgroup\tcreative\t";
+  result << "os\tdevice\tdev_type\tchannel\tgroup\tcreative\t";
   result << "users\timpressions\t";
   result << "os users\tos impressions\t";
   result << "converters\tconv impressions\t";
