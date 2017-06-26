@@ -82,7 +82,7 @@ struct user_info_struct {
   bool is_valid = false;
   bool is_converter = false;
   bool is_clicker = false;
-  std::unordered_map<std::string, float> order_skus;
+  // std::unordered_map<std::string, float> order_skus;
   std::unordered_set<std::string> cart_skus;
   std::unordered_set<std::string> product_skus;
   
@@ -138,13 +138,15 @@ user_info_struct get_user_info(unsigned long vid) {
 	  
 	  float value = e->ensighten.items[itt].price * e->ensighten.items[itt].quantity;
 	  result.is_converter = true;
+
+	  /*
 	  auto it = result.order_skus.find(e->ensighten.items[itt].sku);
 	  if (it == result.order_skus.end()) {
 	    result.order_skus[e->ensighten.items[itt].sku] = value;
 	  } else {
 	    it->second += value;
 	  }
-				   
+	  */
 	  result.order_value += value;
 	  result.invoices[invoice][e->ensighten.items[itt].sku] = value;
 	}

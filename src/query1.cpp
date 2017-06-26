@@ -137,8 +137,8 @@ struct stats_struct {
   std::map<std::string, float> order_category_value;
   std::map<std::string, std::set<unsigned int> > invoices_category; // stores invoice_ids
   std::set<unsigned int> invoices;
-  std::map<std::string, std::set<unsigned int> > skus_category;
-  std::set<unsigned int> skus;
+  std::map<std::string, std::set<std::string> > skus_category;
+  std::set<std::string> skus;
 };
 
 std::unordered_map<std::string, std::string> sku_category;
@@ -153,6 +153,8 @@ void update_stats(unsigned long vid, unsigned long ts, std::string os, std::stri
     stats_struct ss = {};
     for (auto it_2 = top_categories.begin(); it_2 != top_categories.end(); it_2++) {
       ss.order_category_value[*it_2] = 0;
+      ss.invoices_category[*it_2] = {};
+      ss.skus_category[*it_2] = {};
     }
     stats[record_id] = ss;
     it = stats.find(record_id);
@@ -173,22 +175,46 @@ void update_stats(unsigned long vid, unsigned long ts, std::string os, std::stri
 
   auto user_info = get_user_info(vid);
 
+  /*
+    1. spending in category
+    2. order skus in category 
+   */
+
+  
   if (user_info.is_valid) {
     it->second.overstock_users.insert(vid);
     if (is_treated) {
       it->second.overstock_impressions++;
     }
-    if (user_info.order_skus.size() > 0) {
+    if (user_info.invoices.size() > 0) {
       if (is_treated) {
 	it->second.converter_impressions++;
       }
       it->second.converter_users.insert(vid);
+
+      for (auto it_i = user_info.invoices.begin(); it_i != user_info.invoices.end(); it_i++) {
+	for (auto it_s = it_i->second.begin(); it_s != it_i->second.end(); it_s++) {
+	  auto it_3 = sku_category.find(it_s->first);
+	  std::string category = "UNKNOWN";
+	  if (it_3 != sku_category.end()) category = it_3->second;
+	  it->second.order_category_value[category] += it_s->second;
+	  
+	  it->second.invoices_category[category].insert(it_i->first);
+	  it->second.invoices.insert(it_i->first);
+
+	  it->second.skus_category[category].insert(it_s->first);
+	  it->second.skus.insert(it_s->first);
+	}
+      }
+
+      /*
       for (auto it_s = user_info.order_skus.begin(); it_s != user_info.order_skus.end(); it_s++) {
 	auto it_3 = sku_category.find(it_s->first);
 	std::string category = "UNKNOWN";
 	if (it_3 != sku_category.end()) category = it_3->second;
 	it->second.order_category_value[category] += it_s->second;
       }
+      */
     }
 
     if (is_treated) {
@@ -196,7 +222,7 @@ void update_stats(unsigned long vid, unsigned long ts, std::string os, std::stri
 	it->second.clicker_impressions++;
 	it->second.clicker_users.insert(vid);
       }
-      if (user_info.order_skus.size() && user_info.is_clicker) {
+      if ((user_info.invoices.size() > 0) && user_info.is_clicker) {
 	it->second.clicker_converter_impressions++;
 	it->second.clicker_converter_users.insert(vid);
       }
@@ -297,10 +323,22 @@ char * query() {
   result << "clickers\tclick impressions\t";
   result << "clickthrough converters\tclickthrough impressions\t";
   result << "first\tlast";
+
   for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
-    result << "\t" << *it;
+    result << "\t" << "VAL:" << *it;
   }
-  result << "\tTOTAL";
+  result << "\tVAL:TOTAL";
+
+  for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+    result << "\t" << "SKU:" << *it;
+  }
+  result << "\tSKU:TOTAL";
+
+  for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+    result << "\t" << "INV:" << *it;
+  }
+  result << "\tINV:TOTAL";
+  
   result << "\n";
     
   for (auto i = stats.begin(); i != stats.end(); i++) {
@@ -318,6 +356,17 @@ char * query() {
       result << "\t" << i->second.order_category_value[*it];
     }
     result << "\t" << total;
+
+    for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+      result << "\t" << i->second.invoices_category[*it].size();
+    }
+    result << "\t" << i->second.invoices.size();
+
+    for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+      result << "\t" << i->second.skus_category[*it].size();
+    }
+    result << "\t" << i->second.skus.size();
+    
     result << "\n";
   }
 

@@ -248,7 +248,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("invoiceId") && d["events"][i]["subids"]["ensighten"]["invoiceId"].IsString()) {
 	  event.ensighten.invoice_id = std::stoul(d["events"][i]["subids"]["ensighten"]["invoiceId"].GetString());
-	  std::cerr << event.ensighten.invoice_id << "\n";
+	  // std::cerr << event.ensighten.invoice_id << "\n";
 	}
       } catch (...) {}
 
