@@ -1,3 +1,5 @@
+#ifndef UTILX_HPP
+#define UTILX_HPP
 #include <unordered_map>
 #include <map>
 #include <string>
@@ -30,7 +32,7 @@ std::string replace_all(
   return result;
 }
 
-std::vector<std::string> split_string(std::string line, const char * sep = " ") {
+std::vector<std::string> basic_split_string(std::string line, const char * sep = " ") {
   std::vector <std::string> result;
   char * pch = strtok ((char *)line.c_str(), sep);
   while (pch != NULL) {
@@ -79,5 +81,5 @@ auto safe_find(std::map<T, V> &map, T key) {
   }
   return it;
 }
-
+#endif
 

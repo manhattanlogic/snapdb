@@ -94,7 +94,7 @@ char * query() {
 	stats["all"].ips.insert(e->ip);
 	
 	if (ua == "") {
-	  ua = e->device_model + ":" + e->browser;
+	  ua = e->_device_type + ":" + e->browser;
 	}
 	
 	if (e->ensighten.pageType == "PRODUCT")  is_meaningful = true;

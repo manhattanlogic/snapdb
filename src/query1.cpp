@@ -128,11 +128,10 @@ char * query() {
   std::set<std::string> top_categories;
   std::unordered_map<std::string, std::string> sku_category;
 
-  std::unordered_map<unsigned long, std::map<unsigned long, std::vector<std::string> > > impressions_data;
   
   std::ifstream sku_crumbs_file("sku_crumbs.csv");
   while (std::getline(sku_crumbs_file, line)) {
-    auto parts = split_string(line, "\t");
+    auto parts = basic_split_string(line, "\t");
     std::string val = parts[1];
     if (val== "Home & Garden") {
       val = "# " + parts[2];
@@ -164,11 +163,13 @@ char * query() {
   };
   
   std::unordered_map<std::string, stats_struct> stats;
-  
+
+  std::unordered_set<unsigned long> impression_vids;
+
   while (std::getline(imp_data, line)) {
-    auto parts = split_string(line, "\t");
+    auto parts = basic_split_string(line, "\t");
     if (parts.size() < 6) continue;
-    auto tags = split_string(parts[5], ",");
+    auto tags = basic_split_string(parts[5], ",");
     if (tags.size() != 4) {
       std::cerr << parts[5] << "\n";
       continue;
@@ -186,15 +187,8 @@ char * query() {
 
     unsigned long vid = std::stoul(parts[0]);
     unsigned long ts = std::stoul(parts[1]);
-
-    auto it_2 = impressions_data.find(vid);
-    if (it_2 == impressions_data.end()) {
-      std::map<unsigned long, std::vector<std::string> > val;
-      impressions_data[vid] = val;
-      it_2 = impressions_data.find(vid);
-    }
-    it_2->second[ts] = std::vector<std::string>(parts.begin() + 2, parts.end());
     
+    impression_vids.insert(vid);
     
     it->second.impressions ++;
     it->second.users.insert(vid);
@@ -209,8 +203,6 @@ char * query() {
 
     auto user_info = get_user_info(std::stoul(parts[0]));
 
-    
-    
     if (user_info.is_valid) {
       it->second.overstock_users.insert(vid);
       it->second.overstock_impressions++;

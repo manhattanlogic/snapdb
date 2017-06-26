@@ -93,7 +93,7 @@ int __main(int argc, char ** argv) {
   long miss = 0;
   
   while (fgets(buffer, 1024*1024, stdin)) {
-    auto parts = split_string(buffer, "\t");
+    auto parts = basic_split_string(buffer, "\t");
     if (parts.size() != 3) {
       continue;
     }
@@ -154,7 +154,7 @@ int ___main(int argc, char ** argv) {
   };
   
   while (fgets(buffer, 1024*1024, stdin)) {
-    auto parts = split_string(buffer, "\t");
+    auto parts = basic_split_string(buffer, "\t");
     if (parts.size() != 3) {
       continue;
     }
@@ -244,9 +244,9 @@ int main(int argc, char** argv) {
   std::unordered_map<std::string, stats_struct> stats;
   
   while (std::getline(imp_data, line)) {
-    auto parts = split_string(line, "\t");
+    auto parts = basic_split_string(line, "\t");
     if (parts.size() < 6) continue;
-    auto tags = split_string(parts[5], ",");
+    auto tags = basic_split_string(parts[5], ",");
     if (tags.size() != 4) {
       std::cerr << parts[5] << "\n";
       continue;

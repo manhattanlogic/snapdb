@@ -240,8 +240,11 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	if (d["events"][i]["ua"].HasMember("_browser") && (d["events"][i]["ua"]["_browser"].IsString())) {
 	  event.browser = d["events"][i]["ua"]["_browser"].GetString();
 	}
-	if (d["events"][i]["ua"].HasMember("_device_model") && (d["events"][i]["ua"]["_device_model"].IsString())) {
-	  event.device_model = d["events"][i]["ua"]["_device_model"].GetString();
+	if (d["events"][i]["ua"].HasMember("_device_type") && (d["events"][i]["ua"]["_device_type"].IsString())) {
+	  event._device_type = d["events"][i]["ua"]["_device_type"].GetString();
+	}
+	if (d["events"][i]["ua"].HasMember("_os") && (d["events"][i]["ua"]["_os"].IsString())) {
+	  event._os = d["events"][i]["ua"]["_os"].GetString();
 	}
       }
 

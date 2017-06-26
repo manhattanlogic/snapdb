@@ -1,3 +1,5 @@
+#ifndef SNAPDB_HPP
+#define SNAPDB_HPP
 #include <string>
 #include <vector>
 #include <map>
@@ -8,6 +10,7 @@
 #include "rapidjson/include/rapidjson/writer.h"
 #include "rapidjson/include/rapidjson/stringbuffer.h"
 #include <mutex>
+#include "util.hpp"
 
 struct ensighten_item {
   std::string sku;
@@ -37,7 +40,8 @@ struct json_simgle_event_type {
   ensighten_type ensighten;
   std::string ip;
   std::string browser;
-  std::string device_model;
+  std::string _os;
+  std::string _device_type;
 };
 
 struct json_history_entry {
@@ -71,6 +75,8 @@ struct user_info_struct {
   std::unordered_set<std::string> product_skus;
 
   float order_value = 0.0;
+
+  std::string browser;
 };
 
 user_info_struct get_user_info(unsigned long vid) {
@@ -83,6 +89,13 @@ user_info_struct get_user_info(unsigned long vid) {
     for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
       if (!(e->ensighten.exists)) continue;
 
+      result.browser = e->ensighten.browser;
+
+      auto pixels = basic_split_string(replace_all(replace_all(replace_all(j->second.pixels, "'", ""), "]", ""), "[", ""), ",");
+      for (auto p=pixels.begin(); p != pixels.end(); p++) {
+	if (*p == "79") result.is_clicker = true;
+      }
+      /*
       if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
 	  (e->ensighten.camSource == "RevJet Acq")) {
 	result.is_clicker = true;
@@ -91,6 +104,7 @@ user_info_struct get_user_info(unsigned long vid) {
 	  (e->ensighten.camGroup == "RevJet Acq")) {
 	result.is_clicker = true;
       }
+      */
       bool productpage = (e->ensighten.pageType == "PRODUCT");
       
       for (int itt = 0; itt < e->ensighten.items.size(); itt ++) {
@@ -117,3 +131,4 @@ user_info_struct get_user_info(unsigned long vid) {
   }
   return (result);
 }
+#endif
