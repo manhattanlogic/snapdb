@@ -18,17 +18,15 @@ struct ensighten_item {
   std::string productName;
   float price;
   int quantity;
+  unsigned int invoice_id;
   // std::vector<std::string> subCatIds;
 };
 
 struct ensighten_type {
   bool exists = false;
-
   std::string browser;
   //char * browser = NULL;
-  
   std::vector<std::string> crumbs;
-
   std::string pageType;
   //char * pageType = NULL;
   

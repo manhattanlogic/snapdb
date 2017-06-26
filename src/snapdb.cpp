@@ -328,6 +328,16 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	    }
 	  } catch (...) {}
 
+	  try {
+	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("invoiceId") && d["events"][i]["subids"]["ensighten"]["items"][j]["invoiceId"].IsString()) {
+	      item.invoice_id = std::stoul(d["events"][i]["subids"]["ensighten"]["items"][j]["invoiceId"].GetString());
+	    }
+	  } catch (...) {}
+
+	  
+	  
+
+	  
 
 	  /*
 	  try {
