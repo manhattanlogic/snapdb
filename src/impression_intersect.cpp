@@ -78,12 +78,12 @@ char * query() {
 	if (!(e->ensighten.exists)) continue;
 	browser = e->ensighten.browser;
 
-	if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
-	    (e->ensighten.camSource == "RevJet Acq")) {
+	if ((e->ensighten.camSource == std::string("DglBrand")) || (e->ensighten.camSource == std::string("Digital Brand")) ||
+	    (e->ensighten.camSource == std::string("RevJet Acq"))) {
 	  is_revjet = true;
 	}
-	if ((e->ensighten.camGroup == "DglBrand") || (e->ensighten.camGroup == "Digital Brand") ||
-	    (e->ensighten.camGroup == "RevJet Acq")) {
+	if ((e->ensighten.camGroup == std::string("DglBrand")) || (e->ensighten.camGroup == std::string("Digital Brand")) ||
+	    (e->ensighten.camGroup == std::string("RevJet Acq"))) {
 	  is_revjet = true;
 	}
 
@@ -97,7 +97,7 @@ char * query() {
 	  ua = e->_device_type + ":" + e->browser;
 	}
 	
-	if (e->ensighten.pageType == "PRODUCT")  is_meaningful = true;
+	if (e->ensighten.pageType == std::string("PRODUCT"))  is_meaningful = true;
 	for (auto ii = e->ensighten.items.begin(); ii != e->ensighten.items.end(); ii++) {
 	  if (ii->tag == "order") is_converter = true;
 	  if (ii->tag == "productpage") is_meaningful = true;

@@ -92,7 +92,7 @@ char * query() {
 	      total_bought += i->quantity;
 	    }
 	  } 
-	  if ((e->ensighten.pageType == "PRODUCT") || (i->tag == "productpage")) {
+	  if ((e->ensighten.pageType == std::string("PRODUCT")) || (i->tag == "productpage")) {
 	      observed_skus.insert(i->sku);
 	  }
 	}

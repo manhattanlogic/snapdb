@@ -54,7 +54,8 @@ char * query() {
       if (j->second.events == NULL) continue;
       for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
 	if (e->ensighten.items.size() > 0) {
-	  if ((e->ensighten.items[0].tag == "featured") || (e->ensighten.items[0].tag == "productpage") || (e -> ensighten.pageType == "PRODUCT")) {
+	  if ((e->ensighten.items[0].tag == "featured") || (e->ensighten.items[0].tag == "productpage") ||
+	      (e -> ensighten.pageType == std::string("PRODUCT"))) {
 	    if (e->ensighten.crumbs.size() == 4 && (!(e->ensighten.crumbs[0] == "O.biz" || e->ensighten.crumbs[0] == "Eziba"))) {
 	      std::vector <std::string> clean_crumbs;
 	      for (auto s = e->ensighten.crumbs.begin(); s != e->ensighten.crumbs.end(); s++) {

@@ -31,7 +31,7 @@ char * query() {
       for (int e = 0; e < j->second.events->size(); e++) {
 	auto event = (*j->second.events)[e];
 	if (event.ensighten.exists) {
-	  bool is_product = event.ensighten.pageType == "PRODUCT";
+	  bool is_product = event.ensighten.pageType == std::string("PRODUCT");
 	  for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	    if ((is_product) || (event.ensighten.items[it].tag == "productpage")) {
 	      //skus.push_back(event.ensighten.items[it].sku);

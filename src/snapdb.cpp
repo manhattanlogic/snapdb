@@ -198,13 +198,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
     }
   } catch (...) {
   }
-  /*
-  if (preprocess) {
-    return result;
-  }
-  if (valid_users.find(result.vid) == valid_users.end()) {
-    return result;
-    }*/
+
   result.events = new std::vector<json_simgle_event_type>;
   
   bool is_active_event = false;
@@ -231,7 +225,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
     } catch (...) {}
     */
 
-    if (is_active_event) {
+    if ((is_active_event) && (!(preprocess))) {
 
       if (d["events"][i].HasMember("ip") && d["events"][i]["ip"].IsString()) {
 	event.ip = d["events"][i]["ip"].GetString();
@@ -253,12 +247,14 @@ json_history_entry parse_data(char * line, bool preprocess) {
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("browser") && d["events"][i]["subids"]["ensighten"]["browser"].IsString()) {
 	  event.ensighten.browser = d["events"][i]["subids"]["ensighten"]["browser"].GetString();
+	  //str_to_char_ptr(&event.ensighten.browser, d["events"][i]["subids"]["ensighten"]["browser"].GetString());
 	}
       } catch (...) {}
 
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("pageType") && d["events"][i]["subids"]["ensighten"]["pageType"].IsString()) {
 	  event.ensighten.pageType = d["events"][i]["subids"]["ensighten"]["pageType"].GetString();
+	  //str_to_char_ptr(&event.ensighten.pageType, d["events"][i]["subids"]["ensighten"]["pageType"].GetString());
 	}
       } catch (...) {}
 
@@ -273,12 +269,14 @@ json_history_entry parse_data(char * line, bool preprocess) {
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("camGroup") && d["events"][i]["subids"]["ensighten"]["camGroup"].IsString()) {
 	  event.ensighten.camGroup = d["events"][i]["subids"]["ensighten"]["camGroup"].GetString();
+	  //str_to_char_ptr(&event.ensighten.camGroup, d["events"][i]["subids"]["ensighten"]["camGroup"].GetString());
 	}
       } catch (...) {}
 
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("camSource") && d["events"][i]["subids"]["ensighten"]["camSource"].IsString()) {
 	  event.ensighten.camSource = d["events"][i]["subids"]["ensighten"]["camSource"].GetString();
+	  //str_to_char_ptr(&event.ensighten.camSource, d["events"][i]["subids"]["ensighten"]["camSource"].GetString());
 	}
       } catch (...) {}
 

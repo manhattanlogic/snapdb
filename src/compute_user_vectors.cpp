@@ -74,7 +74,7 @@ char * query_x() {
 	auto event = (*(j->second.events))[j->second.events->size() - 1];
 	if (event.ensighten.exists) {
 	  browser = event.ensighten.browser;
-	  bool is_product = event.ensighten.pageType == "PRODUCT";
+	  bool is_product = event.ensighten.pageType == std::string("PRODUCT");
 	  for (int it = 0; it < event.ensighten.items.size(); it ++) {
 	    if (event.ensighten.items[it].tag == "order") {
 	      is_converter = true;

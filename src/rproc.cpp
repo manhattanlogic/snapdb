@@ -102,16 +102,16 @@ char * query() {
 
 	browser = e->ensighten.browser;
 	
-	if ((e->ensighten.camSource == "DglBrand") || (e->ensighten.camSource == "Digital Brand") ||
-	    (e->ensighten.camSource == "RevJet Acq")) {
+	if ((e->ensighten.camSource == std::string("DglBrand")) || (e->ensighten.camSource == std::string("Digital Brand")) ||
+	    (e->ensighten.camSource == std::string("RevJet Acq"))) {
 	  is_revjet = true;
 	}
-	if ((e->ensighten.camGroup == "DglBrand") || (e->ensighten.camGroup == "Digital Brand") ||
-	    (e->ensighten.camGroup == "RevJet Acq")) {
+	if ((e->ensighten.camGroup == std::string("DglBrand")) || (e->ensighten.camGroup == std::string("Digital Brand")) ||
+	    (e->ensighten.camGroup == std::string("RevJet Acq"))) {
 	  is_revjet = true;
 	}
 
-	if (e->ensighten.pageType == "PRODUCT") {
+	if (e->ensighten.pageType == std::string("PRODUCT")) {
 	  is_meaningful = true;
 	}
 	

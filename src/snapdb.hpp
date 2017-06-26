@@ -23,9 +23,15 @@ struct ensighten_item {
 
 struct ensighten_type {
   bool exists = false;
-  std::string browser; //
+
+  std::string browser;
+  //char * browser = NULL;
+  
   std::vector<std::string> crumbs;
+
   std::string pageType;
+  //char * pageType = NULL;
+  
   // std::string pageName;
   std::vector<ensighten_item> items;
   std::string camGroup;
@@ -64,6 +70,12 @@ struct single_json_history {
 extern std::unordered_map<unsigned long, single_json_history *> json_history;
 extern std::unordered_set<unsigned long> history_filter;
 extern rapidjson::Document load_json_at_position(unsigned long position);
+
+
+void str_to_char_ptr(char ** chr, std::string value) {
+  *chr = (char *)malloc(value.size() + 1);
+  memcpy(*chr, value.c_str(), value.size() + 1);
+}
 
 
 struct user_info_struct {
@@ -109,7 +121,7 @@ user_info_struct get_user_info(unsigned long vid) {
 	result.is_clicker = true;
       }
       */
-      bool productpage = (e->ensighten.pageType == "PRODUCT");
+      bool productpage = (std::string(e->ensighten.pageType) == "PRODUCT");
       
       for (int itt = 0; itt < e->ensighten.items.size(); itt ++) {
 	if (e->ensighten.items[itt].tag == "order") {
