@@ -244,6 +244,15 @@ json_history_entry parse_data(char * line, bool preprocess) {
 
       
       event.ensighten.exists = true;
+
+      try {
+	if (d["events"][i]["subids"]["ensighten"].HasMember("invoiceId") && d["events"][i]["subids"]["ensighten"]["invoiceId"].IsString()) {
+	  event.ensighten.invoice_id = std::stoul(d["events"][i]["subids"]["ensighten"]["invoiceId"].GetString());
+	  std::cerr << event.ensighten.invoice_id << "\n";
+	}
+      } catch (...) {}
+
+      
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("browser") && d["events"][i]["subids"]["ensighten"]["browser"].IsString()) {
 	  event.ensighten.browser = d["events"][i]["subids"]["ensighten"]["browser"].GetString();
@@ -328,11 +337,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	    }
 	  } catch (...) {}
 
-	  try {
-	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("invoiceId") && d["events"][i]["subids"]["ensighten"]["items"][j]["invoiceId"].IsString()) {
-	      item.invoice_id = std::stoul(d["events"][i]["subids"]["ensighten"]["items"][j]["invoiceId"].GetString());
-	    }
-	  } catch (...) {}
+	  
 
 	  
 	  

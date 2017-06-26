@@ -18,7 +18,7 @@ struct ensighten_item {
   std::string productName;
   float price;
   int quantity;
-  unsigned int invoice_id;
+  
   // std::vector<std::string> subCatIds;
 };
 
@@ -35,6 +35,8 @@ struct ensighten_type {
   std::string camGroup;
   std::string camSource;
   //std::string searchTerm;
+
+  unsigned int invoice_id;
   
 };
 
@@ -83,7 +85,9 @@ struct user_info_struct {
   std::unordered_map<std::string, float> order_skus;
   std::unordered_set<std::string> cart_skus;
   std::unordered_set<std::string> product_skus;
-
+  
+  std::unordered_map<unsigned int, std::map<std::string, float> > invoices;
+  
   float order_value = 0.0;
 
   std::string browser;
@@ -120,9 +124,18 @@ user_info_struct get_user_info(unsigned long vid) {
       }
       */
       bool productpage = (std::string(e->ensighten.pageType) == "PRODUCT");
+
+      unsigned int invoice = e->ensighten.invoice_id;
+      if (invoice > 0) {
+	if (result.invoices.find(invoice) != result.invoices.end()) continue;
+	std::map<std::string, float> skus;
+	result.invoices[invoice] = skus;
+      }
+
       
       for (int itt = 0; itt < e->ensighten.items.size(); itt ++) {
 	if (e->ensighten.items[itt].tag == "order") {
+	  
 	  float value = e->ensighten.items[itt].price * e->ensighten.items[itt].quantity;
 	  result.is_converter = true;
 	  auto it = result.order_skus.find(e->ensighten.items[itt].sku);
@@ -133,6 +146,7 @@ user_info_struct get_user_info(unsigned long vid) {
 	  }
 				   
 	  result.order_value += value;
+	  result.invoices[invoice][e->ensighten.items[itt].sku] = value;
 	}
 	if (productpage || e->ensighten.items[itt].tag == "productpage") {
 	  result.product_skus.insert(e->ensighten.items[itt].sku);

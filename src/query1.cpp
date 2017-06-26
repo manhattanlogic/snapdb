@@ -135,6 +135,10 @@ struct stats_struct {
   unsigned long min_time;
   unsigned long max_time;
   std::map<std::string, float> order_category_value;
+  std::map<std::string, std::set<unsigned int> > invoices_category; // stores invoice_ids
+  std::set<unsigned int> invoices;
+  std::map<std::string, std::set<unsigned int> > skus_category;
+  std::set<unsigned int> skus;
 };
 
 std::unordered_map<std::string, std::string> sku_category;
