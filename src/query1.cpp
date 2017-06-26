@@ -9,6 +9,7 @@
 #include <fstream>
 #include <iostream>
 #include "util.hpp"
+#include <vector>
 
 // history_filter contains filter for the display application
 
@@ -126,6 +127,8 @@ char * query() {
 
   std::set<std::string> top_categories;
   std::unordered_map<std::string, std::string> sku_category;
+
+  std::unordered_map<unsigned long, std::map<unsigned long, std::vector<std::string> > > impressions_data;
   
   std::ifstream sku_crumbs_file("sku_crumbs.csv");
   while (std::getline(sku_crumbs_file, line)) {
@@ -182,6 +185,16 @@ char * query() {
     }
 
     unsigned long vid = std::stoul(parts[0]);
+    unsigned long ts = std::stoul(parts[1]);
+
+    auto it_2 = impressions_data.find(vid);
+    if (it_2 == impressions_data.end()) {
+      std::map<unsigned long, std::vector<std::string> > val;
+      impressions_data[vid] = val;
+      it_2 = impressions_data.find(vid);
+    }
+    it_2->second[ts] = std::vector<std::string>(parts.begin() + 2, parts.end());
+    
     
     it->second.impressions ++;
     it->second.users.insert(vid);
