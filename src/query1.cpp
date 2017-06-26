@@ -191,6 +191,36 @@ void update_stats(unsigned long vid, unsigned long ts, std::string os, std::stri
   }
 }
 
+struct tags_struct {
+  std::string og;
+  std::string crv;
+  bool valid = false;
+};
+
+tags_struct get_tags(std::string tags_in) {
+  tags_struct result;
+  auto tags = basic_split_string(tags_in, ",");
+  if (tags.size() == 4) {
+    result.og = tags[2];
+    result.crv = tags[3];
+    result.valid = true;
+    return result;
+  }
+  if (tags.size() < 2) return result;
+  std::string og, crv;
+  for (int i = 0; i < tags.size(); i++) {
+    if (tags[i].substr(0, 2) == "og") og = tags[i];
+    if (tags[i].substr(0, 3) == "crv") crv = tags[i];
+  }
+  if (og != "" && crv != "") {
+    result.og = og;
+    result.crv = crv;
+    result.valid = true;
+    return result;
+  }
+  return result;
+}
+
 
 extern "C"
 char * query() {
@@ -221,8 +251,8 @@ char * query() {
   while (std::getline(imp_data, line)) {
     auto parts = basic_split_string(line, "\t");
     if (parts.size() < 6) continue;
-    auto tags = basic_split_string(parts[5], ",");
-    if (tags.size() != 4) {
+    auto tags = get_tags(parts[5]);
+    if (!(tags.valid)) {
       std::cerr << parts[5] << "\n";
       continue;
     }
@@ -232,7 +262,7 @@ char * query() {
     
     impression_vids.insert(vid);
 
-    update_stats(vid, ts, parts[2], parts[3], parts[4], tags[2], tags[3]);
+    update_stats(vid, ts, parts[2], parts[3], parts[4], tags.og, tags.crv);
     
   }
 

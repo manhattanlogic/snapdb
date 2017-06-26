@@ -18,7 +18,7 @@ struct ensighten_item {
   std::string productName;
   float price;
   int quantity;
-  std::vector<std::string> subCatIds;
+  // std::vector<std::string> subCatIds;
 };
 
 struct ensighten_type {
@@ -26,11 +26,11 @@ struct ensighten_type {
   std::string browser; //
   std::vector<std::string> crumbs;
   std::string pageType;
-  std::string pageName;
+  // std::string pageName;
   std::vector<ensighten_item> items;
   std::string camGroup;
   std::string camSource;
-  std::string searchTerm;
+  //std::string searchTerm;
   
 };
 

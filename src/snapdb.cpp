@@ -261,12 +261,14 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	  event.ensighten.pageType = d["events"][i]["subids"]["ensighten"]["pageType"].GetString();
 	}
       } catch (...) {}
-      
+
+      /*
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("pageName") && d["events"][i]["subids"]["ensighten"]["pageName"].IsString()) {
 	  event.ensighten.pageName = d["events"][i]["subids"]["ensighten"]["pageName"].GetString();
 	}
       } catch (...) {}
+      */
       
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("camGroup") && d["events"][i]["subids"]["ensighten"]["camGroup"].IsString()) {
@@ -280,12 +282,13 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	}
       } catch (...) {}
 
+      /*
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("searchTerm") && d["events"][i]["subids"]["ensighten"]["searchTerm"].IsString()) {
 	  event.ensighten.searchTerm = d["events"][i]["subids"]["ensighten"]["searchTerm"].GetString();
 	}
       } catch (...) {}
-
+      */
       
 
 
@@ -328,7 +331,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	  } catch (...) {}
 
 
-	  
+	  /*
 	  try {
 	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("subCatIds") &&
 		d["events"][i]["subids"]["ensighten"]["items"][j]["subCatIds"].IsArray()) {
@@ -339,7 +342,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
 	      }
 	    }
 	  } catch (...) {}
-	  
+	  */
 
 	  
 	  

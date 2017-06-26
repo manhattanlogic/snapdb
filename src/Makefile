@@ -4,11 +4,13 @@ PROG2 = impressions_trainsform
 PROG2 = impressions_trainsform_filtered
 INCLUDES= -I/usr/local/include
 
-CXX = g++ -std=c++14
-CXXFLAGS = -O3  $(INCLUDES)
+DEBUG = -O3
+
+CXX = g++ $(DEBUG) -std=c++14
+CXXFLAGS = $(DEBUG)  $(INCLUDES)
 
 CC = cc
-CFLAGS = -O3 $(INCLUDES)
+CFLAGS = $(DEBUG) $(INCLUDES)
 
 LIBS = -L/usr/local/lib -lpthread -ldl 
 
