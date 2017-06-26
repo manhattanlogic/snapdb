@@ -120,14 +120,82 @@ std::string device_to_device_type(std::string os, std::string device) {
   return "other";
 }
 
+
+struct stats_struct {
+  std::unordered_set<unsigned long> users;
+  unsigned long impressions;
+  std::unordered_set<unsigned long> overstock_users;
+  unsigned long overstock_impressions;
+  std::unordered_set<unsigned long> converter_users;
+  unsigned long converter_impressions;
+  std::unordered_set<unsigned long> clicker_users;
+  unsigned long clicker_impressions;
+  std::unordered_set<unsigned long> clicker_converter_users;
+  unsigned long clicker_converter_impressions;
+  unsigned long min_time;
+  unsigned long max_time;
+  std::map<std::string, float> order_category_value;
+};
+
+std::unordered_map<std::string, std::string> sku_category;
+std::set<std::string> top_categories;
+std::unordered_map<std::string, stats_struct> stats;
+
+void update_stats(unsigned long vid, unsigned long ts, std::string os, std::string device, std::string chennel,
+		  std::string group, std::string creative) {
+  std::string record_id = os + "\t" + device+ "\t" + device_to_device_type(os, device) + "\t" + chennel+ "\t" + group + "\t" + creative;
+  auto it = stats.find(record_id);
+  if (it == stats.end()) {
+    stats_struct ss = {};
+    for (auto it_2 = top_categories.begin(); it_2 != top_categories.end(); it_2++) {
+      ss.order_category_value[*it_2] = 0;
+    }
+    stats[record_id] = ss;
+    it = stats.find(record_id);
+  }
+    
+  it->second.impressions ++;
+  it->second.users.insert(vid);
+
+  if (it->second.min_time == 0) {
+    it->second.min_time = ts;
+    it->second.max_time = ts;
+  } else {
+    it->second.min_time = std::min(it->second.min_time, ts);
+    it->second.max_time = std::max(it->second.min_time, ts); 
+  }
+
+  auto user_info = get_user_info(vid);
+
+  if (user_info.is_valid) {
+    it->second.overstock_users.insert(vid);
+    it->second.overstock_impressions++;
+    if (user_info.order_skus.size() > 0) {
+      it->second.converter_impressions++;
+      it->second.converter_users.insert(vid);
+      for (auto it_s = user_info.order_skus.begin(); it_s != user_info.order_skus.end(); it_s++) {
+	auto it_3 = sku_category.find(it_s->first);
+	std::string category = "UNKNOWN";
+	if (it_3 != sku_category.end()) category = it_3->second;
+	it->second.order_category_value[category] += it_s->second;
+      }
+    }
+    if (user_info.is_clicker) {
+      it->second.clicker_impressions++;
+      it->second.clicker_users.insert(vid);
+    }
+    if (user_info.order_skus.size() && user_info.is_clicker) {
+      it->second.clicker_converter_impressions++;
+      it->second.clicker_converter_users.insert(vid);
+    }
+  }
+}
+
+
 extern "C"
 char * query() {
   std::stringstream result;
   std::string line;
-
-  std::set<std::string> top_categories;
-  std::unordered_map<std::string, std::string> sku_category;
-
   
   std::ifstream sku_crumbs_file("sku_crumbs.csv");
   while (std::getline(sku_crumbs_file, line)) {
@@ -146,23 +214,7 @@ char * query() {
   std::cerr << "time test:" << ts_to_time(0) << "\n";
   
   std::ifstream imp_data("impressions_compact.csv");
-  struct stats_struct {
-    std::unordered_set<unsigned long> users;
-    unsigned long impressions;
-    std::unordered_set<unsigned long> overstock_users;
-    unsigned long overstock_impressions;
-    std::unordered_set<unsigned long> converter_users;
-    unsigned long converter_impressions;
-    std::unordered_set<unsigned long> clicker_users;
-    unsigned long clicker_impressions;
-    std::unordered_set<unsigned long> clicker_converter_users;
-    unsigned long clicker_converter_impressions;
-    unsigned long min_time;
-    unsigned long max_time;
-    std::map<std::string, float> order_category_value;
-  };
-  
-  std::unordered_map<std::string, stats_struct> stats;
+
 
   std::unordered_set<unsigned long> impression_vids;
 
@@ -174,59 +226,27 @@ char * query() {
       std::cerr << parts[5] << "\n";
       continue;
     }
-    std::string record_id = parts[2] + "\t" + parts[3] + "\t" + device_to_device_type(parts[2], parts[3]) + "\t" + parts[4] + "\t" + tags[2] + "\t" + tags[3];
-    auto it = stats.find(record_id);
-    if (it == stats.end()) {
-      stats_struct ss = {};
-      for (auto it_2 = top_categories.begin(); it_2 != top_categories.end(); it_2++) {
-	ss.order_category_value[*it_2] = 0;
-      }
-      stats[record_id] = ss;
-      it = stats.find(record_id);
-    }
 
     unsigned long vid = std::stoul(parts[0]);
     unsigned long ts = std::stoul(parts[1]);
     
     impression_vids.insert(vid);
+
+    update_stats(vid, ts, parts[2], parts[3], parts[4], tags[2], tags[3]);
     
-    it->second.impressions ++;
-    it->second.users.insert(vid);
+  }
 
-    if (it->second.min_time == 0) {
-      it->second.min_time = std::stoul(parts[1]);
-      it->second.max_time = std::stoul(parts[1]);
-    } else {
-      it->second.min_time = std::min(it->second.min_time, std::stoul(parts[1]));
-      it->second.max_time = std::max(it->second.min_time, std::stoul(parts[1])); 
-    }
-
-    auto user_info = get_user_info(std::stoul(parts[0]));
-
+  std::cerr << "done processing impressions\n";
+  for (auto i = json_history.begin(); i != json_history.end(); i++) {
+    auto vid = i->first;
+    if (impression_vids.find(vid) != impression_vids.end()) continue;
+    auto user_info = get_user_info(vid);
     if (user_info.is_valid) {
-      it->second.overstock_users.insert(vid);
-      it->second.overstock_impressions++;
-      if (user_info.order_skus.size() > 0) {
-	it->second.converter_impressions++;
-	it->second.converter_users.insert(vid);
-	for (auto it_s = user_info.order_skus.begin(); it_s != user_info.order_skus.end(); it_s++) {
-	  auto it_3 = sku_category.find(it_s->first);
-	  std::string category = "UNKNOWN";
-	  if (it_3 != sku_category.end()) category = it_3->second;
-	  it->second.order_category_value[category] += it_s->second;
-	}
-      }
-      if (user_info.is_clicker) {
-	it->second.clicker_impressions++;
-	it->second.clicker_users.insert(vid);
-      }
-      if (user_info.order_skus.size() && user_info.is_clicker) {
-	it->second.clicker_converter_impressions++;
-	it->second.clicker_converter_users.insert(vid);
-      }
+      update_stats(vid, 0, user_info.os, user_info.device, "---", "NONE", "NONE");
     }
   }
 
+  
   result << "os\tdevice\tdev_type\tchannel\tgroup\tcreative\t";
   result << "users\timpressions\t";
   result << "os users\tos impressions\t";

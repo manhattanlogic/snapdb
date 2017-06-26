@@ -77,6 +77,8 @@ struct user_info_struct {
   float order_value = 0.0;
 
   std::string browser;
+  std::string os;
+  std::string device;
 };
 
 user_info_struct get_user_info(unsigned long vid) {
@@ -90,7 +92,9 @@ user_info_struct get_user_info(unsigned long vid) {
       if (!(e->ensighten.exists)) continue;
 
       result.browser = e->ensighten.browser;
-
+      if (result.os == "" && e->_os != "") result.os = e->_os;
+      if (result.device == "" && e->_device_type != "") result.device = e->_device_type;
+      
       auto pixels = basic_split_string(replace_all(replace_all(replace_all(j->second.pixels, "'", ""), "]", ""), "[", ""), ",");
       for (auto p=pixels.begin(); p != pixels.end(); p++) {
 	if (*p == "79") result.is_clicker = true;
