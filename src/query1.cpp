@@ -137,8 +137,16 @@ struct stats_struct {
   std::map<std::string, float> order_category_value;
   std::map<std::string, std::set<unsigned int> > invoices_category; // stores invoice_ids
   std::set<unsigned int> invoices;
+  
   std::map<std::string, std::set<std::string> > skus_category;
   std::set<std::string> skus;
+
+  std::set<std::string> product_skus;
+  std::map<std::string, std::set<std::string> > product_skus_category;
+
+  std::set<unsigned long> product_users;
+  std::map<std::string, std::set<unsigned long> > product_users_category;
+  
 };
 
 std::unordered_map<std::string, std::string> sku_category;
@@ -152,9 +160,11 @@ void update_stats(unsigned long vid, unsigned long ts, std::string os, std::stri
   if (it == stats.end()) {
     stats_struct ss = {};
     for (auto it_2 = top_categories.begin(); it_2 != top_categories.end(); it_2++) {
-      ss.order_category_value[*it_2] = 0;
-      ss.invoices_category[*it_2] = {};
-      ss.skus_category[*it_2] = {};
+      ss.order_category_value[*it_2]   =  0;
+      ss.invoices_category[*it_2]      = {};
+      ss.skus_category[*it_2]          = {};
+      ss.product_skus_category[*it_2]  = {};
+      ss.product_users_category[*it_2] = {};
     }
     stats[record_id] = ss;
     it = stats.find(record_id);
@@ -206,17 +216,26 @@ void update_stats(unsigned long vid, unsigned long ts, std::string os, std::stri
 	  it->second.skus.insert(it_s->first);
 	}
       }
-
-      /*
-      for (auto it_s = user_info.order_skus.begin(); it_s != user_info.order_skus.end(); it_s++) {
-	auto it_3 = sku_category.find(it_s->first);
-	std::string category = "UNKNOWN";
-	if (it_3 != sku_category.end()) category = it_3->second;
-	it->second.order_category_value[category] += it_s->second;
-      }
-      */
     }
 
+    if (user_info.product_skus.size() > 0) {
+      it->second.product_users.insert(vid);
+      
+      for (auto p = user_info.product_skus.begin(); p != user_info.product_skus.end(); p++) {
+	it->second.product_skus.insert(*p);
+	
+	auto it_3 = sku_category.find(*p);
+	std::string category = "UNKNOWN";
+	if (it_3 != sku_category.end()) category = it_3->second;
+
+	it->second.product_skus_category[category].insert(*p);
+	it->second.product_users_category[category].insert(vid);
+	
+	
+      }
+    }
+
+    
     if (is_treated) {
       if (user_info.is_clicker) {
 	it->second.clicker_impressions++;
@@ -338,6 +357,21 @@ char * query() {
     result << "\t" << "INV:" << *it;
   }
   result << "\tINV:TOTAL";
+
+  // ---------------------------
+
+  for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+    result << "\t" << "PKU:" << *it;
+  }
+  result << "\tPKU:TOTAL";
+
+
+  for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+    result << "\t" << "PRD:" << *it;
+  }
+  result << "\tPRD:TOTAL";
+
+
   
   result << "\n";
     
@@ -366,6 +400,23 @@ char * query() {
       result << "\t" << i->second.skus_category[*it].size();
     }
     result << "\t" << i->second.skus.size();
+
+
+    //--------------------------
+
+    
+    for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+      result << "\t" << i->second.product_users_category[*it].size();
+    }
+    result << "\t" << i->second.product_users.size();
+
+    for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+      result << "\t" << i->second.product_skus_category[*it].size();
+    }
+    result << "\t" << i->second.product_skus.size();
+
+
+
     
     result << "\n";
   }
