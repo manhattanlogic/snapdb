@@ -105,13 +105,13 @@ std::string device_to_device_type(std::string os, std::string device) {
   if ((device == "Unknown" && os == "Mac OS") || (device == "Unknown" && os == "Windows") || (device == "Unknown" && os == "Linux")) {
     return "desktop";
   }
-  if (device == "AndroidPhone" || device == "BlackBerry" || device == "iPhone" || device == "UnknownMobile" || device == "Windows Phone") {
+  if (device == "AndroidPhone" || device == "BlackBerry" || device == "iPhone" || device == "iPod" || device == "UnknownMobile" || device == "Windows Phone") {
     return "mobile";
   }
   if (device == "Unknown" && os == "iPhone OS") {
     return "mobile";
   }
-  if (device == "AndroidTablet" || device == "iPad" || device == "iPod" || device == "Kindle Fire") {
+  if (device == "AndroidTablet" || device == "iPad" ||  device == "Kindle Fire") {
     return "tablet";
   }
   if (device == "Unknown" && os == "CrOS") {
