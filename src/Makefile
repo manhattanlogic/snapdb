@@ -19,7 +19,7 @@ OBJS = $(PROG).o
 OBJS2 = $(PROG2).o
 OBJS3 = $(PROG3).o
 
-all: $(PROG3) $(PROG2) $(PROG) rproc.so query1.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so flat_crumbs.so impression_intersect.so
+all: $(PROG3) $(PROG2) $(PROG) rproc.so query1.so phase3.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so flat_crumbs.so impression_intersect.so
 
 $(PROG2): $(OBJS2)
 	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
@@ -37,6 +37,9 @@ rproc.so: rproc.cpp
 query1.so: query1.cpp
 	$(CXX) -Wall -fPIC -c query1.cpp -o query1.o
 	$(CXX) -shared -rdynamic -o query1.so query1.o
+phase3.so: phase3.cpp
+	$(CXX) -Wall -fPIC -c phase3.cpp -o phase3.o
+	$(CXX) -shared -rdynamic -o phase3.so phase3.o
 dump_skus.so: dump_skus.cpp
 	$(CXX) -Wall -fPIC -c dump_skus.cpp -o dump_skus.o
 	$(CXX) -shared -rdynamic -o dump_skus.so dump_skus.o
@@ -63,6 +66,8 @@ rproc.so: rproc.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup rproc.cpp -o $@ 
 query1.so: query1.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup query1.cpp -o $@
+phase3.so: phase3.cpp
+	$(CXX) -dynamiclib -undefined dynamic_lookup phase3.cpp -o $@
 dump_skus.so: dump_skus.cpp
 	$(CXX) -dynamiclib -undefined dynamic_lookup dump_skus.cpp -o $@
 compute_user_vectors.so: compute_user_vectors.cpp
