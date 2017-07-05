@@ -209,8 +209,9 @@ json_history_entry parse_data(char * line, bool preprocess) {
     } else {
       is_active_event = false;
     }
-    json_simgle_event_type event;
-
+    json_simgle_event_type event = {};
+    
+    
     /*
     try {
       if (d["events"][i]["subids"].HasMember("location") && d["events"][i]["subids"]["location"].IsString()) {
@@ -244,7 +245,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
 
       
       event.ensighten.exists = true;
-
+      
       try {
 	if (d["events"][i]["subids"]["ensighten"].HasMember("invoiceId") && d["events"][i]["subids"]["ensighten"]["invoiceId"].IsString()) {
 	  event.ensighten.invoice_id = std::stoul(d["events"][i]["subids"]["ensighten"]["invoiceId"].GetString());
@@ -317,7 +318,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
 
       if (d["events"][i]["subids"]["ensighten"].HasMember("items") && d["events"][i]["subids"]["ensighten"]["items"].IsArray()) {
 	for (int j = 0; j < d["events"][i]["subids"]["ensighten"]["items"].Size(); j++) {
-	  ensighten_item item;
+	  ensighten_item item = {};
 	  
 	  try {
 	    if (d["events"][i]["subids"]["ensighten"]["items"][j].HasMember("sku") && d["events"][i]["subids"]["ensighten"]["items"][j]["sku"].IsString()) {
@@ -382,6 +383,7 @@ json_history_entry parse_data(char * line, bool preprocess) {
       
     }
     result.events->push_back(event);
+    
   }
 
 

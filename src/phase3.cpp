@@ -13,7 +13,9 @@
 
 
 /*
-We now need to add impression information columns souch as "geo"
+WE NEED TO ADD:
+1. purchased product counter
+2. observed  product counter
  */
 
 
@@ -74,6 +76,12 @@ struct stats_struct {
 
   std::set<unsigned long> product_users;
   std::map<std::string, std::set<unsigned long> > product_users_category;
+
+  unsigned long purchaed_items;
+  std::map<std::string, unsigned long> purchaed_items_category;
+
+  unsigned long viewed_items;
+  std::map<std::string, unsigned long> viewed_items_category;
   
 };
 
@@ -126,7 +134,11 @@ void update_stats(unsigned long vid, unsigned long ts, std::string os, std::stri
     if (is_treated) {
       it->second.overstock_impressions++;
     }
+
+    // std::cerr << "user_info.invoices.size():" << user_info.invoices.size() << "\n";
+    
     if (user_info.invoices.size() > 0) {
+      std::cerr << user_info.invoices.begin()->first << "\n";
       if (is_treated) {
 	it->second.converter_impressions++;
       }

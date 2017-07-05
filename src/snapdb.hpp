@@ -11,6 +11,7 @@
 #include "rapidjson/include/rapidjson/stringbuffer.h"
 #include <mutex>
 #include "util.hpp"
+#include <iostream>
 
 struct ensighten_item {
   std::string sku;
@@ -127,6 +128,7 @@ user_info_struct get_user_info(unsigned long vid) {
 
       unsigned int invoice = e->ensighten.invoice_id;
       if (invoice > 0) {
+	//std::cerr << "VID:" << vid << "\n";
 	if (result.invoices.find(invoice) != result.invoices.end()) continue;
 	std::map<std::string, float> skus;
 	result.invoices[invoice] = skus;
