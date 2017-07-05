@@ -85,7 +85,7 @@ void update_stats(unsigned long vid, unsigned long ts, std::string os, std::stri
 		  std::string group, std::string creative, bool is_treated,
 		  std::string country, std::string state, std::string city, std::string metro) {
   std::string record_id = os + "\t" + device+ "\t" + device_to_device_type(os, device) + "\t" + chennel+ "\t" + group + "\t" + creative +
-    country + "\t" + state + "\t" + city + "\t" + metro;
+    "\t" + country + "\t" + state + "\t" + city + "\t" + metro;
   auto it = stats.find(record_id);
   if (it == stats.end()) {
     stats_struct ss = {};
@@ -267,7 +267,7 @@ char * query() {
   }
 
   
-  result << "os\tdevice\tdev_type\tchannel\tgroup\tcreative\t";
+  result << "os\tdevice\tdev_type\tchannel\tgroup\tcreative\tcountry\tstate\tcity\tmetro\t";
   result << "rj users\trj impressions\t";
   result << "os users\tos impressions\t";
   result << "converters\tconv impressions\t";
