@@ -139,7 +139,9 @@ int __main(int argc, char ** argv) {
 }
 
 
-int ___main(int argc, char ** argv) {
+int main(int argc, char ** argv) {
+  // this is the "impressions_compact.csv" file producer. Add Geo info here
+  // cat /media/disk1/revjet_impressions/* | gunzip | ./impressions_trainsform_filtered > impressions_compact.csv
   char buffer[1024 * 1204];
   
   std::unordered_set<std::string> devices;
@@ -151,6 +153,10 @@ int ___main(int argc, char ** argv) {
     std::string device;
     std::string channel;
     std::vector<std::string> tags;
+    std::string country = "NONE";
+    std::string state = "NONE";
+    std::string city = "NONE";
+    std::string metro = "NONE";
   };
   
   while (fgets(buffer, 1024*1024, stdin)) {
@@ -194,6 +200,22 @@ int ___main(int argc, char ** argv) {
 	    e = " - ";
 	  }
 
+
+	  if (d["events"][i].HasMember("geo") && d["events"][i]["geo"].IsObject()) {
+	    if (d["events"][i]["geo"].HasMember("country") && d["events"][i]["geo"]["country"].IsString()) {
+	      line.country = d["events"][i]["geo"]["country"].GetString();
+	    }
+	    if (d["events"][i]["geo"].HasMember("state") && d["events"][i]["geo"]["state"].IsString()) {
+	      line.state = d["events"][i]["geo"]["state"].GetString();
+	    }
+	    if (d["events"][i]["geo"].HasMember("city") && d["events"][i]["geo"]["city"].IsString()) {
+	      line.city = d["events"][i]["geo"]["city"].GetString();
+	    }
+	    if (d["events"][i]["geo"].HasMember("metro") && d["events"][i]["geo"]["metro"].IsString()) {
+	      line.metro = d["events"][i]["geo"]["metro"].GetString();
+	    }
+	  }
+	  
 	  std::string g = "";
 	  if (d["events"][i].HasMember("plc") && d["events"][i]["plc"].IsArray()) {
 	    for (int j = 0; j < d["events"][i]["plc"].Size(); j++) {
@@ -222,6 +244,7 @@ int ___main(int argc, char ** argv) {
 	  if (j > 0) std::cout << ",";
 	  std::cout << line.tags[j];
 	}
+	std::cout << "\t" << line.country << "\t" << line.state << "\t" << line.city << "\t" << line.metro;
 	std::cout << "\n";
 	// std::cerr << vid << "\t" << full_string << "\n";
       } else {
@@ -233,7 +256,7 @@ int ___main(int argc, char ** argv) {
 }
 
 
-int main(int argc, char** argv) {
+int main_(int argc, char** argv) {
   std::ifstream imp_data("impressions_compact.csv");
   struct stats_struct {
     std::unordered_set<unsigned long> users;
