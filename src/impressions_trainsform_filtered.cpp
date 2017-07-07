@@ -287,6 +287,7 @@ int main(int argc, char ** argv) {
 	}
 	std::cout << "\t" << line.country << "\t" << line.state << "\t" << line.city << "\t" << line.metro;
 	std::cout << "\t" << line.weekday << "\t" << line.daypart;
+	std::cout << "\t" << str_ts;
 	std::cout << "\n";
 	// std::cerr << vid << "\t" << full_string << "\n";
       } else {
