@@ -189,10 +189,10 @@ int main(int argc, char ** argv) {
 	    auto str_ts = d["events"][i]["ts"].GetString();
 
 
-	    ts = parse8601(std::istringstream{str_ts}).time_since_epoch().count() / 1000;
+	    //ts = parse8601(std::istringstream{str_ts}).time_since_epoch().count() / 1000;
 	    
-	    // strptime(str_ts, "%Y-%m-%dT%H:%M:%S", &tm);
-	    // ts = mktime(&tm);
+	    strptime(str_ts, "%Y-%m-%dT%H:%M:%S", &tm);
+	    ts = mktime(&tm);
 
 	    os = d["events"][i]["ua"]["_os"].GetString();
 	    device = d["events"][i]["ua"]["_device_type"].GetString();
