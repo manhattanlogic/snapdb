@@ -8,6 +8,8 @@
 #include <fstream>
 #include <unordered_set>
 
+#include "civil_time.h"
+#include "time_zone.h"
 
 std::unordered_map<unsigned long, std::vector<unsigned long> > vid_map;
 
@@ -64,6 +66,8 @@ int _main(int argc, char ** argv) {
   }
   std::cerr << "users: " << users << "\ncrossusers: " << crossusers << "\n";
   std::cerr << "imps_users: " << imps_users << "\nimps_crossusers: " << imps_crossusers << "\n";
+  return 0;
+
 }
 
 
@@ -137,10 +141,22 @@ int __main(int argc, char ** argv) {
     vid_map_file.write((char *)&(it->second[0]), sizeof(unsigned long));
     vid_map_file.write((char *)&(it->second[1]), sizeof(unsigned long));
   }
+  return 0;
 }
 
 
 int main(int argc, char ** argv) {
+  std::unordered_map<std::string, std::string> state_to_timezone;
+  {
+    std::ifstream zones_file("state_timezones.csv");
+    std::string line;
+    while (std::getline(zones_file, line)) {
+      auto parts = basic_split_string(line, ",");
+      if (parts.size() != 3) continue;
+      state_to_timezone[parts[0]] = parts[2];
+    }
+  }
+  
   // this is the "impressions_compact.csv" file producer. Add Geo info here
   // cat /media/disk1/revjet_impressions/* | gunzip | ./impressions_trainsform_filtered > impressions_compact.csv
   char buffer[1024 * 1204];
@@ -158,6 +174,8 @@ int main(int argc, char ** argv) {
     std::string state = "NONE";
     std::string city = "NONE";
     std::string metro = "NONE";
+    std::string daypart = "";
+    std::string weekday = "";
   };
   
   while (fgets(buffer, 1024*1024, stdin)) {
@@ -184,16 +202,20 @@ int main(int argc, char ** argv) {
 	  std::string channel = "x";
 	  std::vector<std::string> tags;
 	  unsigned long ts;
+	  
+	  std::chrono::system_clock::time_point tp;
+	  struct tm tm = {};
+	  auto str_ts = d["events"][i]["ts"].GetString();
+	  cctz::time_zone utc;
+	  cctz::load_time_zone("UTC", &utc);
+	  auto ok = cctz::parse("%Y-%m-%dT%H:%M:%E*S%Ez", str_ts, utc, &tp);
+	  ts = tp.time_since_epoch().count() / 1000;
+	  
 	  if (d["events"][i].HasMember("ua") && d["events"][i]["ua"].IsObject()) {
-	    struct tm tm = {};
-	    auto str_ts = d["events"][i]["ts"].GetString();
-
-
 	    //ts = parse8601(std::istringstream{str_ts}).time_since_epoch().count() / 1000;
 	    
-	    strptime(str_ts, "%Y-%m-%dT%H:%M:%S", &tm);
-	    ts = mktime(&tm);
-
+	    // strptime(str_ts, "%Y-%m-%dT%H:%M:%S", &tm);
+	    // ts = mktime(&tm);
 	    os = d["events"][i]["ua"]["_os"].GetString();
 	    device = d["events"][i]["ua"]["_device_type"].GetString();
 	    devices.insert(device);
@@ -243,13 +265,28 @@ int main(int argc, char ** argv) {
 	    line.tags = tags;
 	    line.ts = ts;
 	  }
+
+
+
+	  if (line.country == "US") {
+	    auto it = state_to_timezone.find(line.state);
+	    if (it != state_to_timezone.end()) {
+	      cctz::time_zone zone;
+	      cctz::load_time_zone(it->second, &zone);
+	      line.weekday = cctz::format("%A", tp, zone);
+	      line.daypart = cctz::format("%H", tp, zone);
+	    }
+	  }
+
 	}
+	
 	std::cout << line.vid << "\t" << line.ts << "\t" << line.os << "\t" << line.device << "\t" << line.channel << "\t";
 	for (int j = 0; j < line.tags.size(); j++) {
 	  if (j > 0) std::cout << ",";
 	  std::cout << line.tags[j];
 	}
 	std::cout << "\t" << line.country << "\t" << line.state << "\t" << line.city << "\t" << line.metro;
+	std::cout << "\t" << line.weekday << "\t" << line.daypart;
 	std::cout << "\n";
 	// std::cerr << vid << "\t" << full_string << "\n";
       } else {

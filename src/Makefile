@@ -1,6 +1,6 @@
 # this is a test
 PROG = snapdb
-PROG2 = impressions_trainsform
+#PROG2 = impressions_trainsform
 PROG2 = impressions_trainsform_filtered
 INCLUDES= -I/usr/local/include
 
@@ -22,10 +22,10 @@ OBJS3 = $(PROG3).o
 all: $(PROG3) $(PROG2) $(PROG) rproc.so query1.so phase3.so dump_skus.so compute_user_vectors.so cluster_statistics.so compute_crumbs_user_vectors.so flat_crumbs.so impression_intersect.so
 
 $(PROG2): $(OBJS2)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS) -lcctz
 
 $(PROG3): $(OBJS3)
-	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ $(LIBS) 
 
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Linux)
