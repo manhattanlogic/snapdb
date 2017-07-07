@@ -7,26 +7,6 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_set>
-#include "date/tz.h"
-
-date::sys_time<std::chrono::milliseconds>
-parse8601(std::istream&& is)
-{
-  // call .time_since_epoch().count() on the result in order to get a UTC unix timestamp in ms 
-  std::string save;
-  is >> save;
-  std::istringstream in{save};
-  date::sys_time<std::chrono::milliseconds> tp;
-  in >> date::parse("%FT%TZ", tp);
-  if (in.fail())
-    {
-      in.clear();
-      in.exceptions(std::ios::failbit);
-      in.str(save);
-      in >> date::parse("%FT%T%Ez", tp);
-    }
-  return tp;
-}
 
 
 std::unordered_map<unsigned long, std::vector<unsigned long> > vid_map;
