@@ -177,6 +177,8 @@ int main(int argc, char ** argv) {
     std::string daypart = "";
     std::string weekday = "";
   };
+
+  std::string timestamp_test = "";
   
   while (fgets(buffer, 1024*1024, stdin)) {
     auto parts = basic_split_string(buffer, "\t");
@@ -206,6 +208,7 @@ int main(int argc, char ** argv) {
 	  std::chrono::system_clock::time_point tp;
 	  struct tm tm = {};
 	  auto str_ts = d["events"][i]["ts"].GetString();
+	  timestamp_test = str_ts;
 	  cctz::time_zone utc;
 	  cctz::load_time_zone("UTC", &utc);
 	  auto ok = cctz::parse("%Y-%m-%dT%H:%M:%E*S%Ez", str_ts, utc, &tp);
@@ -287,7 +290,7 @@ int main(int argc, char ** argv) {
 	}
 	std::cout << "\t" << line.country << "\t" << line.state << "\t" << line.city << "\t" << line.metro;
 	std::cout << "\t" << line.weekday << "\t" << line.daypart;
-	std::cout << "\t" << str_ts;
+	std::cout << "\t" << timestamp_test;
 	std::cout << "\n";
 	// std::cerr << vid << "\t" << full_string << "\n";
       } else {
