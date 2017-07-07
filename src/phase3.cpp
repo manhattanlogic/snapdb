@@ -11,12 +11,32 @@
 #include "util.hpp"
 #include <vector>
 
+#include "date/tz.h"
 
 /*
 WE NEED TO ADD:
 1. purchased product counter
 2. observed  product counter
  */
+
+date::sys_time<std::chrono::milliseconds>
+parse8601(std::istream&& is)
+{
+  // call .time_since_epoch().count() on the result in order to get a UTC unix timestamp in ms 
+  std::string save;
+  is >> save;
+  std::istringstream in{save};
+  date::sys_time<std::chrono::milliseconds> tp;
+  in >> date::parse("%FT%TZ", tp);
+  if (in.fail())
+    {
+      in.clear();
+      in.exceptions(std::ios::failbit);
+      in.str(save);
+      in >> date::parse("%FT%T%Ez", tp);
+    }
+  return tp;
+}
 
 
 std::string ts_to_time(unsigned long _tt) {
@@ -197,6 +217,21 @@ struct tags_struct {
   bool valid = false;
 };
 
+
+
+// step 1
+// colect and assemble this data for the Impressions X OS dataset
+struct impression_summary_struct {
+  int num_impressions = 0; // # of impressions shown to the user
+  unsigned long ts = 0;    // time of the last impressions
+  std::string day_of_week; // for the last impression
+  std::string day_part;    // for the last impression
+};
+std::unordered_map<unsigned long, impression_summary_struct> impressions_summary;
+
+
+
+
 tags_struct get_tags(std::string tags_in) {
   tags_struct result;
   auto tags = basic_split_string(tags_in, ",");
@@ -220,6 +255,14 @@ tags_struct get_tags(std::string tags_in) {
   }
   return result;
 }
+
+
+struct marginal_user_struct {
+  unsigned long vid;
+  unsigned long ts; // last impressions's timestamp
+  std::string day_of_week;
+  std::string time_of_day;
+};
 
 
 extern "C"

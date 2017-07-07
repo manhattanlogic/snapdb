@@ -7,6 +7,27 @@
 #include <iostream>
 #include <fstream>
 #include <unordered_set>
+#include "date/tz.h"
+
+date::sys_time<std::chrono::milliseconds>
+parse8601(std::istream&& is)
+{
+  // call .time_since_epoch().count() on the result in order to get a UTC unix timestamp in ms 
+  std::string save;
+  is >> save;
+  std::istringstream in{save};
+  date::sys_time<std::chrono::milliseconds> tp;
+  in >> date::parse("%FT%TZ", tp);
+  if (in.fail())
+    {
+      in.clear();
+      in.exceptions(std::ios::failbit);
+      in.str(save);
+      in >> date::parse("%FT%T%Ez", tp);
+    }
+  return tp;
+}
+
 
 std::unordered_map<unsigned long, std::vector<unsigned long> > vid_map;
 
@@ -186,8 +207,12 @@ int main(int argc, char ** argv) {
 	  if (d["events"][i].HasMember("ua") && d["events"][i]["ua"].IsObject()) {
 	    struct tm tm = {};
 	    auto str_ts = d["events"][i]["ts"].GetString();
-	    strptime(str_ts, "%Y-%m-%dT%H:%M:%S", &tm);
-	    ts = mktime(&tm);
+
+
+	    ts = parse8601(std::istringstream{str_ts}).time_since_epoch().count() / 1000;
+	    
+	    // strptime(str_ts, "%Y-%m-%dT%H:%M:%S", &tm);
+	    // ts = mktime(&tm);
 
 	    os = d["events"][i]["ua"]["_os"].GetString();
 	    device = d["events"][i]["ua"]["_device_type"].GetString();
