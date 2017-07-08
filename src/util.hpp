@@ -28,7 +28,7 @@ std::string replace_all(
     result.append( replace );
     from = pos + find_len;
   }
-  result.append( str, from , string::npos );
+  result.append( str, from , string::npos ); 
   return result;
 }
 
