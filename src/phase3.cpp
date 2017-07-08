@@ -93,7 +93,11 @@ std::unordered_map<std::string, stats_struct> stats;
 
 void update_stats(unsigned long vid, unsigned long ts, std::string os, std::string device, std::string chennel,
 		  std::string group, std::string creative, bool is_treated,
-		  std::string country, std::string state, std::string city, std::string metro) {
+		  std::string country, std::string state, std::string city, std::string metro, std::string weekday, std::string hour) {
+
+
+  /* group by state, weekday, hour */
+  
   std::string record_id = os + "\t" + device+ "\t" + device_to_device_type(os, device) + "\t" + chennel+ "\t" + group + "\t" + creative +
     "\t" + country + "\t" + state + "\t" + city + "\t" + metro;
   auto it = stats.find(record_id);
@@ -239,13 +243,13 @@ tags_struct get_tags(std::string tags_in) {
 }
 
 
+
 struct marginal_user_struct {
-  unsigned long vid;
-  unsigned long ts; // last impressions's timestamp
-  std::string day_of_week;
-  std::string time_of_day;
+  std::string weekday;
+  std::string daytime;
 };
 
+std::unordered_map<unsigned long, std::map<unsigned long, marginal_user_struct> > treated_users;
 
 extern "C"
 char * query() {
@@ -269,12 +273,47 @@ char * query() {
 
   std::cerr << "time test:" << ts_to_time(1492049877) << "\n";
   std::cerr << "time test:" << ts_to_time(0) << "\n";
+
+  long linelimit = 100000;
   
   std::ifstream imp_data("impressions_compact_v3.csv");
 
+  while (std::getline(imp_data, line)) {
+    if (linelimit-- <= 0) break;
+    auto parts = basic_split_string(line, "\t");
+    unsigned long vid = std::stoul(parts[0]);
+    unsigned long ts = std::stoul(parts[1]);
+    std::string country = parts[6];
+    std::string state = parts[7];
+    std::string weekday = parts[9];
+    std::string dayhour = parts[9];
 
+    if (country != "US" || state == "") {
+      // std::cerr << "loaction: " << country << " " << state << "\n";
+      continue;
+    }
+    auto info = get_user_info(vid);
+    if (!(info.is_valid)) {
+      // std::cerr << "OS\n";
+      continue;
+    }
+    auto it = treated_users.find(vid);
+    if (it == treated_users.end()) {
+      treated_users[vid] = {};
+      it = treated_users.find(vid);
+    }
+    it->second[ts] = {weekday, dayhour};
+    // std::cerr << "treated_users:" << treated_users.size() << "\n";
+  }
+
+  std::cerr << treated_users.size() << " impression users loaded\n";
+
+  /*
+  
   std::unordered_set<unsigned long> impression_vids;
 
+
+  
   while (std::getline(imp_data, line)) {
     auto parts = basic_split_string(line, "\t");
     if (parts.size() < 6) continue;
@@ -289,7 +328,8 @@ char * query() {
     
     impression_vids.insert(vid);
 
-    update_stats(vid, ts, parts[2], parts[3], parts[4], tags.og, tags.crv, true, parts[6], parts[7], parts[8], parts[9]);
+    update_stats(vid, ts, parts[2], parts[3], parts[4], tags.og, tags.crv, true, parts[6], parts[7], parts[8], parts[9],
+		 parts[10], parts[11]);
     
   }
 
@@ -299,7 +339,7 @@ char * query() {
     if (impression_vids.find(vid) != impression_vids.end()) continue;
     auto user_info = get_user_info(vid);
     if (user_info.is_valid) {
-      update_stats(vid, 0, user_info.os, user_info.device, "---", "NONE", "NONE", false, "NONE","NONE","NONE","NONE");
+      update_stats(vid, 0, user_info.os, user_info.device, "---", "NONE", "NONE", false, "NONE","NONE","NONE","NONE","NONE","NONE");
     }
   }
 
@@ -390,6 +430,8 @@ char * query() {
     result << "\n";
   }
 
+
+  */
 
   result_str << "ok\n";
   
