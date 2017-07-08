@@ -361,6 +361,7 @@ char * query() {
       for (auto it_s = it_i->second.begin(); it_s != it_i->second.end(); it_s++) {
 	auto it_3 = sku_category.find(it_s->first);
 	std::string category = "UNKNOWN";
+	if (it_3 != sku_category.end()) category = it_3->second;
 	sit->second.converters_category[category].insert(it->first);
       }
     }
@@ -368,12 +369,14 @@ char * query() {
     for (auto p = info.cart_skus.begin(); p != info.cart_skus.end(); p++) {
       auto it_3 = sku_category.find(*p);
       std::string category = "UNKNOWN";
+      if (it_3 != sku_category.end()) category = it_3->second;
       sit->second.carters_category[category].insert(it->first);
     }
     
     for (auto p = info.product_skus.begin(); p != info.product_skus.end(); p++) {
       auto it_3 = sku_category.find(*p);
       std::string category = "UNKNOWN";
+      if (it_3 != sku_category.end()) category = it_3->second;
       sit->second.producters_category[category].insert(it->first);
     }
     
