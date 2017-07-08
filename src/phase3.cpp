@@ -420,6 +420,8 @@ char * query() {
   for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
     result << "\t" << "PROD:" << *it;
   }
+
+  result << "\n";
   
   for (auto lit = stats.begin(); lit != stats.end(); lit++) {
     result << lit->first;
@@ -432,8 +434,9 @@ char * query() {
     for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
       result << "\t" << lit->second.producters_category[*it].size();
     }
+    result << "\n";
   }
-  result << "\n";
+  
 
 
 
