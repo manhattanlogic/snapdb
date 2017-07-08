@@ -359,8 +359,7 @@ char * query() {
   for (auto it = treated_users.begin(); it != treated_users.end(); it++) {
     auto info = get_user_info(it->first, it->second.rbegin()->first);
     if (!(info.is_valid)) continue;
-    std::string record_id = it->second.rbegin()->second.os + "\t" + it->second.rbegin()->second.device +
-      "\t" + device_to_device_type(it->second.rbegin()->second.os, it->second.rbegin()->second.device) + 
+    std::string record_id = device_to_device_type(it->second.rbegin()->second.os, it->second.rbegin()->second.device) + 
       "\t" + it->second.rbegin()->second.state + "\t" + it->second.rbegin()->second.weekday +
       "\t" + it->second.rbegin()->second.daytime + "\t" + std::to_string(std::min(it->second.size(), (unsigned long)5));
 
@@ -405,9 +404,9 @@ char * query() {
   }
 
 
-  result << "os\tdevice\tdevice_type\t";
+  result << "device_type\t";
   result << "state\tweekday\tdaytime\t";
-  result << "impressions\t";
+  result << "impressions";
 
   for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
     result << "\t" << "CONV:" << *it;
