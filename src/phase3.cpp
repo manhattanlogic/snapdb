@@ -55,7 +55,20 @@ std::string device_to_device_type(std::string os, std::string device) {
 
 struct stats_struct {
   std::unordered_set<unsigned long> users;
+  std::map<std::string, std::unordered_set<unsigned long> > converters_category;
+  std::map<std::string, std::unordered_set<unsigned long> > producters_category;
+  std::map<std::string, std::unordered_set<unsigned long> > carters_category;
+
+  
+  unsigned long viewed_items;
+  std::map<std::string, unsigned long> viewed_items_category;
+  
+  unsigned long cart_users;
+  std::map<std::string, unsigned long> cart_users_category;
+  
   unsigned long impressions;
+  
+  
   std::unordered_set<unsigned long> overstock_users;
   unsigned long overstock_impressions;
   std::unordered_set<unsigned long> converter_users;
@@ -82,8 +95,7 @@ struct stats_struct {
   unsigned long purchaed_items;
   std::map<std::string, unsigned long> purchaed_items_category;
 
-  unsigned long viewed_items;
-  std::map<std::string, unsigned long> viewed_items_category;
+  
   
 };
 
@@ -95,6 +107,9 @@ void update_stats(unsigned long vid, unsigned long ts, std::string os, std::stri
 		  std::string group, std::string creative, bool is_treated,
 		  std::string country, std::string state, std::string city, std::string metro, std::string weekday, std::string hour) {
 
+
+
+  
 
   /* group by state, weekday, hour */
   
@@ -205,16 +220,6 @@ struct tags_struct {
 
 
 
-// step 1
-// colect and assemble this data for the Impressions X OS dataset
-struct impression_summary_struct {
-  int num_impressions = 0; // # of impressions shown to the user
-  unsigned long ts = 0;    // time of the last impressions
-  std::string day_of_week; // for the last impression
-  std::string day_part;    // for the last impression
-};
-std::unordered_map<unsigned long, impression_summary_struct> impressions_summary;
-
 
 
 
@@ -247,16 +252,34 @@ tags_struct get_tags(std::string tags_in) {
 struct marginal_user_struct {
   std::string weekday;
   std::string daytime;
+  std::string state;
+  std::string os;
+  std::string device;
 };
 
 std::unordered_map<unsigned long, std::map<unsigned long, marginal_user_struct> > treated_users;
+
+std::string hour_transformer(std::string hour) {
+  int h = 0;
+  try {
+    h = std::stoul(hour);
+  } catch(...) {
+    std::cerr << "HOUR:" << hour << "\n";
+  }
+  if (h < 4) return  ("0-3:59");
+  if (h < 8) return  ("4-7:59");
+  if (h < 12) return ("8-11:59");
+  if (h < 16) return ("12-15:59");
+  if (h < 20) return ("16-19:59");
+  return ("20-23");
+}
 
 extern "C"
 char * query() {
   std::stringstream result_str;
   std::string line;
 
-  std::ofstream result("result_p3.csv");
+  std::ofstream result("result_phase_3.csv");
   
   std::ifstream sku_crumbs_file("sku_crumbs.csv");
   while (std::getline(sku_crumbs_file, line)) {
@@ -283,10 +306,14 @@ char * query() {
     auto parts = basic_split_string(line, "\t");
     unsigned long vid = std::stoul(parts[0]);
     unsigned long ts = std::stoul(parts[1]);
+
+    std::string os = parts[2];
+    std::string device = parts[3];
+    
     std::string country = parts[6];
     std::string state = parts[7];
-    std::string weekday = parts[9];
-    std::string dayhour = parts[9];
+    std::string weekday = parts[10];
+    std::string dayhour = hour_transformer(parts[11]);
 
     if (country != "US" || state == "") {
       // std::cerr << "loaction: " << country << " " << state << "\n";
@@ -302,12 +329,101 @@ char * query() {
       treated_users[vid] = {};
       it = treated_users.find(vid);
     }
-    it->second[ts] = {weekday, dayhour};
+    it->second[ts] = {weekday, dayhour, state, os, device};
     // std::cerr << "treated_users:" << treated_users.size() << "\n";
   }
 
   std::cerr << treated_users.size() << " impression users loaded\n";
 
+  for (auto it = treated_users.begin(); it != treated_users.end(); it++) {
+    auto info = get_user_info(it->first, it->second.rbegin()->first);
+    if (!(info.is_valid)) continue;
+    std::string record_id = it->second.rbegin()->second.os + "\t" + it->second.rbegin()->second.device +
+      "\t" + device_to_device_type(it->second.rbegin()->second.os, it->second.rbegin()->second.device) + 
+      "\t" + it->second.rbegin()->second.state + "\t" + it->second.rbegin()->second.weekday +
+      "\t" + it->second.rbegin()->second.daytime + "\t" + std::to_string(std::min(it->second.size(), (unsigned long)10));
+
+    auto sit = stats.find(record_id);
+
+    if (sit == stats.end()) {
+      stats_struct ss = {};
+      for (auto it_2 = top_categories.begin(); it_2 != top_categories.end(); it_2++) {
+	ss.converters_category[*it_2]    = {};
+	ss.producters_category[*it_2]         = {};
+	ss.carters_category[*it_2]          = {};
+      }
+      stats[record_id] = ss;
+      sit = stats.find(record_id);
+    }
+
+
+    for (auto it_i = info.invoices.begin(); it_i != info.invoices.end(); it_i++) {
+      for (auto it_s = it_i->second.begin(); it_s != it_i->second.end(); it_s++) {
+	auto it_3 = sku_category.find(it_s->first);
+	std::string category = "UNKNOWN";
+	sit->second.converters_category[category].insert(it->first);
+      }
+    }
+
+    for (auto p = info.cart_skus.begin(); p != info.cart_skus.end(); p++) {
+      auto it_3 = sku_category.find(*p);
+      std::string category = "UNKNOWN";
+      sit->second.carters_category[category].insert(it->first);
+    }
+    
+    for (auto p = info.product_skus.begin(); p != info.product_skus.end(); p++) {
+      auto it_3 = sku_category.find(*p);
+      std::string category = "UNKNOWN";
+      sit->second.producters_category[category].insert(it->first);
+    }
+    
+    
+  }
+
+
+  result << "os\tdevice\tdevice_type\t";
+  result << "state\tweekday\tdaytime\t";
+  result << "impressions\t";
+
+  for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+    result << "\t" << "CONV:" << *it;
+  }
+
+  for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+    result << "\t" << "CART:" << *it;
+  }
+
+  for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+    result << "\t" << "PROD:" << *it;
+  }
+  
+  for (auto lit = stats.begin(); lit != stats.end(); lit++) {
+    result << lit->first;
+    for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+      result << "\t" << lit->second.converters_category[*it].size();
+    }
+    for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+      result << "\t" << lit->second.carters_category[*it].size();
+    }
+    for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
+      result << "\t" << lit->second.producters_category[*it].size();
+    }
+  }
+  result << "\n";
+
+
+
+  
+  /*
+  std::unordered_set<unsigned long> users;
+  std::map<std::string, unsigned long> converters_category;
+  std::map<std::string, unsigned long> items_category;
+  std::map<std::string, unsigned long> cart_category;
+  */
+
+
+
+  
   /*
   
   std::unordered_set<unsigned long> impression_vids;

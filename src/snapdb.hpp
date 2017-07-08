@@ -96,12 +96,16 @@ struct user_info_struct {
   std::string device;
 };
 
-user_info_struct get_user_info(unsigned long vid) {
+user_info_struct get_user_info(unsigned long vid, unsigned long time_horizon = 0) {
   user_info_struct result;
   auto it = json_history.find(vid);
   if (it == json_history.end()) return result;
-  result.is_valid = true;
+  
   for (auto j = it->second->history.begin(); j != it->second->history.end(); j++) {
+    if (j->first < time_horizon) continue;
+    // it is now valid if there are events beyond the time horizon
+    result.is_valid = true;
+    
     if (j->second.events == NULL) continue;
     for (auto e = j->second.events->begin(); e != j->second.events->end(); e++) {
       if (!(e->ensighten.exists)) continue;
