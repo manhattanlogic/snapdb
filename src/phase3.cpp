@@ -319,7 +319,7 @@ char * query() {
     std::string country = parts[6];
     std::string state = parts[7];
     std::string weekday = parts[10];
-    std::string dayhour = hour_transformer(parts[11]);
+    
 
     
     
@@ -332,6 +332,8 @@ char * query() {
       continue;
     }
 
+    std::string dayhour = hour_transformer(parts[11]);
+    
     if (dayhour == "---") {
       std::cerr << country << " " << state << "\n";
       std::cerr << line << "\n";
