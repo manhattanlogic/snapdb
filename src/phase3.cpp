@@ -55,6 +55,7 @@ std::string device_to_device_type(std::string os, std::string device) {
 
 struct stats_struct {
   std::unordered_set<unsigned long> users;
+  unsigned long flat_users = 0;
   std::map<std::string, std::unordered_set<unsigned long> > converters_category;
   std::map<std::string, std::unordered_set<unsigned long> > producters_category;
   std::map<std::string, std::unordered_set<unsigned long> > carters_category;
@@ -277,6 +278,12 @@ std::string hour_transformer(std::string hour) {
 
 extern "C"
 char * query() {
+  /*
+   * - add unique users
+
+   */
+
+  
   std::stringstream result_str;
   std::string line;
 
@@ -371,11 +378,14 @@ char * query() {
 	ss.converters_category[*it_2]    = {};
 	ss.producters_category[*it_2]         = {};
 	ss.carters_category[*it_2]          = {};
+	ss.flat_users = 0;
       }
       stats[record_id] = ss;
       sit = stats.find(record_id);
     }
 
+    sit->second.flat_users += 1;
+    
 
     for (auto it_i = info.invoices.begin(); it_i != info.invoices.end(); it_i++) {
       for (auto it_s = it_i->second.begin(); it_s != it_i->second.end(); it_s++) {
@@ -406,7 +416,7 @@ char * query() {
 
   result << "device_type\t";
   result << "state\tweekday\tdaytime\t";
-  result << "impressions";
+  result << "impressions\tusers";
 
   for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
     result << "\t" << "CONV:" << *it;
@@ -424,6 +434,7 @@ char * query() {
   
   for (auto lit = stats.begin(); lit != stats.end(); lit++) {
     result << lit->first;
+    result << "\t" << lit->second.flat_users;
     for (auto it = top_categories.begin(); it != top_categories.end(); it++) {
       result << "\t" << lit->second.converters_category[*it].size();
     }
