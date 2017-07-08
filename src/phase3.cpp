@@ -311,7 +311,7 @@ char * query() {
       continue;
     }
     unsigned long vid = std::stoul(parts[0]);
-    unsigned long ts = std::stoul(parts[1]);
+    unsigned long ts = std::stoul(parts[1]) / 1000;
 
     std::string os = parts[2];
     std::string device = parts[3];
