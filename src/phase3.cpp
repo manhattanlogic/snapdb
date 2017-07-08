@@ -265,6 +265,7 @@ std::string hour_transformer(std::string hour) {
     h = std::stoul(hour);
   } catch(...) {
     std::cerr << "HOUR:" << hour << "\n";
+    return ("---");
   }
   if (h < 4) return  ("0-3:59");
   if (h < 8) return  ("4-7:59");
@@ -315,6 +316,10 @@ char * query() {
     std::string weekday = parts[10];
     std::string dayhour = hour_transformer(parts[11]);
 
+    if (dayhour == "---") {
+      std::cerr << line << "\n";
+    }
+    
     if (country != "US" || state == "") {
       // std::cerr << "loaction: " << country << " " << state << "\n";
       continue;
