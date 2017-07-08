@@ -305,6 +305,11 @@ char * query() {
   while (std::getline(imp_data, line)) {
     // if (linelimit-- <= 0) break;
     auto parts = basic_split_string(line, "\t");
+
+    if (parts.size() < 12) {
+      std::cerr << "===>" << parts.size() << line << "\n"; 
+      continue;
+    }
     unsigned long vid = std::stoul(parts[0]);
     unsigned long ts = std::stoul(parts[1]);
 
@@ -316,14 +321,23 @@ char * query() {
     std::string weekday = parts[10];
     std::string dayhour = hour_transformer(parts[11]);
 
-    if (dayhour == "---") {
-      std::cerr << line << "\n";
-    }
+    
     
     if (country != "US" || state == "") {
       // std::cerr << "loaction: " << country << " " << state << "\n";
       continue;
     }
+
+    if (state == "NONE") {
+      continue;
+    }
+
+    if (dayhour == "---") {
+      std::cerr << country << " " << state << "\n";
+      std::cerr << line << "\n";
+      continue;
+    }
+    
     auto info = get_user_info(vid);
     if (!(info.is_valid)) {
       // std::cerr << "OS\n";

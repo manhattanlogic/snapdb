@@ -34,11 +34,23 @@ std::string replace_all(
 
 std::vector<std::string> basic_split_string(std::string line, const char * sep = " ") {
   std::vector <std::string> result;
+
+  char *token, *string, *tofree;
+
+  tofree = string = strdup((char *)line.c_str());
+  while ((token = strsep(&string, sep)) != NULL) {
+    result.push_back(token);
+  }
+
+  free(tofree);
+
+  /*
   char * pch = strtok ((char *)line.c_str(), sep);
   while (pch != NULL) {
     result.push_back(pch);
     pch = strtok (NULL, sep);
   }
+  */
   return result;
 }
 
