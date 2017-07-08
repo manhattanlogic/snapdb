@@ -302,7 +302,7 @@ char * query() {
   std::ifstream imp_data("impressions_compact_v3.csv");
 
   while (std::getline(imp_data, line)) {
-    if (linelimit-- <= 0) break;
+    // if (linelimit-- <= 0) break;
     auto parts = basic_split_string(line, "\t");
     unsigned long vid = std::stoul(parts[0]);
     unsigned long ts = std::stoul(parts[1]);
@@ -341,7 +341,7 @@ char * query() {
     std::string record_id = it->second.rbegin()->second.os + "\t" + it->second.rbegin()->second.device +
       "\t" + device_to_device_type(it->second.rbegin()->second.os, it->second.rbegin()->second.device) + 
       "\t" + it->second.rbegin()->second.state + "\t" + it->second.rbegin()->second.weekday +
-      "\t" + it->second.rbegin()->second.daytime + "\t" + std::to_string(std::min(it->second.size(), (unsigned long)10));
+      "\t" + it->second.rbegin()->second.daytime + "\t" + std::to_string(std::min(it->second.size(), (unsigned long)5));
 
     auto sit = stats.find(record_id);
 
