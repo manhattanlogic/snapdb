@@ -20,7 +20,7 @@ WE NEED TO ADD:
  */
 
 
-bool first_impression = true;
+bool first_impression = false;
 
 
 std::string ts_to_time(unsigned long _tt) {
