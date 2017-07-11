@@ -258,6 +258,7 @@ struct marginal_user_struct {
   std::string state;
   std::string os;
   std::string device;
+  std::string channel;
 };
 
 std::unordered_map<unsigned long, std::map<unsigned long, marginal_user_struct> > treated_users;
@@ -332,6 +333,9 @@ char * query() {
 
     std::string os = parts[2];
     std::string device = parts[3];
+
+    std::string channel =  parts[4];
+
     
     std::string country = parts[6];
     std::string state = parts[7];
@@ -367,7 +371,7 @@ char * query() {
       treated_users[vid] = {};
       it = treated_users.find(vid);
     }
-    it->second[ts] = {weekday, dayhour, state, os, device};
+    it->second[ts] = {weekday, dayhour, state, os, device, channel};
     // std::cerr << "treated_users:" << treated_users.size() << "\n";
   }
 
@@ -376,9 +380,19 @@ char * query() {
   for (auto it = treated_users.begin(); it != treated_users.end(); it++) {
     auto info = get_user_info(it->first, first_impression ? it->second.begin()->first : it->second.rbegin()->first);
     if (!(info.is_valid)) continue;
-    std::string record_id = device_to_device_type(it->second.rbegin()->second.os, it->second.rbegin()->second.device) + 
-      "\t" + it->second.rbegin()->second.state + "\t" + it->second.rbegin()->second.weekday +
-      "\t" + it->second.rbegin()->second.daytime + "\t" + std::to_string(std::min(it->second.size(), (unsigned long)5));
+    std::string record_id;
+    if (first_impression) {
+      record_id = device_to_device_type(it->second.begin()->second.os, it->second.begin()->second.device) +
+	"\t" + it->second.begin()->second.channel +
+	"\t" + it->second.begin()->second.state + "\t" + it->second.begin()->second.weekday +
+	"\t" + it->second.begin()->second.daytime + "\t" + std::to_string(std::min(it->second.size(), (unsigned long)5));
+    } else {
+      record_id = device_to_device_type(it->second.rbegin()->second.os, it->second.rbegin()->second.device) +
+	"\t" + it->second.rbegin()->second.channel +
+	"\t" + it->second.rbegin()->second.state + "\t" + it->second.rbegin()->second.weekday +
+	"\t" + it->second.rbegin()->second.daytime + "\t" + std::to_string(std::min(it->second.size(), (unsigned long)5));
+    }
+    
 
     auto sit = stats.find(record_id);
 
