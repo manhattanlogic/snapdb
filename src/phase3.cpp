@@ -20,6 +20,8 @@ WE NEED TO ADD:
  */
 
 
+bool first_impression = true;
+
 
 std::string ts_to_time(unsigned long _tt) {
   unsigned long tt = _tt;
@@ -287,7 +289,15 @@ char * query() {
   std::stringstream result_str;
   std::string line;
 
-  std::ofstream result("result_phase_3.csv");
+  std::string output_file_name;
+  if (first_impression) {
+    output_file_name = "result_phase_3_first.csv";
+  } else {
+    output_file_name = "result_phase_3.csv";
+  }
+  
+  
+  std::ofstream result(output_file_name);
   
   std::ifstream sku_crumbs_file("sku_crumbs.csv");
   while (std::getline(sku_crumbs_file, line)) {
@@ -364,7 +374,7 @@ char * query() {
   std::cerr << treated_users.size() << " impression users loaded\n";
 
   for (auto it = treated_users.begin(); it != treated_users.end(); it++) {
-    auto info = get_user_info(it->first, it->second.rbegin()->first);
+    auto info = get_user_info(it->first, first_impression ? it->second.begin()->first : it->second.rbegin()->first);
     if (!(info.is_valid)) continue;
     std::string record_id = device_to_device_type(it->second.rbegin()->second.os, it->second.rbegin()->second.device) + 
       "\t" + it->second.rbegin()->second.state + "\t" + it->second.rbegin()->second.weekday +
