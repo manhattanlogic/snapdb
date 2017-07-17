@@ -380,13 +380,15 @@ char * query() {
   for (auto js = json_history.begin(); js != json_history.end(); js++) {
     //for (auto it = treated_users.begin(); it != treated_users.end(); it++) {
 
+    auto vid = js->first;
+    
     std::string channel = "NONE";
     std::string state = "NONE";
     std::string daytime = "NONE";
 
-    auto it = treated_users.find(js->first);
+    auto it = treated_users.find(vid);
 
-    auto info = get_user_info(js->first, 0);
+    auto info = get_user_info(vid, 0);
     if (!(info.is_valid)) continue;
     
     std::string record_id;
@@ -436,7 +438,7 @@ char * query() {
 	std::string category = "UNKNOWN";
 	if (it_3 != sku_category.end()) category = it_3->second;
 	
-	sit->second.converters_category[category].insert(it->first);
+	sit->second.converters_category[category].insert(vid);
       }
     }
 
@@ -444,14 +446,14 @@ char * query() {
       auto it_3 = sku_category.find(*p);
       std::string category = "UNKNOWN";
       if (it_3 != sku_category.end()) category = it_3->second;
-      sit->second.carters_category[category].insert(it->first);
+      sit->second.carters_category[category].insert(vid);
     }
     
     for (auto p = info.product_skus.begin(); p != info.product_skus.end(); p++) {
       auto it_3 = sku_category.find(*p);
       std::string category = "UNKNOWN";
       if (it_3 != sku_category.end()) category = it_3->second;
-      sit->second.producters_category[category].insert(it->first);
+      sit->second.producters_category[category].insert(vid);
     }
     
     
