@@ -6,7 +6,7 @@ INCLUDES= -I/usr/local/include
 
 
 
-DEBUG = -O3
+DEBUG = -g
 
 CXX = g++ $(DEBUG) -std=c++14
 CXXFLAGS = $(DEBUG)  $(INCLUDES)

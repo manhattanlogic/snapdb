@@ -162,7 +162,7 @@ void update_stats(unsigned long vid, unsigned long ts, std::string os, std::stri
     // std::cerr << "user_info.invoices.size():" << user_info.invoices.size() << "\n";
     
     if (user_info.invoices.size() > 0) {
-      std::cerr << user_info.invoices.begin()->first << "\n";
+      // std::cerr << user_info.invoices.begin()->first << "\n";
       if (is_treated) {
 	it->second.converter_impressions++;
       }
@@ -268,7 +268,7 @@ std::string hour_transformer(std::string hour) {
   try {
     h = std::stoul(hour);
   } catch(...) {
-    std::cerr << "HOUR:" << hour << "\n";
+    // std::cerr << "HOUR:" << hour << "\n";
     return ("---");
   }
   if (h < 4) return  ("0-3:59");
@@ -356,8 +356,8 @@ char * query() {
     std::string dayhour = hour_transformer(parts[11]);
     
     if (dayhour == "---") {
-      std::cerr << country << " " << state << "\n";
-      std::cerr << line << "\n";
+      // std::cerr << country << " " << state << "\n";
+      // std::cerr << line << "\n";
       continue;
     }
     
@@ -377,22 +377,40 @@ char * query() {
 
   std::cerr << treated_users.size() << " impression users loaded\n";
 
-  for (auto it = treated_users.begin(); it != treated_users.end(); it++) {
-    auto info = get_user_info(it->first, first_impression ? it->second.begin()->first : it->second.rbegin()->first);
+  for (auto js = json_history.begin(); js != json_history.end(); js++) {
+    //for (auto it = treated_users.begin(); it != treated_users.end(); it++) {
+
+    std::string channel = "NONE";
+    std::string state = "NONE";
+    std::string daytime = "NONE";
+
+    auto it = treated_users.find(js->first);
+
+    auto info = get_user_info(js->first, 0);
     if (!(info.is_valid)) continue;
-    std::string record_id;
-    if (first_impression) {
-      record_id = device_to_device_type(it->second.begin()->second.os, it->second.begin()->second.device) +
-	"\t" + it->second.begin()->second.channel +
-	"\t" + it->second.begin()->second.state + "\t" + it->second.begin()->second.weekday +
-	"\t" + it->second.begin()->second.daytime + "\t" + std::to_string(std::min(it->second.size(), (unsigned long)5));
-    } else {
-      record_id = device_to_device_type(it->second.rbegin()->second.os, it->second.rbegin()->second.device) +
-	"\t" + it->second.rbegin()->second.channel +
-	"\t" + it->second.rbegin()->second.state + "\t" + it->second.rbegin()->second.weekday +
-	"\t" + it->second.rbegin()->second.daytime + "\t" + std::to_string(std::min(it->second.size(), (unsigned long)5));
-    }
     
+    std::string record_id;
+    if (it != treated_users.end()) {
+      info = get_user_info(it->first, first_impression ? it->second.begin()->first : it->second.rbegin()->first);
+      if (!(info.is_valid)) continue;
+      
+      if (first_impression) {
+	record_id = device_to_device_type(it->second.begin()->second.os, it->second.begin()->second.device) +
+	  "\t" + it->second.begin()->second.channel +
+	  "\t" + it->second.begin()->second.state + "\t" + it->second.begin()->second.weekday +
+	  "\t" + it->second.begin()->second.daytime + "\t" + std::to_string(std::min(it->second.size(), (unsigned long)5));
+      } else {
+	record_id = device_to_device_type(it->second.rbegin()->second.os, it->second.rbegin()->second.device) +
+	  "\t" + it->second.rbegin()->second.channel +
+	  "\t" + it->second.rbegin()->second.state + "\t" + it->second.rbegin()->second.weekday +
+	  "\t" + it->second.rbegin()->second.daytime + "\t" + std::to_string(std::min(it->second.size(), (unsigned long)5));
+      }
+    } else {
+      record_id = std::string("NONE") +
+	"\tNONE" +
+	"\tNONE\tNONE" +
+	"\tNONE\t0";
+    }
 
     auto sit = stats.find(record_id);
 
@@ -409,13 +427,15 @@ char * query() {
     }
 
     sit->second.flat_users += 1;
-    
+
+    // std::cerr << "it->first:" << it->first << "\n";
 
     for (auto it_i = info.invoices.begin(); it_i != info.invoices.end(); it_i++) {
       for (auto it_s = it_i->second.begin(); it_s != it_i->second.end(); it_s++) {
 	auto it_3 = sku_category.find(it_s->first);
 	std::string category = "UNKNOWN";
 	if (it_3 != sku_category.end()) category = it_3->second;
+	
 	sit->second.converters_category[category].insert(it->first);
       }
     }
